@@ -4,7 +4,7 @@ const app = express();
 const server = http.Server(app);
 var fs = require('fs');
 var openApiURL = 'http://aiopen.etri.re.kr:8000/WiseASR/Recognition';
-var accessKey = config.apikey;
+var accessKey = '8356b229-c7b7-48ed-b085-be27df8632c7';
 var languageCode = 'korean';
 
 var request = require('request');
