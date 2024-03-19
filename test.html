@@ -9,7 +9,7 @@
     <script>
       document.addEventListener("DOMContentLoaded", function() {
         var socket = io();
-        
+	      <!-- test -->
         function sendMessage() {
           var message = document.getElementById('message').value;
           socket.emit('chat message', message);
