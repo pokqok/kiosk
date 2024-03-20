@@ -2,21 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Combined Features</title>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
         var socket = io();
-	      <!-- test -->
+
+        socket.on('jwt', function(token) {
+          sessionStorage.setItem('jwt', token);
+        });
+
         function sendMessage() {
-          var message = document.getElementById('message').value;
+          var message = document.getElementById('message').value.trim();
+          if (message === '') {
+            return;
+          }
           socket.emit('chat message', message);
-          document.getElementById('message').value = ''; // Clear the input after sending
+          document.getElementById('message').value = '';
         }
 
-        document.getElementById('sendButton').onclick = sendMessage;
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            fetch('/user', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success)
+                {
+                    // 음성 인식 결과를 HTML 페이지 내에 출력합니다.
+                    document.getElementById('resultText').textContent = data.data;
+                    document.getElementById('recognitionResult').style.display = 'block';
+                } else {
+                    document.getElementById('resultText').textContent = 'Error processing file.';
+                    document.getElementById('recognitionResult').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('resultText').textContent = 'Error submitting the form.';
+                document.getElementById('recognitionResult').style.display = 'block';
+            });
+        });
 
         socket.on('chat message', function(msg){
           var item = document.createElement('li');
@@ -29,19 +62,21 @@
 </head>
 <body>
 
-<!-- Form for file upload and number of speakers -->
 <form action="/user" enctype="multipart/form-data" method="post">
-  <div class="form-group">
-    <input type="file" class="form-control-file" name="uploaded_file">
-    <input type="text" class="form-control" placeholder="Number of speakers" name="nspeakers">
-    <input type="submit" value="Get me the stats!" class="btn btn-default">
+  <div>
+    <input type="file" name="uploaded_file" id="uploaded_file">
+    <input type="text" placeholder="Number of speakers" name="nspeakers" id="nspeakers">
+    <button type="submit">Upload and Analyze</button>
   </div>
 </form>
 
-<!-- Real-time chat interface -->
 <ul id="messages"></ul>
-<input id="message" autocomplete="off" />
-<button id="sendButton">Send</button>
+<input id="message" autocomplete="off"><button id="sendButton">Send</button>
+
+<!-- 결과를 표시할 영역 -->
+<div id="recognitionResult" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; display: none;">
+    <span id="resultText">No results yet.</span>
+</div>
 
 </body>
 </html>
