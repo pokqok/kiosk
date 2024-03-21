@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
   res.sendFile('test.html', { root: __dirname });
 });
 
-const jwtSecret = "YourSecretKeyHere";
+const jwtSecret = 'mysecret key';
 
 io.on('connection', (socket) => {
   console.log('A user connected');
