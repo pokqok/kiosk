@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>기능 총 통합</title>
+    <title>Integrated Features</title>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
@@ -34,9 +34,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                if(data.success)
-                {
-                    // 음성 인식 결과를 HTML 페이지 내에 출력합니다.
+                if(data.success) {
                     document.getElementById('resultText').textContent = data.data;
                     document.getElementById('recognitionResult').style.display = 'block';
                 } else {
@@ -51,7 +49,7 @@
             });
         });
 
-        socket.on('chat message', function(msg){
+        socket.on('chat message', function(msg) {
           var item = document.createElement('li');
           item.textContent = msg;
           document.getElementById('messages').appendChild(item);
@@ -61,6 +59,11 @@
     </script>
 </head>
 <body>
+
+
+</script>
+
+
 
 <form action="/user" enctype="multipart/form-data" method="post">
   <div>
@@ -73,7 +76,6 @@
 <ul id="messages"></ul>
 <input id="message" autocomplete="off"><button id="sendButton">Send</button>
 
-<!-- 결과를 표시할 영역 -->
 <div id="recognitionResult" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; display: none;">
     <span id="resultText">No results yet.</span>
 </div>
