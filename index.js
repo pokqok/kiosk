@@ -11,6 +11,9 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const axios = require('axios'); // 상단에 axios 모듈 추가
+
+
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -81,4 +84,32 @@ server.listen(PORT, () => {
 });
 
 
+app.post("/payments/verify", async (req, res) => {
+  const { imp_uid } = req.body; // 클라이언트로부터 전달받은 imp_uid
+
+  try {
+      // 1. 아임포트 Access Token 획득
+      const { data: { response: { access_token } } } = await axios.post("https://api.iamport.kr/users/getToken", {
+          imp_key: "2380114616885334", // 실제 아임포트 REST API 키로 변경해야 합니다.
+          imp_secret: "HOPSUHN0O3iTWQ30k26M6vcXE081OBblGD34gVQQ5sRMHahuI0jaunCDnbgypxcl9W4jrudKyHIoDW6y" // 실제 아임포트 REST API Secret으로 변경해야 합니다.
+      });
+
+      // 2. 결제 정보 조회
+      const { data: { response: paymentData } } = await axios.get(`https://api.iamport.kr/payments/${imp_uid}`, {
+          headers: { "Authorization": access_token }
+      });
+
+      // 3. 결제 상태 확인
+      if (paymentData.status === 'paid') {
+          // 결제가 성공적으로 완료된 경우
+          res.sendStatus(200);
+      } else {
+          // 결제가 성공적으로 처리되지 않은 경우
+          res.status(400).send("결제가 완료되지 않았습니다.");
+      }
+  } catch (error) {
+      console.error("결제 정보 검증 중 오류 발생:", error);
+      res.status(500).send("결제 정보 검증 중 오류가 발생했습니다.");
+  }
+});
 
