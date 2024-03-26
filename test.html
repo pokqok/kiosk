@@ -1,19 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- PortOne SDK -->
-  <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
-  
-  <script>
-    var IMP = window.IMP; // Import 라이브러리 초기화
-    IMP.init("imp03664607"); // 'imp03664607' 대신에 실제 사용하는 아임포트 가맹점 식별코드를 입력해야 합니다.
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrated Features</title>
+    <!-- External Libraries -->
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+<!-- File Upload Form -->
+<form action="/user" enctype="multipart/form-data" method="post">
+    <div>
+        <input type="file" name="uploaded_file" id="uploaded_file">
+        <input type="text" placeholder="Number of speakers" name="nspeakers" id="nspeakers">
+        <button type="submit">Upload and Analyze</button>
+    </div>
+</form>
+
+<!-- Messages List -->
+<ul id="messages"></ul>
+<!-- Message Input and Send Button -->
+<input id="message" autocomplete="off">
+<button id="sendButton">Send</button>
+
+<!-- Recognition Result Display -->
+<div id="recognitionResult" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; display: none;">
+    <span id="resultText">No results yet.</span>
+</div>
+
+<!-- Payment Button -->
+<button onclick="requestPay()">결제하기</button>
+
+<script>
+    var IMP = window.IMP; // Initialize Import library
+    IMP.init("imp03664607"); // Replace "imp03664607" with your actual Iamport merchant code.
 
     function requestPay() {
-        const merchantUid = "merchant_" + new Date().getTime(); // 고유 주문번호 생성
+        const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
 
         IMP.request_pay({
-            pg: "nice_v2",
-            pay_method: "kakaopay",
+            pg: "html5_inicis.INIpayTest",
+            //pay_method: "kakaopay",
             merchant_uid: merchantUid,
             name: "제발 되라",
             amount: 100,
@@ -22,68 +52,60 @@
             buyer_tel: "010-1234-5678",
             buyer_addr: "서울특별시 강남구 삼성동",
             buyer_postcode: "123-456",
-        }, async (rsp) => {
+        }, rsp => {
+            //이부분에서 문제 발생
+            //rsp.success 부분에서 오류
             if (rsp.success) {
-                try {
-                    const response = await axios.post('/payments/verify', {
+                console.log("성공");
+                axios({
+                    url: "http://192.168.56.1:3000/payments/verify",
+                    method: "post",
+                    headers: { "Content-Type": "application/json" },
+                    data: {
                         imp_uid: rsp.imp_uid,
-                        merchant_uid: merchantUid,
-                    });
-                    if(response.status === 200) {
-                        alert("결제가 성공적으로 완료되었습니다.");
-                    } else {
-                        alert("결제 검증에 실패했습니다.");
+                        merchant_uid: rsp.merchant_uid
                     }
-                } catch (error) {
-                    console.error("결제 검증 요청 실패:", error);
-                    alert("결제 검증 과정에서 오류가 발생했습니다.");
-                }
+                }).then((data) => {
+                    console.log("성공");
+                    // Logic for successful server payment API call
+                })
             } else {
-                alert(`결제에 실패하였습니다. 돈은 빠져 나감 에러 내용: ${rsp.error_msg}`);
+                alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
             }
         });
     }
 </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integrated Features</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
         var socket = io();
 
         socket.on('jwt', function(token) {
-          sessionStorage.setItem('jwt', token);
+            sessionStorage.setItem('jwt', token);
         });
 
         function sendMessage() {
-          var message = document.getElementById('message').value.trim();
-          if (message === '') {
-            return;
-          }
-          socket.emit('chat message', message);
-          document.getElementById('message').value = '';
+            var message = document.getElementById('message').value.trim();
+            if (message === '') return;
+            
+            socket.emit('chat message', message);
+            document.getElementById('message').value = '';
         }
 
         document.getElementById('sendButton').addEventListener('click', sendMessage);
 
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
-
             var formData = new FormData(this);
+
             fetch('/user', {
                 method: 'POST',
                 body: formData,
             })
             .then(response => response.json())
             .then(data => {
-                if(data.success) {
-                    document.getElementById('resultText').textContent = data.data;
-                    document.getElementById('recognitionResult').style.display = 'block';
-                } else {
-                    document.getElementById('resultText').textContent = 'Error processing file.';
-                    document.getElementById('recognitionResult').style.display = 'block';
-                }
+                document.getElementById('resultText').textContent = data.success ? data.data : 'Error processing file.';
+                document.getElementById('recognitionResult').style.display = 'block';
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -93,34 +115,13 @@
         });
 
         socket.on('chat message', function(msg) {
-          var item = document.createElement('li');
-          item.textContent = msg;
-          document.getElementById('messages').appendChild(item);
-          window.scrollTo(0, document.body.scrollHeight);
+            var item = document.createElement('li');
+            item.textContent = msg;
+            document.getElementById('messages').appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
         });
-      });
-    </script>
-  
-    
-</head>
-<body>
-<form action="/user" enctype="multipart/form-data" method="post">
-  <div>
-    <input type="file" name="uploaded_file" id="uploaded_file">
-    <input type="text" placeholder="Number of speakers" name="nspeakers" id="nspeakers">
-    <button type="submit">Upload and Analyze</button>
-  </div>
-</form>
-
-<ul id="messages"></ul>
-<input id="message" autocomplete="off"><button id="sendButton">Send</button>
-
-<div id="recognitionResult" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; display: none;">
-    <span id="resultText">No results yet.</span>
-</div>
-
-<button onclick="requestPay()">결제하기</button>
-    <!-- 결제하기 버튼 생성 -->
+    });
+</script>
 
 </body>
 </html>

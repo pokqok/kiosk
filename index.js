@@ -11,8 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const axios = require('axios'); // 상단에 axios 모듈 추가
-
+//const axios = require('axios'); // 상단에 axios 모듈 추가
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -102,6 +101,7 @@ app.post("/payments/verify", async (req, res) => {
       // 3. 결제 상태 확인
       if (paymentData.status === 'paid') {
           // 결제가 성공적으로 완료된 경우
+          console.log("결제 성공");
           res.sendStatus(200);
       } else {
           // 결제가 성공적으로 처리되지 않은 경우
