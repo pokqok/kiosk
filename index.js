@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-//const axios = require('axios'); // 상단에 axios 모듈 추가
+const axios = require('axios'); // 상단에 axios 모듈 추가
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -77,12 +77,7 @@ app.post('/user', upload.single('uploaded_file'), function (req, res) {
   });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
-
-
+//이쪽에서 문제 발생
 app.post("/payments/verify", async (req, res) => {
   const { imp_uid } = req.body; // 클라이언트로부터 전달받은 imp_uid
 
@@ -113,3 +108,7 @@ app.post("/payments/verify", async (req, res) => {
   }
 });
 
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

@@ -40,10 +40,10 @@
 
     function requestPay() {
         const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-
+        
         IMP.request_pay({
             pg: "html5_inicis.INIpayTest",
-            //pay_method: "kakaopay",
+           // pay_method: "kakaopay",
             merchant_uid: merchantUid,
             name: "제발 되라",
             amount: 100,
@@ -53,8 +53,6 @@
             buyer_addr: "서울특별시 강남구 삼성동",
             buyer_postcode: "123-456",
         }, rsp => {
-            //이부분에서 문제 발생
-            //rsp.success 부분에서 오류
             if (rsp.success) {
                 console.log("성공");
                 axios({
