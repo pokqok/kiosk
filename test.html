@@ -2,46 +2,124 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Combined Features</title>
+    <title>Integrated Features</title>
+    <!-- External Libraries -->
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        var socket = io();
-	      <!-- test -->
-        function sendMessage() {
-          var message = document.getElementById('message').value;
-          socket.emit('chat message', message);
-          document.getElementById('message').value = ''; // Clear the input after sending
-        }
-
-        document.getElementById('sendButton').onclick = sendMessage;
-
-        socket.on('chat message', function(msg){
-          var item = document.createElement('li');
-          item.textContent = msg;
-          document.getElementById('messages').appendChild(item);
-          window.scrollTo(0, document.body.scrollHeight);
-        });
-      });
-    </script>
 </head>
 <body>
 
-<!-- Form for file upload and number of speakers -->
+<!-- File Upload Form -->
 <form action="/user" enctype="multipart/form-data" method="post">
-  <div class="form-group">
-    <input type="file" class="form-control-file" name="uploaded_file">
-    <input type="text" class="form-control" placeholder="Number of speakers" name="nspeakers">
-    <input type="submit" value="Get me the stats!" class="btn btn-default">
-  </div>
+    <div>
+        <input type="file" name="uploaded_file" id="uploaded_file">
+        <input type="text" placeholder="Number of speakers" name="nspeakers" id="nspeakers">
+        <button type="submit">Upload and Analyze</button>
+    </div>
 </form>
 
-<!-- Real-time chat interface -->
+<!-- Messages List -->
 <ul id="messages"></ul>
-<input id="message" autocomplete="off" />
+<!-- Message Input and Send Button -->
+<input id="message" autocomplete="off">
 <button id="sendButton">Send</button>
+
+<!-- Recognition Result Display -->
+<div id="recognitionResult" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; display: none;">
+    <span id="resultText">No results yet.</span>
+</div>
+
+<!-- Payment Button -->
+<button onclick="requestPay()">결제하기</button>
+
+<script>
+    var IMP = window.IMP; // Initialize Import library
+    IMP.init("imp03664607"); // Replace "imp03664607" with your actual Iamport merchant code.
+
+    function requestPay() {
+        const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
+        
+        IMP.request_pay({
+            pg: "html5_inicis.INIpayTest",
+           // pay_method: "kakaopay",
+            merchant_uid: merchantUid,
+            name: "제발 되라",
+            amount: 100,
+            buyer_email: "Iamport@chai.finance",
+            buyer_name: "포트원 기술지원팀",
+            buyer_tel: "010-1234-5678",
+            buyer_addr: "서울특별시 강남구 삼성동",
+            buyer_postcode: "123-456",
+        }, rsp => {
+            if (rsp.success) {
+                console.log("성공");
+                axios({
+                    url: "http://192.168.56.1:3000/payments/verify",
+                    method: "post",
+                    headers: { "Content-Type": "application/json" },
+                    data: {
+                        imp_uid: rsp.imp_uid,
+                        merchant_uid: rsp.merchant_uid
+                    }
+                }).then((data) => {
+                    console.log("성공");
+                    // Logic for successful server payment API call
+                })
+            } else {
+                alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
+            }
+        });
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var socket = io();
+
+        socket.on('jwt', function(token) {
+            sessionStorage.setItem('jwt', token);
+        });
+
+        function sendMessage() {
+            var message = document.getElementById('message').value.trim();
+            if (message === '') return;
+            
+            socket.emit('chat message', message);
+            document.getElementById('message').value = '';
+        }
+
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            fetch('/user', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('resultText').textContent = data.success ? data.data : 'Error processing file.';
+                document.getElementById('recognitionResult').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('resultText').textContent = 'Error submitting the form.';
+                document.getElementById('recognitionResult').style.display = 'block';
+            });
+        });
+
+        socket.on('chat message', function(msg) {
+            var item = document.createElement('li');
+            item.textContent = msg;
+            document.getElementById('messages').appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    });
+</script>
 
 </body>
 </html>
