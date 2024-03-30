@@ -5,6 +5,8 @@ const fs = require('fs');
 const request = require('request');
 const multer = require('multer');
 const bodyParser = require('body-parser');
+const path = require('path');
+const exp = require("constants");
 
 const app = express();
 const server = http.createServer(app);
@@ -15,14 +17,17 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 var upload = multer({ dest: __dirname });
 
+// Vue.js 빌드 결과물을 제공하는 미들웨어 설정
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
+
 // ETRI Open API 관련 설정
 var openApiURL = 'http://aiopen.etri.re.kr:8000/WiseASR/Recognition';
 var accessKey = '8356b229-c7b7-48ed-b085-be27df8632c7';
 var languageCode = 'korean';
 
-app.get('/', (req, res) => {
-  // 루트 경로 요청 시 test.html 파일 전송
-  res.sendFile('test.html', { root: (__dirname) });
+// http 요청 들어오면 frontend/dist/index.html 제공
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
 });
 
 io.on('connection', (socket) => {
