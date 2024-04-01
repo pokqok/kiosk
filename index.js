@@ -31,6 +31,7 @@ var languageCode = 'korean';
 // http 요청 들어오면 frontend/dist/index.html 제공
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
+});
 app.get('/', (req, res) => {
   res.sendFile('test.html', { root: __dirname });
 });
@@ -138,9 +139,4 @@ const PORT = process.env.PORT || 3000; // 포트 번호 설정
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 
-});
-
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
 });
