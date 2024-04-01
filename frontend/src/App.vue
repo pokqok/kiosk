@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div v-if="showTest">
     <!-- File Upload Form -->
     <form @submit.prevent="uploadFile">
       <div>
         <input type="file" name="uploaded_file" id="uploaded_file" @change="handleFileUpload">
         <input type="text" placeholder="Number of speakers" v-model="nspeakers">
         <button type="submit">Upload and Analyze</button>
+        <AudioRecord/>
       </div>
     </form>
 
@@ -22,25 +23,25 @@
       <span>{{ resultText }}</span>
     </div>
 
-    <!-- 상품 이름 입력 -->
-    <input type="text" v-model="productName" placeholder="상품 이름">
-
-    <!-- 상품 금액 입력 -->
-    <input type="number" v-model="productAmount" placeholder="상품 금액">
-
-    <!-- 결제하기 버튼 -->
-    <button @click="requestPayKakao" :disabled="productAmount < 100">카카오페이</button>
-    <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>
-    <button @click="requestPay" :disabled="productAmount < 100">일반결제</button>
-
+    <!-- Payment Button -->
+    <button @click="requestPay">결제하기</button>
   </div>
+
+  <button @click="showTest=true">Test Open</button>
+  <RouterLink to="/login"> <button>go UI</button> </RouterLink>
+  <RouterView></RouterView>
 </template>
 
 <script>
 import io from 'socket.io-client';
 import axios from 'axios';
+
 export default {
   name: 'App',
+
+  components: {
+    AudioRecord
+  },
 
   data() {
     return {
@@ -51,8 +52,6 @@ export default {
       resultText: '',
       showResult: false,
       IMP: window.IMP,
-      productName: '', 
-      productAmount: 0, 
     };
   },
 
@@ -222,7 +221,7 @@ export default {
           this.resultText = 'Error submitting the form.';
           this.showResult = true;
         });
-    }
+    },
   }
 };
 </script>
