@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="showTest">
     <!-- File Upload Form -->
     <form @submit.prevent="uploadFile">
       <div>
@@ -25,7 +25,12 @@
 
     <!-- Payment Button -->
     <button @click="requestPay">결제하기</button>
+    <button @click="showTest=false">Test Close</button>
   </div>
+
+  <button @click="showTest=true">Test Open</button>
+  <RouterLink to="/login"> <button>go UI</button> </RouterLink>
+  <RouterView></RouterView>
 </template>
 
 <script>
@@ -49,6 +54,7 @@ export default {
       resultText: '',
       showResult: false,
       IMP: window.IMP,
+      showTest: false,
     };
   },
 
@@ -137,7 +143,7 @@ export default {
           this.resultText = 'Error submitting the form.';
           this.showResult = true;
         });
-    }
+    },
   }
 };
 </script>
