@@ -7,17 +7,17 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 const path = require('path');
 const jwt = require('jsonwebtoken');
-
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-
 const axios = require('axios');
+
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var upload = multer({ dest: __dirname });
+
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
@@ -27,9 +27,12 @@ var openApiURL = 'http://aiopen.etri.re.kr:8000/WiseASR/Recognition';
 var accessKey = '8356b229-c7b7-48ed-b085-be27df8632c7';
 var languageCode = 'korean';
 
+
 // http 요청 들어오면 frontend/dist/index.html 제공
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
+app.get('/', (req, res) => {
+  res.sendFile('test.html', { root: __dirname });
 });
 
 const jwtSecret = 'mysecret key';
@@ -81,6 +84,7 @@ app.post('/user', upload.single('uploaded_file'), function (req, res) {
         }
         fs.unlinkSync(audioFilePath); // Ensure the file is deleted after processing
     });
+
 });
 
 //이쪽에서 문제 발생
@@ -117,4 +121,10 @@ app.post("/payments/verify", async (req, res) => {
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
