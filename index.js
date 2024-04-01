@@ -119,7 +119,29 @@ app.post("/payments/verify", async (req, res) => {
     }
 });
 
+//오디오 녹음 받기
+app.post('/upload', upload.single('audio'), (req, res) => {
+    const audioFile = req.file;
+    const tempPath = audioFile.path;
+    const targetPath = `uploads/${audioFile.originalname}`;
+  
+    fs.rename(tempPath, targetPath, err => {
+      if (err) {
+        console.error('Error moving file:', err);
+        return res.status(500).send('Error uploading file');
+      }
+      res.send('File uploaded successfully');
+    });
+  });
+//////
+
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
