@@ -6,6 +6,7 @@
         <input type="file" name="uploaded_file" id="uploaded_file" @change="handleFileUpload">
         <input type="text" placeholder="Number of speakers" v-model="nspeakers">
         <button type="submit">Upload and Analyze</button>
+        <AudioRecord/>
       </div>
     </form>
 
@@ -30,9 +31,14 @@
 <script>
 import io from 'socket.io-client';
 import axios from 'axios';
+import AudioRecord from './components/record.vue';
 
 export default {
   name: 'App',
+
+  components: {
+    AudioRecord
+  },
 
   data() {
     return {
