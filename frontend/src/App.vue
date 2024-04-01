@@ -31,9 +31,9 @@
       <input type="text" v-model="productName" placeholder="상품 이름">
       <!-- 상품 금액 입력 -->
       <input type="number" v-model="productAmount" placeholder="상품 금액">
-      <button @click="requestPay">일반결제</button>
-      <button @click="requestPayKakao">카카오페이</button>
-      <button @click="requestPayToss">토스페이</button>
+      <button @click="requestPay" :disabled="productAmount < 100">결제하기</button>
+      <button @click="requestPayKakao" :disabled="productAmount < 100">카카오페이</button>
+      <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>
     </div>
   </div>
 
@@ -64,6 +64,8 @@ export default {
       showResult: false,
       IMP: window.IMP,
       showTest: false,
+      productName: '', 
+      productAmount: 0, 
     };
   },
 
@@ -95,8 +97,8 @@ export default {
         pg: "html5_inicis.INIpayTest",
         // pay_method: "kakaopay", 카카오페이만을 결제 수단으로 한다면 추가. 여러가지 존재 가능
         merchant_uid: merchantUid,
-        name: "제발 되라",
-        amount: 100,
+        name: this.productName,
+        amount: this.productAmount,
         buyer_email: "Iamport@chai.finance",
         buyer_name: "포트원 기술지원팀",
         buyer_tel: "010-1234-5678",
@@ -106,7 +108,7 @@ export default {
         if (rsp.success) {
           console.log("성공");
           axios({
-            url: "http://192.168.56.1:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+            url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
             method: "post",
             headers: { "Content-Type": "application/json" },
             data: {
@@ -130,8 +132,8 @@ export default {
         pg: "html5_inicis.INIpayTest",
         pay_method: "kakaopay",
         merchant_uid: merchantUid,
-        name: "제발 되라",
-        amount: 100,
+        name: this.productName,
+        amount: this.productAmount,
         buyer_email: "Iamport@chai.finance",
         buyer_name: "포트원 기술지원팀",
         buyer_tel: "010-1234-5678",
@@ -141,7 +143,7 @@ export default {
         if (rsp.success) {
           console.log("성공");
           axios({
-            url: "http://192.168.56.1:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+            url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
             method: "post",
             headers: { "Content-Type": "application/json" },
             data: {
@@ -165,8 +167,8 @@ export default {
         pg: "html5_inicis.INIpayTest",
         pay_method: "tosspay", 
         merchant_uid: merchantUid,
-        name: "제발 되라",
-        amount: 100,
+        name: this.productName,
+        amount: this.productAmount,
         buyer_email: "Iamport@chai.finance",
         buyer_name: "포트원 기술지원팀",
         buyer_tel: "010-1234-5678",
@@ -176,7 +178,7 @@ export default {
         if (rsp.success) {
           console.log("성공");
           axios({
-            url: "http://192.168.56.1:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+            url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
             method: "post",
             headers: { "Content-Type": "application/json" },
             data: {
@@ -236,4 +238,16 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+
+/* 위에서 제공된 CSS 코드를 여기에 추가 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 </style>
