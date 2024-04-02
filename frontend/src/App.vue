@@ -224,7 +224,7 @@ export default {
           this.resultText = 'Error submitting the form.';
           this.showResult = true;
         });
-    },
+    }
   }
 };
 </script>
