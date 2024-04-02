@@ -224,33 +224,9 @@ export default {
           this.resultText = 'Error submitting the form.';
           this.showResult = true;
         });
-    },
-    login() {
-      axios.post('/login', {
-        username: this.username, // 사용자가 입력한 사용자 이름
-        password: this.password,  // 사용자가 입력한 비밀번호\
-      })
-      .then(response => {
-        if (response.data.success) {
-          sessionStorage.setItem('jwt', response.data.token);
-          alert('로그인 완료'); // 로그인 성공 알림 추가
-          // 로그인 성공 후의 처리, 예: 관리자 페이지로 리다이렉트
-         } else {
-            alert('로그인 실패')
-          }
-        })
-        .catch(error => {
-          console.error('로그인 요청 실패:', error);
-          alert('로그인 처리 중 오류가 발생했습니다.'); // 에러 처리 추가
-        });
-      }
+    }
   }
 };
-
-//로그인 세션 관련
-
-
-
 </script>
 
 <style>
