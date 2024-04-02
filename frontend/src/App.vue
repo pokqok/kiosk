@@ -23,8 +23,18 @@
       <span>{{ resultText }}</span>
     </div>
 
-    <!-- Payment Button -->
-    <button @click="requestPay">결제하기</button>
+    
+    <button @click="showTest=false">Test Close</button>
+
+    <div>
+      <!-- 상품 이름 입력 -->
+      <input type="text" v-model="productName" placeholder="상품 이름">
+      <!-- 상품 금액 입력 -->
+      <input type="number" v-model="productAmount" placeholder="상품 금액">
+      <button @click="requestPay" :disabled="productAmount < 100">결제하기</button>
+      <button @click="requestPayKakao" :disabled="productAmount < 100">카카오페이</button>
+      <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>
+    </div>
   </div>
 
   <button @click="showTest=true">Test Open</button>
@@ -35,6 +45,7 @@
 <script>
 import io from 'socket.io-client';
 import axios from 'axios';
+import AudioRecord from './components/record.vue';
 
 export default {
   name: 'App',
@@ -47,11 +58,14 @@ export default {
     return {
       message: '',
       messages: [],
-      file: null, 
+      file: null, // 파일 상태를 null로 초기화
       numSpeakers: 0,
       resultText: '',
       showResult: false,
       IMP: window.IMP,
+      showTest: false,
+      productName: '', 
+      productAmount: 0, 
     };
   },
 
@@ -76,19 +90,15 @@ export default {
       this.socket = socket;
     },
     
-    requestPayKakao() {
-      if (this.productAmount < 100) {
-        alert("결제 금액이 100원 미만입니다.");
-        return; // 함수를 여기서 종료
-      }
+    requestPay() {
       const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
 
       this.IMP.request_pay({
         pg: "html5_inicis.INIpayTest",
-        pay_method: "kakaopay",
+        // pay_method: "kakaopay", 카카오페이만을 결제 수단으로 한다면 추가. 여러가지 존재 가능
         merchant_uid: merchantUid,
-        name: this.productName, 
-        amount: this.productAmount, 
+        name: this.productName,
+        amount: this.productAmount,
         buyer_email: "Iamport@chai.finance",
         buyer_name: "포트원 기술지원팀",
         buyer_tel: "010-1234-5678",
@@ -98,7 +108,42 @@ export default {
         if (rsp.success) {
           console.log("성공");
           axios({
-            url: "http://192.168.56.1:3000/payments/verify",
+            url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            data: {
+              imp_uid: rsp.imp_uid,
+              merchant_uid: rsp.merchant_uid
+            }
+          }).then(() => {
+            console.log("성공");
+            alert("결제가 완료되었습니다.");
+          })
+        } else {
+          alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
+        }
+      });
+    },
+
+    requestPayKakao() {
+      const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
+
+      this.IMP.request_pay({
+        pg: "html5_inicis.INIpayTest",
+        pay_method: "kakaopay",
+        merchant_uid: merchantUid,
+        name: this.productName,
+        amount: this.productAmount,
+        buyer_email: "Iamport@chai.finance",
+        buyer_name: "포트원 기술지원팀",
+        buyer_tel: "010-1234-5678",
+        buyer_addr: "서울특별시 강남구 삼성동",
+        buyer_postcode: "123-456",
+      }, rsp => {
+        if (rsp.success) {
+          console.log("성공");
+          axios({
+            url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
             method: "post",
             headers: { "Content-Type": "application/json" },
             data: {
@@ -116,18 +161,14 @@ export default {
     },
 
     requestPayToss() {
-      if (this.productAmount < 100) {
-        alert("결제 금액이 100원 미만입니다.");
-        return; // 함수를 여기서 종료
-      }
       const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
 
       this.IMP.request_pay({
         pg: "html5_inicis.INIpayTest",
-        pay_method: "tosspay",
+        pay_method: "tosspay", 
         merchant_uid: merchantUid,
-        name: this.productName, // 사용자가 입력한 상품 이름 사용
-        amount: this.productAmount, // 사용자가 입력한 금액 사용
+        name: this.productName,
+        amount: this.productAmount,
         buyer_email: "Iamport@chai.finance",
         buyer_name: "포트원 기술지원팀",
         buyer_tel: "010-1234-5678",
@@ -137,45 +178,7 @@ export default {
         if (rsp.success) {
           console.log("성공");
           axios({
-            url: "http://192.168.56.1:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-            data: {
-              imp_uid: rsp.imp_uid,
-              merchant_uid: rsp.merchant_uid
-            }
-          }).then(() => {
-            console.log("성공");
-            alert("결제가 완료되었습니다.");
-          })
-        } else {
-          alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
-        }
-      });
-    },
-
-    requestPay() {
-      if (this.productAmount < 100) {
-        alert("결제 금액이 100원 미만입니다.");
-        return; 
-      }
-      const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-
-      this.IMP.request_pay({
-        pg: "html5_inicis.INIpayTest",
-        merchant_uid: merchantUid,
-        name: this.productName, // 사용자가 입력한 상품 이름 사용
-        amount: this.productAmount, // 사용자가 입력한 금액 사용
-        buyer_email: "Iamport@chai.finance",
-        buyer_name: "포트원 기술지원팀",
-        buyer_tel: "010-1234-5678",
-        buyer_addr: "서울특별시 강남구 삼성동",
-        buyer_postcode: "123-456",
-      }, rsp => {
-        if (rsp.success) {
-          console.log("성공");
-          axios({
-            url: "http://192.168.56.1:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+            url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
             method: "post",
             headers: { "Content-Type": "application/json" },
             data: {
@@ -221,7 +224,7 @@ export default {
           this.resultText = 'Error submitting the form.';
           this.showResult = true;
         });
-    },
+    }
   }
 };
 </script>
@@ -235,15 +238,16 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
 
-  input[type="number"] {
-    -moz-appearance: textfield;
-  }
+/* 위에서 제공된 CSS 코드를 여기에 추가 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
+input[type="number"] {
+  -moz-appearance: textfield;
+}
 
 </style>
