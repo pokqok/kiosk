@@ -43,7 +43,7 @@ export default {
             console.log("LOGIN SUCCESS");
             alert('로그인 완료되었습니다.');
           // 관리자 페이지로 이동
-            this.$router.push('/'); // 이동할 페이지 위치
+            this.$router.push('/admin'); // 이동할 페이지 위치
         } else {
           alert('로그인 실패: ' + response.data.message);
         }
