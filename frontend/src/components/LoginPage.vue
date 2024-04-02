@@ -24,11 +24,33 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
     name: 'LoginPage',
     data() {
         return {
-
+            userId: '', // 사용자 ID
+            password: '', // 사용자 비밀번호
+        }
+    },
+    methods: {
+        async login() {
+            console.log("Logging in with:", this.userId, this.password);
+            try {
+                const response = await axios.post('/login', { // 로그인 요청 주소
+                    username: this.userId,
+                    password: this.password,
+                });
+                if (response.data.success) {
+                    alert('로그인 완료');
+                    // 로그인 성공 후의 처리. 예: 메인 페이지로 리다이렉트
+                    this.$router.push('/main'); // 예시, 실제 라우트 경로에 맞게 수정해야 함
+                } else {
+                    alert('로그인 실패: ' + response.data.message);
+                }
+            } catch (error) {
+                alert('로그인 요청 실패: ' + error);
+            }
         }
     }
 }
