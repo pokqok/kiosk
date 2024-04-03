@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="login-page">
     <img v-if="$route.params.mode == 'shop'" src="../assets/logo.png">
     <img v-if="$route.params.mode == 'admin'" src="../assets/admin.png">
 
@@ -21,9 +21,9 @@
     <div>
       <button type="button" class="btn btn-success" @click="login">Login</button>
     </div>
-  </div>
 
-  <button @click="goToRootPage">메인 페이지로 돌아가기</button>
+    <button @click="goToRootPage">메인 페이지로 돌아가기</button>
+  </div>
 </template>
 
 <script>
@@ -83,8 +83,7 @@ export default {
 </script>
 
 <style>
-/* .login {
-    margin-left: 30%;
-    margin-right: 30%;
-} */
+.login-page {
+  margin-top: 60px;
+}
 </style>

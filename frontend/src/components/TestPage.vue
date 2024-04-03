@@ -1,37 +1,39 @@
 <template>
-    <!-- File Upload Form -->
-    <form @submit.prevent="uploadFile">
-        <div>
-            <input type="file" name="uploaded_file" id="uploaded_file" @change="handleFileUpload($event)">
-            <input type="text" placeholder="Number of speakers" @change="handleNumSpeakers($event)">
-            <button type="submit">Upload and Analyze</button>
-            <AudioRecord />
+    <div class="test-page">
+        <!-- File Upload Form -->
+        <form @submit.prevent="uploadFile">
+            <div>
+                <input type="file" name="uploaded_file" id="uploaded_file" @change="handleFileUpload($event)">
+                <input type="text" placeholder="Number of speakers" @change="handleNumSpeakers($event)">
+                <button type="submit">Upload and Analyze</button>
+                <AudioRecord />
+            </div>
+        </form>
+
+        <ul>
+            <li v-for="msg in messages" :key="msg">{{ msg }}</li>
+        </ul>
+        <!-- Message Input and Send Button -->
+        <input v-model="message" autocomplete="off">
+        <button @click="sendMessage">Send</button>
+
+        <!-- Recognition Result Display -->
+        <div v-if="showResult" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
+            <span>{{ resultText }}</span>
         </div>
-    </form>
 
-    <ul>
-        <li v-for="msg in messages" :key="msg">{{ msg }}</li>
-    </ul>
-    <!-- Message Input and Send Button -->
-    <input v-model="message" autocomplete="off">
-    <button @click="sendMessage">Send</button>
+        <div>
+            <!-- 상품 이름 입력 -->
+            <input type="text" @change="handleProductName" placeholder="상품 이름">
+            <!-- 상품 금액 입력 -->
+            <input type="number" @change="handleProductAmount" placeholder="상품 금액">
+            <button @click="requestPay" :disabled="productAmount < 100">결제하기</button>
+            <button @click="requestPayKakao" :disabled="productAmount < 100">카카오페이</button>
+            <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>
+        </div>
 
-    <!-- Recognition Result Display -->
-    <div v-if="showResult" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
-        <span>{{ resultText }}</span>
+        <button @click="goToRootPage">메인 페이지로 돌아가기</button>
     </div>
-
-    <div>
-        <!-- 상품 이름 입력 -->
-        <input type="text" @change="handleProductName" placeholder="상품 이름">
-        <!-- 상품 금액 입력 -->
-        <input type="number" @change="handleProductAmount" placeholder="상품 금액">
-        <button @click="requestPay" :disabled="productAmount < 100">결제하기</button>
-        <button @click="requestPayKakao" :disabled="productAmount < 100">카카오페이</button>
-        <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>
-    </div>
-
-    <button @click="goToRootPage">메인 페이지로 돌아가기</button>
 </template>
 
 <script>
@@ -232,4 +234,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+.test-page {
+    margin-top: 60px;
+}
+</style>

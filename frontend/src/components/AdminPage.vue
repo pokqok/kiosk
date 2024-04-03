@@ -21,6 +21,6 @@ export default {
 <!-- 스타일 (필요에 따라 추가) -->
 <style>
 .admin-page {
-  /* 스타일링 */
+  margin-top: 60px;
 }
 </style>
