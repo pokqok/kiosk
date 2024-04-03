@@ -20,6 +20,8 @@
             <button type="button" class="btn btn-success" @click="login">Login</button>
         </div>
     </div>
+
+    <button @click="goToRootPage">메인 페이지로 돌아가기</button>
 </template>
 
 <script>
@@ -50,6 +52,11 @@ export default {
       } catch (error) {
         alert('로그인 요청 실패: ' + error);
       }
+    },
+
+    goToRootPage(){
+      this.$router.push("/")
+      this.$emit("comeBack")
     },
   },
 };
