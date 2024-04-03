@@ -1,27 +1,29 @@
 <template>
-    <div>
-        <img src="../assets/logo.png">
+  <div>
+    <img v-if="$route.params.mode == 'shop'" src="../assets/logo.png">
+    <img v-if="$route.params.mode == 'admin'" src="../assets/admin.png">
 
-        <!-- ID 입력 -->
-        <div class="mb-3" style="margin-left: 30%; margin-right: 30%;">
-            <label for="basic-url" class="form-label" style="margin-right: 100%;">ID</label>
-            <input type="text" class="form-control" id="email" v-model="email" placeholder="Enter your ID here">
-        </div>
-
-        <!-- Password 입력 -->
-        <div class="mb-3" style="margin-left: 30%; margin-right: 30%;">
-            <label for="basic-url" class="form-label" style="margin-right: 100%">Password</label>
-            <input type="password" class="form-control" id="password" v-model="password" placeholder="Enter your Password here">
-        </div>
-        
-
-        <!-- login 버튼 -->
-        <div>
-            <button type="button" class="btn btn-success" @click="login">Login</button>
-        </div>
+    <!-- ID 입력 -->
+    <div class="mb-3" style="margin-left: 30%; margin-right: 30%;">
+      <label for="basic-url" class="form-label" style="margin-right: 100%;">ID</label>
+      <input type="text" class="form-control" id="email" v-model="email" placeholder="Enter your ID here">
     </div>
 
-    <button @click="goToRootPage">메인 페이지로 돌아가기</button>
+    <!-- Password 입력 -->
+    <div class="mb-3" style="margin-left: 30%; margin-right: 30%;">
+      <label for="basic-url" class="form-label" style="margin-right: 100%">Password</label>
+      <input type="password" class="form-control" id="password" v-model="password"
+        placeholder="Enter your Password here">
+    </div>
+
+
+    <!-- login 버튼 -->
+    <div>
+      <button type="button" class="btn btn-success" @click="login">Login</button>
+    </div>
+  </div>
+
+  <button @click="goToRootPage">메인 페이지로 돌아가기</button>
 </template>
 
 <script>
@@ -36,25 +38,43 @@ export default {
   },
   methods: {
     async login() {
-      try {
-        const response = await axios.post('http://localhost:3000/login', {
-          email: this.email,
-          password: this.password,
-        });
-        if (response.data.success) {
+      if (this.$route.params.mode == 'admin') {
+        try {
+          const response = await axios.post('http://localhost:3000/login/admin', {
+            email: this.email,
+            password: this.password,
+          });
+          if (response.data.success) {
             console.log("LOGIN SUCCESS");
             alert('로그인 완료되었습니다.');
-          // 관리자 페이지로 이동
-            this.$router.push('/admin'); // 이동할 페이지 위치
-        } else {
-          alert('로그인 실패: ' + response.data.message);
+            // 관리자 페이지로 이동
+            this.$router.push('/admin/' + response.data.userID); // 이동할 페이지 위치
+          } else {
+            alert('로그인 실패: ' + response.data.message);
+          }
+        } catch (error) {
+          alert('로그인 요청 실패: ' + error);
         }
-      } catch (error) {
-        alert('로그인 요청 실패: ' + error);
+      } else if (this.$route.params.mode == 'shop') {
+        try {
+          const response = await axios.post('http://localhost:3000/login/shop', {
+            email: this.email,
+            password: this.password,
+          });
+          if (response.data.success) {
+            console.log("LOGIN SUCCESS");
+            alert('로그인 완료되었습니다.');
+            this.$router.push('/shop/' + response.data.shopID); // 이동할 페이지 위치
+          } else {
+            alert('로그인 실패: ' + response.data.message);
+          }
+        } catch (error) {
+          alert('로그인 요청 실패: ' + error);
+        }
       }
     },
 
-    goToRootPage(){
+    goToRootPage() {
       this.$router.push("/")
       this.$emit("comeBack")
     },

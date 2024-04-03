@@ -1,7 +1,8 @@
 <template>
   <RouterView @comeBack="showButton=true"></RouterView>
   <RouterLink to="/test"> <button v-if="showButton" @click="showButton = false">go Test</button> </RouterLink>
-  <RouterLink to="/login"> <button v-if="showButton" @click="showButton = false">go UI</button> </RouterLink>
+  <RouterLink to="/login/admin"> <button v-if="showButton" @click="showButton = false">go admin Login</button> </RouterLink>
+  <RouterLink to="/login/shop"> <button v-if="showButton" @click="showButton = false">go shop Login</button> </RouterLink>
 </template>
 
 <script>
