@@ -3,8 +3,7 @@
         <h2 class="title">실타래 {{ $route.params.id }}</h2>
         <nav id="navbar-menu" class="navbar navbar-custom">
             <ul class="nav">
-                <li :class="{ 'active': isScrollspyActive(i) }" class="nav-item-custom" v-for="i in 6"
-                    :key="i">
+                <li :class="{ 'active': isScrollspyActive(i) }" class="nav-item-custom" v-for="i in 6" :key="i">
                     <a class="nav-link" :href="'#CategoryTitle' + i" @click="handleItemClick(i)">Category {{ i }}</a>
                 </li>
             </ul>
@@ -14,29 +13,37 @@
     <div class="scrollspy-container">
         <div data-bs-spy="scroll" data-bs-target="#navbar-menu" data-bs-root-margin="0px 0px -40%"
             data-bs-smooth-scroll="true" class="scrollspy-example bg-body-tertiary p-3 rounded-2" tabindex="0">
-            <div v-for="i in 6" :key="i">
+            <div class="category-container" v-for="i in 6" :key="i">
                 <h4 :id="'CategoryTitle' + i">{{ i }} 번째 카테고리</h4>
-                <p>...</p>
-                <p>...</p>
-                <p>...</p>
-                <p>...</p>
-                <p>...</p>
-                <p>...</p>
-                <p>...</p>
+                <!-- test용 -->
+                <div class="product-container">
+                    <ProductItem @selectProduct="openProductOptionModal($event)" v-for="i in 10" :key="i" />
+                </div>
             </div>
         </div>
     </div>
-
+    <ProductOptionModal @closeProductOptionModal="showOptionModal=false" :selectedProduct="selectedProduct" v-if="showOptionModal"/>
 </template>
 
 <script>
+import ProductItem from './Product.vue';
+import ProductOptionModal from './ProductOptionModal.vue'
+
 export default {
     name: 'ShopPage',
     data() {
         return {
-            activeScrollspy: 1
+            activeScrollspy: 1,
+            showOptionModal: false,
+            selectedProduct: null,
         }
     },
+
+    components: {
+        ProductItem,
+        ProductOptionModal,
+    },
+
     mounted() {
         window.addEventListener('scroll', this.handleScroll);
     },
@@ -61,6 +68,11 @@ export default {
 
         handleItemClick(index) {
             this.activeScrollspy = index;
+        },
+
+        openProductOptionModal(data) {
+            this.selectedProduct = data
+            this.showOptionModal = true
         }
     }
 }
@@ -100,6 +112,17 @@ export default {
 
 .scrollspy-container {
     margin-top: 120px;
-    /* head-container의 높이 만큼 아래로 내림 */
+}
+
+.product-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.category-container {
+    display: flex;
+    flex-direction: column;
+    margin: 5%;
 }
 </style>
