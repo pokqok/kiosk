@@ -86,10 +86,9 @@ export default {
             this.showOptionModal = true
         },
 
-        // 미구현
         payment() {
             this.showOptionModal = false
-            alert('미구현')
+            this.$router.push("/payment")
         },
 
         //미구현

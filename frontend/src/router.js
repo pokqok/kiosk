@@ -2,7 +2,8 @@ import { createWebHistory, createRouter } from "vue-router";
 import AdminPage from "./components/AdminPage.vue";
 import LoginPage from "./components/LoginPage.vue";
 import TestPage from "./components/TestPage.vue";
-import ShopPage from "./components/ShopPage.vue"
+import ShopPage from "./components/ShopPage.vue";
+import PaymentPage from "./components/PaymentPage.vue";
 
 const routes = [
   {
@@ -20,6 +21,10 @@ const routes = [
   {
     path: '/shop/:id',
     component: ShopPage,
+  },
+  {
+    path: '/payment',
+    component: PaymentPage,
   }
 ];
 
