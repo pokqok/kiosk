@@ -9,24 +9,11 @@
 <script>
 export default {
     name: 'ProductItem',
-    data() {
-        return {
-            // test Data
-            product: {
-                ProductNO: 1,
-                ProductName: '아메리카노',
-                Price: 4500,
-                CategoryNO: 1,
-                ProductDetail: 'HP 포션',
-                ProductImage: require("../assets/logo.png")
-            }
-        }
-    }
 
     // db에서 받아오면 사용
-    // props: {
-    //     product: Object
-    // }
+    props: {
+        product: Object
+    }
 }
 </script>
 

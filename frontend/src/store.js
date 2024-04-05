@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import testdata from './assets/testdata'
 import io from 'socket.io-client'
 
 const store = createStore({
@@ -11,6 +12,7 @@ const store = createStore({
             jwt: null,
             productName: '',
             productAmount: 0,
+            testdata: testdata,
         }
     },
 
