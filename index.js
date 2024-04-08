@@ -14,7 +14,6 @@ const axios = require('axios');
 require('dotenv').config();
 const speech = require('@google-cloud/speech');
 
-
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -38,7 +37,7 @@ app.get('/', (req, res) => {
   res.sendFile('test.html', { root: __dirname });
 });
 
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = "mysecret key"
 
 io.on('connection', (socket) => {
     console.log('A user connected');
@@ -75,12 +74,19 @@ app.post('/user', upload.single('uploaded_file'), async (req, res) => {
             encoding: 'LINEAR16',
             languageCode: 'ko-KR', // 한국어로 설정하세요
         };
+    
+        content = fs.readFileSync(audioFilePath).toString('base64');
 
         const audio = {
-            content: fs.readFileSync(audioFilePath).toString('base64'),
-        };
+            uri: req.file.path,
+        }
 
-        const [response] = await client.recognize({ audio, config });
+        const request = {
+            config: config,
+            audio: audio,
+        }
+
+        const [response] = await client.recognize(request);
         const transcription = response.results
             .map(result => result.alternatives[0].transcript)
             .join('\n');
