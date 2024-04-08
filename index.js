@@ -11,6 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const axios = require('axios');
+const speech = require('@google-cloud/speech');
 
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
@@ -59,34 +60,40 @@ io.on('connection', (socket) => {
     });
 });
 
-app.post('/user', upload.single('uploaded_file'), function (req, res) {
-    var audioFilePath = req.file.path;
-    var audioData = fs.readFileSync(audioFilePath);
+const client = new speech.SpeechClient();
 
-    var requestJson = {
-        'argument': {
-            'language_code': languageCode,
-            'audio': audioData.toString('base64')
+app.post('/user', upload.single('uploaded_file'), async (req, res) => {
+    let audioFilePath; // 변수를 try 블록 밖에서 선언합니다.
+
+    try {
+        audioFilePath = req.file.path; // 변수를 할당합니다.
+
+        const config = {
+            encoding: 'LINEAR16',
+            sampleRateHertz: 16000,
+            languageCode: 'ko-KR', // 한국어로 설정하세요
+        };
+
+        const audio = {
+            content: fs.readFileSync(audioFilePath).toString('base64'),
+        };
+
+        const [response] = await client.recognize({ audio, config });
+        const transcription = response.results
+            .map(result => result.alternatives[0].transcript)
+            .join('\n');
+
+        res.json({ success: true, message: "", data: transcription });
+    } catch (error) {
+        console.error("파일 처리 중 오류 발생:", error);
+        res.json({ success: false, message: "파일 처리 중 오류가 발생했습니다." });
+    } finally {
+        if (audioFilePath) {
+            fs.unlinkSync(audioFilePath); // 처리 후 파일 삭제
         }
-    };
-
-    var options = {
-        url: openApiURL,
-        body: JSON.stringify(requestJson),
-        headers: { 'Content-Type': 'application/json', 'Authorization': accessKey }
-    };
-
-    request.post(options, function (error, response, body) {
-        if (!error) {
-            let json = JSON.parse(body);
-            res.json({ success: true, message: "", data: json.return_object.recognized });
-        } else {
-            res.json({ success: false, message: "Error processing file." });
-        }
-        fs.unlinkSync(audioFilePath); // Ensure the file is deleted after processing
-    });
-
+    }
 });
+
 
 //이쪽에서 문제 발생
 app.post("/payments/verify", async (req, res) => {
