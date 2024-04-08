@@ -162,7 +162,6 @@ export default {
 
     requestPayToss() {
       const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-
       this.IMP.request_pay({
         pg: "html5_inicis.INIpayTest",
         pay_method: "tosspay", 
