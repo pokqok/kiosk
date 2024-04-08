@@ -73,7 +73,6 @@ app.post('/user', upload.single('uploaded_file'), async (req, res) => {
 
         const config = {
             encoding: 'LINEAR16',
-            sampleRateHertz: 16000,
             languageCode: 'ko-KR', // 한국어로 설정하세요
         };
 
