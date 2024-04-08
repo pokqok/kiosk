@@ -12,6 +12,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const axios = require('axios');
 const speech = require('@google-cloud/speech');
+const oracledb = require('oracledb');
 
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
@@ -27,6 +28,34 @@ app.use(express.static(path.join(__dirname, 'frontend/dist')));
 var openApiURL = 'http://aiopen.etri.re.kr:8000/WiseASR/Recognition';
 var accessKey = '8356b229-c7b7-48ed-b085-be27df8632c7';
 var languageCode = 'korean';
+
+// Oracle DB 연결 정보
+const dbConfig = {
+    user: 'c##manager',//이름, 지금 오라클 21c 사용중, 근데 이름에 c##을 붙여야 함 왠진 모르겠지만
+    password: '123456',
+    connectString: 'SEHWANCOM:1521/xe' // Oracle 서버 주소
+    //connectString: '0.0.0.0/xe' // Oracle 서버 주소
+  };
+
+// 태그 목록 조회
+app.get('/tags', async (req, res) => {
+  try {
+    // Oracle DB 연결
+    const connection = await oracledb.getConnection(dbConfig);
+    
+    // 쿼리 실행
+    const result = await connection.execute('SELECT * FROM product');
+
+    // 연결 종료
+    await connection.close();
+
+    // 쿼리 결과 반환
+    res.json(result.rows);
+  } catch (error) {
+    console.error('태그 목록 조회 중 오류 발생:', error);
+    res.status(500).send('태그 목록 조회 중 오류가 발생했습니다.');
+  }
+});
 
 
 // http 요청 들어오면 frontend/dist/index.html 제공
@@ -59,6 +88,8 @@ io.on('connection', (socket) => {
         io.emit('chat message', msg);
     });
 });
+
+
 
 
 const client = new speech.SpeechClient();
