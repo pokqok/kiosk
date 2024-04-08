@@ -34,7 +34,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
 });
 app.get('/', (req, res) => {
-  res.sendFile('test.html', { root: __dirname });
+    res.sendFile('test.html', { root: __dirname });
 });
 
 const jwtSecret = 'mysecret key';
@@ -104,7 +104,7 @@ app.post("/payments/verify", async (req, res) => {
         // 1. 아임포트 Access Token 획득
         const { data: { response: { access_token } } } = await axios.post("https://api.iamport.kr/users/getToken", {
             imp_key: "2380114616885334",
-            imp_secret: "HOPSUHN0O3iTWQ30k26M6vcXE081OBblGD34gVQQ5sRMHahuI0jaunCDnbgypxcl9W4jrudKyHIoDW6y" 
+            imp_secret: "HOPSUHN0O3iTWQ30k26M6vcXE081OBblGD34gVQQ5sRMHahuI0jaunCDnbgypxcl9W4jrudKyHIoDW6y"
         });
 
         // 2. 결제 정보 조회
@@ -132,26 +132,37 @@ app.post('/upload', upload.single('audio'), (req, res) => {
     const audioFile = req.file;
     const tempPath = audioFile.path;
     const targetPath = `uploads/${audioFile.originalname}`;
-  
-    fs.rename(tempPath, targetPath, err => {
-      if (err) {
-        console.error('Error moving file:', err);
-        return res.status(500).send('Error uploading file');
-      }
-      res.send('File uploaded successfully');
-    });
-  });
 
-//로그인
-app.post('/login', (req, res) => {
+    fs.rename(tempPath, targetPath, err => {
+        if (err) {
+            console.error('Error moving file:', err);
+            return res.status(500).send('Error uploading file');
+        }
+        res.send('File uploaded successfully');
+    });
+});
+
+// admin 로그인
+app.post('/login/admin', (req, res) => {
     const { email, password } = req.body;
     if (email === 'admin' && password === 'admin') {
-      const token = jwt.sign({ email: 'admin' }, jwtSecret, { expiresIn: '1h' });
-      res.json({ success: true, token });
+        const token = jwt.sign({ email: 'admin' }, jwtSecret, { expiresIn: '1h' });
+        res.json({ success: true, token, userID: 1 });
     } else {
-      res.status(401).json({ success: false, message: 'Invalid credentials' });
+        res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
-  });
+});
+
+//shop 로그인
+app.post('/login/shop', (req, res) => {
+    const { email, password } = req.body;
+    if (email === 'shop' && password === 'shop') {
+        const token = jwt.sign({ email: 'shop' }, jwtSecret, { expiresIn: '1h' });
+        res.json({ success: true, token, shopID: 1 });
+    } else {
+        res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+});
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
