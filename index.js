@@ -11,6 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const axios = require('axios');
+require('dotenv').config();
 const speech = require('@google-cloud/speech');
 
 
@@ -37,7 +38,7 @@ app.get('/', (req, res) => {
   res.sendFile('test.html', { root: __dirname });
 });
 
-const jwtSecret = 'mysecret key';
+const jwtSecret = process.env.JWT_SECRET;
 
 io.on('connection', (socket) => {
     console.log('A user connected');
