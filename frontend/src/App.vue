@@ -239,7 +239,6 @@ export default {
   margin-top: 60px;
 }
 
-/* 위에서 제공된 CSS 코드를 여기에 추가 */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
