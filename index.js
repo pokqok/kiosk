@@ -11,7 +11,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const axios = require('axios');
-const speech = require('@google-cloud/speech');
+const { SpeechClient } = require('@google-cloud/speech');
+const oracledb = require('oracledb');
 
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
@@ -19,14 +20,40 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var upload = multer({ dest: __dirname });
 
+// CORS 설정
+const cors = require('cors');
+app.use(cors());
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
-// ETRI Open API 관련 설정
-var openApiURL = 'http://aiopen.etri.re.kr:8000/WiseASR/Recognition';
-var accessKey = '8356b229-c7b7-48ed-b085-be27df8632c7';
-var languageCode = 'korean';
+// Oracle DB 연결 정보
+const dbConfig = {
+    user: 'c##manager',//이름, 지금 오라클 21c 사용중, 근데 이름에 c##을 붙여야 함 왠진 모르겠지만
+    password: '123456',
+    connectString: 'SEHWANCOM:1521/xe' // Oracle 서버 주소
+    //connectString: '0.0.0.0/xe' // Oracle 서버 주소
+  };
+
+// 태그 목록 조회
+app.get('/tags', async (req, res) => {
+  try {
+    // Oracle DB 연결
+    const connection = await oracledb.getConnection(dbConfig);
+    
+    // 쿼리 실행
+    const result = await connection.execute('SELECT * FROM product');
+
+    // 연결 종료
+    await connection.close();
+
+    // 쿼리 결과 반환
+    res.json(result.rows);
+  } catch (error) {
+    console.error('태그 목록 조회 중 오류 발생:', error);
+    res.status(500).send('태그 목록 조회 중 오류가 발생했습니다.');
+  }
+});
 
 
 // http 요청 들어오면 frontend/dist/index.html 제공
@@ -42,6 +69,8 @@ const jwtSecret = 'mysecret key';
 io.on('connection', (socket) => {
     console.log('A user connected');
 
+    const clientId = socket.id;
+    const client = new SpeechClient();
     const token = jwt.sign({ id: socket.id }, jwtSecret, { expiresIn: 60 * 60 });
     socket.emit('jwt', token);
 
@@ -61,10 +90,20 @@ io.on('connection', (socket) => {
 });
 
 
-const client = new speech.SpeechClient();
 
 
-app.post('/user', upload.single('uploaded_file'), async (req, res) => {
+// SpeechClient 인스턴스 생성
+// 인증 파일 경로 설정
+// JSON 파일의 경로를 환경 변수에서 가져옵니다.
+const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
+// JSON 파일을 읽어와서 파싱합니다.
+const credentials = JSON.parse(fs.readFileSync(credentialsPath));
+
+// SpeechClient를 생성할 때 credentials를 사용합니다.
+const client = new SpeechClient({ credentials });
+
+  app.post('/', upload.single('uploaded_file'), async (req, res) => {
     let audioFilePath; // 변수를 try 블록 밖에서 선언합니다.
 
     try {
@@ -79,7 +118,11 @@ app.post('/user', upload.single('uploaded_file'), async (req, res) => {
             content: fs.readFileSync(audioFilePath).toString('base64'),
         };
 
-        const [response] = await client.recognize({ audio, config });
+        const [response] = await client.recognize({
+            audio: audio,
+            config: config,
+        });
+
         const transcription = response.results
             .map(result => result.alternatives[0].transcript)
             .join('\n');
@@ -96,7 +139,7 @@ app.post('/user', upload.single('uploaded_file'), async (req, res) => {
 });
 
 
-//이쪽에서 문제 발생
+//결제
 app.post("/payments/verify", async (req, res) => {
     const { imp_uid } = req.body; // 클라이언트로부터 전달받은 imp_uid
 
@@ -168,3 +211,5 @@ server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 
 });
+
+

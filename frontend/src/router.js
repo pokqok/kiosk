@@ -25,6 +25,10 @@ const routes = [
   {
     path: '/payment',
     component: PaymentPage,
+  },
+  {
+    path: '/',
+    component: TestPage
   }
 ];
 
