@@ -99,7 +99,7 @@ export default {
             formData.append('uploaded_file', this.file);
             formData.append('nspeakers', this.numSpeakers);
 
-            fetch('/user', {
+            fetch('/', {
                 method: 'POST',
                 body: formData,
             })
