@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const app = express();
+const { Server } = require("socket.io");
 const server = http.createServer(app);
-const io = socketIo(server);
 const axios = require('axios');
 const { SpeechClient } = require('@google-cloud/speech');
 const oracledb = require('oracledb');
@@ -22,6 +22,15 @@ var upload = multer({ dest: __dirname });
 
 const cors = require('cors');
 app.use(cors()); // 모든 요청에 대해 CORS 허용
+
+const io = new Server(server, {
+    cors: {
+      origin: "*", // 모든 출처에서의 요청을 허용하도록 설정
+      methods: ["GET", "POST"],
+      credentials: true
+    }
+  });
+  
 
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
@@ -90,8 +99,6 @@ io.on('connection', (socket) => {
 });
 
 
-
-
 // SpeechClient 인스턴스 생성
 // 인증 파일 경로 설정
 // JSON 파일의 경로를 환경 변수에서 가져옵니다.
@@ -103,7 +110,7 @@ const credentials = JSON.parse(fs.readFileSync(credentialsPath));
 // SpeechClient를 생성할 때 credentials를 사용합니다.
 const client = new SpeechClient({ credentials });
 
-  app.post('/', upload.single('uploaded_file'), async (req, res) => {
+  app.post('/audio-upload', upload.single('uploaded_file'), async (req, res) => {
     let audioFilePath; // 변수를 try 블록 밖에서 선언합니다.
 
     try {
