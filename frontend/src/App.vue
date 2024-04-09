@@ -85,7 +85,7 @@ export default {
         if (rsp.success) {
           console.log("성공");
           axios({
-            url: "http://192.168.56.1:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+            url: "http://192.168.0.4:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
             method: "post",
             headers: { "Content-Type": "application/json" },
             data: {
