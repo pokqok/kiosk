@@ -40,7 +40,7 @@ export default {
     async login() {
       if (this.$route.params.mode == 'admin') {
         try {
-          const response = await axios.post('http://localhost:3000/login/admin', {
+          const response = await axios.post('http://localhost:8081/login/admin', {
             email: this.email,
             password: this.password,
           });
@@ -57,7 +57,7 @@ export default {
         }
       } else if (this.$route.params.mode == 'shop') {
         try {
-          const response = await axios.post('http://localhost:3000/login/shop', {
+          const response = await axios.post('http://localhost:8081/login/shop', {
             email: this.email,
             password: this.password,
           });
