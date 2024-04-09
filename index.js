@@ -20,9 +20,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var upload = multer({ dest: __dirname });
 
-// CORS 설정
 const cors = require('cors');
-app.use(cors());
+app.use(cors()); // 모든 요청에 대해 CORS 허용
+
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
