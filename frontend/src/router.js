@@ -5,6 +5,7 @@ import TestPage from "./components/TestPage.vue";
 import ShopPage from "./components/ShopPage.vue";
 import PaymentPage from "./components/PaymentPage.vue";
 import AudioUpload from "./components/AudioUpload.vue";
+import ProductTags from "./components/ProductTags.vue";
 
 const routes = [
   {
@@ -31,8 +32,12 @@ const routes = [
     path: '/audio-upload',
     name: 'AudioUpload',
     component: AudioUpload,
+  },
+  {
+    path: '/tags',
+    name: 'ProductTags',
+    component: ProductTags,
   }
-  
 ];
 
 const router = createRouter({

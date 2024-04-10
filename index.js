@@ -47,6 +47,7 @@ const dbConfig = {
 // 태그 목록 조회
 app.get('/tags', async (req, res) => {
   try {
+    console.log('태그 목록 조회 요청이 들어왔습니다.');
     // Oracle DB 연결
     const connection = await oracledb.getConnection(dbConfig);
     
