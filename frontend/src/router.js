@@ -6,6 +6,8 @@ import ShopPage from "./components/ShopPage.vue";
 import PaymentPage from "./components/PaymentPage.vue";
 import AudioUpload from "./components/AudioUpload.vue";
 import ProductTags from "./components/ProductTags.vue";
+import ModeSelectPage from "./components/ModeSelectPage.vue";
+import OrderTypePage from "./components/OrderTypePage.vue";
 
 const routes = [
   {
@@ -37,6 +39,14 @@ const routes = [
     path: '/tags',
     name: 'ProductTags',
     component: ProductTags,
+  },
+  {
+    path: '/mode-select',
+    component: ModeSelectPage,
+  },
+  {
+    path: '/order-type',
+    component: OrderTypePage,
   }
 ];
 

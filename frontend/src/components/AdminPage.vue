@@ -17,7 +17,6 @@ export default {
     },
     goToProductTags(){
       this.$router.push("/tags")
-      this.$emit("comeBack")
     }
   }
 };
