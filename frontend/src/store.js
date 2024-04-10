@@ -13,6 +13,8 @@ const store = createStore({
             productName: '',
             productAmount: 0,
             testdata: testdata,
+
+            ShopID: -1,
         }
     },
 
@@ -38,6 +40,9 @@ const store = createStore({
         },
         setProductAmount(state, amount) {
             state.productAmount = amount
+        },
+        setShopID(state, ID){
+            state.ShopID = ID
         }
     },
 

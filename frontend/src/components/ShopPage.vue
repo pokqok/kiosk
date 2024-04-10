@@ -1,6 +1,6 @@
 <template>
     <div class="head-container row">
-        <h2 class="title">실타래 {{ $route.params.id }}</h2>
+        <h2 class="title">실타래 {{ ShopID }}</h2>
         <nav id="navbar-menu" class="navbar">
             <ul class="nav row">
                 <!-- test 나중에 6 대신 카테고리 -->
@@ -47,7 +47,7 @@ export default {
     },
 
     computed: {
-        ...mapState(['testdata'])
+        ...mapState(['testdata', 'ShopID'])
     },
 
     components: {
