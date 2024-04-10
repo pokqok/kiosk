@@ -10,7 +10,7 @@
             주문</button>
     </div>
     <div class="col-12 p-3">
-        <button type="button" class="btn btn-success custom-btn" @click="goToHelper">도우미 모드</button>
+        <button type="button" class="btn btn-outline-success custom-btn" @click="goToHelper">도우미 모드</button>
     </div>
 
     <!-- 미구현 -->
@@ -33,7 +33,15 @@ export default {
         goToHelper() {
             alert("미구현")
         }
-    }
+    },
+
+    // 로그인 정보 받아올 수 있을 때 사용
+    // mounted() {
+    //     if(this.$store.state.ShopID == -1) {
+    //         alert("login error")
+    //         this.$router.push('/login/shop')
+    //     }
+    // }
 }
 </script>
 

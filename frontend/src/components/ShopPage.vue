@@ -47,7 +47,7 @@ export default {
     },
 
     computed: {
-        ...mapState(['testdata', 'ShopID'])
+        ...mapState(['testdata', 'ShopID', 'orderType'])
     },
 
     components: {
@@ -57,6 +57,13 @@ export default {
 
     mounted() {
         window.addEventListener('scroll', this.handleScroll);
+
+        // shopID 받아 올 수 있을 때 사용
+        // if(this.ShopID == -1) {
+        //     alert('login error')
+        // } else if(this.orderType == -1) {
+        //     alert('orderType error')
+        // }
     },
     beforeUnmount() {
         window.removeEventListener('scroll', this.handleScroll);
