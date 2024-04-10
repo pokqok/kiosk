@@ -12,7 +12,6 @@
         </li>
       </ul>
       <div></div>
-      <p>밑에 메인 페이지로 돌아가기 말고 다른 버튼 안보이게 부탁드립니다.</p>
       <button @click="goToRootPage">메인 페이지로 돌아가기</button>
     </div>
   </template>
