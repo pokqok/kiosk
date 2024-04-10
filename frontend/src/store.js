@@ -11,11 +11,12 @@ const store = createStore({
             socket: null,
             jwt: null,
             productName: '',
-            productAmount: 0,
             testdata: testdata,
 
             ShopID: -1,
             orderType: -1, // init -1, if == 0 is 포장, if == 1 is 매장
+            cart: [],
+            totalPrice: 0,
         }
     },
 
@@ -39,15 +40,24 @@ const store = createStore({
         setProductName(state, name) {
             state.productName = name
         },
-        setProductAmount(state, amount) {
-            state.productAmount = amount
+        setTotalPrice(state, price) {
+            state.totalPrice += price
         },
         setShopID(state, ID){
             state.ShopID = ID
         },
         setOrderType(state, type){
             state.orderType = type
-        }
+        },
+        addCart(state, product){
+            state.cart.push(product)
+        },
+        subCart(state, product){
+            const index = state.cart.indexOf(product)
+            if (index != -1) {
+                state.cart.splice(index, 1)
+            }
+        },
     },
 
     actions: {
