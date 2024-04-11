@@ -39,8 +39,8 @@ export default {
       }
     },
     async uploadAudio(blob) {
-  const formData = new FormData();
-  formData.append('audio', blob);
+      const formData = new FormData();
+      formData.append('audio', blob);
 
   try {
     const response = await fetch('/upload', {

@@ -100,24 +100,19 @@ export default {
             formData.append('nspeakers', this.numSpeakers);
 
             fetch('/upload', {
-    method: 'POST',
-    body: formData,
-})
-.then(response => {
-    if (!response.ok) {
-        throw new Error('Internal Server Error');
-    }
-    return response.text(); // 텍스트로 처리
-})
-.then(data => {
-    this.resultText = data; // 텍스트로 출력
-    this.showResult = true;
-})
-.catch(error => {
-    console.error('Error:', error);
-    this.resultText = 'Error submitting the form.';
-    this.showResult = true;
-});
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.resultText = data.success ? data.data : 'Error processing file.';
+                    this.showResult = true;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.resultText = 'Error submitting the form.';
+                    this.showResult = true;
+                });
         },
 
         sendMessage() {
