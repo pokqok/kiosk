@@ -100,38 +100,26 @@ const credentials = JSON.parse(fs.readFileSync(credentialsPath));
 // SpeechClient를 생성할 때 credentials를 사용합니다.
 const client = new SpeechClient({ credentials });
 
-  app.post('/', upload.single('uploaded_file'), async (req, res) => {
-    let audioFilePath; // 변수를 try 블록 밖에서 선언합니다.
-
+app.post('/upload', upload.single('audio'), (req, res) => {
     try {
-        audioFilePath = req.file.path; // 변수를 할당합니다.
-
-        const config = {
-            encoding: 'LINEAR16',
-            languageCode: 'ko-KR', // 한국어로 설정하세요
-        };
-
-        const audio = {
-            content: fs.readFileSync(audioFilePath).toString('base64'),
-        };
-
-        const [response] = await client.recognize({
-            audio: audio,
-            config: config,
-        });
-
-        const transcription = response.results
-            .map(result => result.alternatives[0].transcript)
-            .join('\n');
-
-        res.json({ success: true, message: "", data: transcription });
-    } catch (error) {
-        console.error("파일 처리 중 오류 발생:", error);
-        res.json({ success: false, message: "파일 처리 중 오류가 발생했습니다." });
-    } finally {
-        if (audioFilePath) {
-            fs.unlinkSync(audioFilePath); // 처리 후 파일 삭제
+        if (!req.file) {
+            return res.status(400).send('No files were uploaded.');
         }
+
+        const audioFile = req.file;
+        const tempPath = audioFile.path;
+        const targetPath = `uploads/${audioFile.originalname}`;
+
+        fs.rename(tempPath, targetPath, err => {
+            if (err) {
+                console.error('Error moving file:', err);
+                return res.status(500).send('Error uploading file');
+            }
+            res.send('File uploaded successfully');
+        });
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        res.status(500).send('Error uploading file');
     }
 });
 
@@ -168,7 +156,7 @@ app.post("/payments/verify", async (req, res) => {
 });
 
 //오디오 녹음 받기
-app.post('./upload', upload.single('audio'), (req, res) => {
+app.post('/upload', upload.single('audio'), (req, res) => {
     const audioFile = req.file;
     const tempPath = audioFile.path;
     const targetPath = `uploads/${audioFile.originalname}`;
