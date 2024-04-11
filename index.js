@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const app = express();
+const { Server } = require("socket.io");
 const server = http.createServer(app);
-const io = socketIo(server);
 const axios = require('axios');
 const { SpeechClient } = require('@google-cloud/speech');
 const oracledb = require('oracledb');
@@ -19,6 +19,18 @@ app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var upload = multer({ dest: __dirname });
+
+const cors = require('cors');
+app.use(cors()); // 모든 요청에 대해 CORS 허용
+
+const io = new Server(server, {
+    cors: {
+      origin: "*", // 모든 출처에서의 요청을 허용하도록 설정
+      methods: ["GET", "POST"],
+      credentials: true
+    }
+  });
+  
 
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
@@ -35,6 +47,7 @@ const dbConfig = {
 // 태그 목록 조회
 app.get('/tags', async (req, res) => {
   try {
+    console.log('태그 목록 조회 요청이 들어왔습니다.');
     // Oracle DB 연결
     const connection = await oracledb.getConnection(dbConfig);
     
@@ -87,8 +100,6 @@ io.on('connection', (socket) => {
 });
 
 
-
-
 // SpeechClient 인스턴스 생성
 // 인증 파일 경로 설정
 // JSON 파일의 경로를 환경 변수에서 가져옵니다.
@@ -99,6 +110,9 @@ const credentials = JSON.parse(fs.readFileSync(credentialsPath));
 
 // SpeechClient를 생성할 때 credentials를 사용합니다.
 const client = new SpeechClient({ credentials });
+
+
+
 
 app.post('/upload', upload.single('audio'), (req, res) => {
     try {

@@ -19,6 +19,7 @@
     "nodemon": "^3.1.0",
     "oracledb": "^6.4.0",
     "request": "^2.88.2",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5"
   }
 }

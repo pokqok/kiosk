@@ -29,7 +29,7 @@
             <input type="number" @change="handleProductAmount" placeholder="상품 금액">
             <button @click="requestPay" :disabled="productAmount < 100">결제하기</button>
             <button @click="requestPayKakao" :disabled="productAmount < 100">카카오페이</button>
-            <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>
+            <!-- <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>-->
         </div>
 
         <button @click="goToRootPage">메인 페이지로 돌아가기</button>
@@ -144,7 +144,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -179,7 +179,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -195,7 +195,7 @@ export default {
                 }
             });
         },
-
+/*
         requestPayToss() {
             const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
 
@@ -214,7 +214,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -230,13 +230,14 @@ export default {
                 }
             });
         },
-
+*/
         goToRootPage() {
             this.$router.push("/")
             this.$emit("comeBack")
         },
     }
 }
+
 </script>
 
 <style>
