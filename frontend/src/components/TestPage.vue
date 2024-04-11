@@ -29,7 +29,7 @@
             <input type="number" @change="handleProductAmount" placeholder="상품 금액">
             <button @click="requestPay" :disabled="productAmount < 100">결제하기</button>
             <button @click="requestPayKakao" :disabled="productAmount < 100">카카오페이</button>
-            <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>
+            <!-- <button @click="requestPayToss" :disabled="productAmount < 100">토스페이</button>-->
         </div>
 
         <button @click="goToRootPage">메인 페이지로 돌아가기</button>
@@ -99,20 +99,25 @@ export default {
             formData.append('uploaded_file', this.file);
             formData.append('nspeakers', this.numSpeakers);
 
-            fetch('/user', {
-                method: 'POST',
-                body: formData,
-            })
-                .then(response => response.json())
-                .then(data => {
-                    this.resultText = data.success ? data.data : 'Error processing file.';
-                    this.showResult = true;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    this.resultText = 'Error submitting the form.';
-                    this.showResult = true;
-                });
+            fetch('/upload', {
+    method: 'POST',
+    body: formData,
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error('Internal Server Error');
+    }
+    return response.text(); // 텍스트로 처리
+})
+.then(data => {
+    this.resultText = data; // 텍스트로 출력
+    this.showResult = true;
+})
+.catch(error => {
+    console.error('Error:', error);
+    this.resultText = 'Error submitting the form.';
+    this.showResult = true;
+});
         },
 
         sendMessage() {
@@ -139,7 +144,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -174,7 +179,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -190,7 +195,7 @@ export default {
                 }
             });
         },
-
+/*
         requestPayToss() {
             const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
 
@@ -209,7 +214,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -225,13 +230,14 @@ export default {
                 }
             });
         },
-
+*/
         goToRootPage() {
             this.$router.push("/")
             this.$emit("comeBack")
         },
     }
 }
+
 </script>
 
 <style>

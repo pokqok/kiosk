@@ -8,8 +8,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const app = express();
+const { Server } = require("socket.io");
 const server = http.createServer(app);
-const io = socketIo(server);
 const axios = require('axios');
 const { SpeechClient } = require('@google-cloud/speech');
 const oracledb = require('oracledb');
@@ -20,9 +20,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 var upload = multer({ dest: __dirname });
 
-// CORS 설정
 const cors = require('cors');
-app.use(cors());
+app.use(cors()); // 모든 요청에 대해 CORS 허용
+
+const io = new Server(server, {
+    cors: {
+      origin: "*", // 모든 출처에서의 요청을 허용하도록 설정
+      methods: ["GET", "POST"],
+      credentials: true
+    }
+  });
+  
+
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
@@ -38,6 +47,7 @@ const dbConfig = {
 // 태그 목록 조회
 app.get('/tags', async (req, res) => {
   try {
+    console.log('태그 목록 조회 요청이 들어왔습니다.');
     // Oracle DB 연결
     const connection = await oracledb.getConnection(dbConfig);
     
@@ -90,8 +100,6 @@ io.on('connection', (socket) => {
 });
 
 
-
-
 // SpeechClient 인스턴스 생성
 // 인증 파일 경로 설정
 // JSON 파일의 경로를 환경 변수에서 가져옵니다.
@@ -103,38 +111,29 @@ const credentials = JSON.parse(fs.readFileSync(credentialsPath));
 // SpeechClient를 생성할 때 credentials를 사용합니다.
 const client = new SpeechClient({ credentials });
 
-  app.post('/', upload.single('uploaded_file'), async (req, res) => {
-    let audioFilePath; // 변수를 try 블록 밖에서 선언합니다.
 
+
+
+app.post('/upload', upload.single('audio'), (req, res) => {
     try {
-        audioFilePath = req.file.path; // 변수를 할당합니다.
-
-        const config = {
-            encoding: 'LINEAR16',
-            languageCode: 'ko-KR', // 한국어로 설정하세요
-        };
-
-        const audio = {
-            content: fs.readFileSync(audioFilePath).toString('base64'),
-        };
-
-        const [response] = await client.recognize({
-            audio: audio,
-            config: config,
-        });
-
-        const transcription = response.results
-            .map(result => result.alternatives[0].transcript)
-            .join('\n');
-
-        res.json({ success: true, message: "", data: transcription });
-    } catch (error) {
-        console.error("파일 처리 중 오류 발생:", error);
-        res.json({ success: false, message: "파일 처리 중 오류가 발생했습니다." });
-    } finally {
-        if (audioFilePath) {
-            fs.unlinkSync(audioFilePath); // 처리 후 파일 삭제
+        if (!req.file) {
+            return res.status(400).send('No files were uploaded.');
         }
+
+        const audioFile = req.file;
+        const tempPath = audioFile.path;
+        const targetPath = `uploads/${audioFile.originalname}`;
+
+        fs.rename(tempPath, targetPath, err => {
+            if (err) {
+                console.error('Error moving file:', err);
+                return res.status(500).send('Error uploading file');
+            }
+            res.send('File uploaded successfully');
+        });
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        res.status(500).send('Error uploading file');
     }
 });
 
@@ -211,5 +210,3 @@ server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 
 });
-
-

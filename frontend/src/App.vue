@@ -3,6 +3,7 @@
   <RouterLink to="/test"> <button v-if="showButton" @click="showButton = false">go Test</button> </RouterLink>
   <RouterLink to="/login/admin"> <button v-if="showButton" @click="showButton = false">go admin Login</button> </RouterLink>
   <RouterLink to="/login/shop"> <button v-if="showButton" @click="showButton = false">go shop Login</button> </RouterLink>
+  <RouterLink to="/audio-upload"> <button v-if="showButton" @click="showButton = false">Audio Upload</button> </RouterLink>
 </template>
 
 <script>

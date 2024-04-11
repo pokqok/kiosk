@@ -17,10 +17,11 @@
             <i class="bi bi-chat-fill pay-icon"></i>
             <p>카카오 페이</p>
         </button>
-        <button @click="requestPayToss" type="button" class="btn btn-light col-4">
+      <!--  <button @click="requestPayToss" type="button" class="btn btn-light col-4">
             <i class="bi bi-fonts pay-icon"></i>
             <p>토스 페이</p>
         </button>
+        -->
     </div>
 </template>
 
@@ -71,7 +72,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -107,7 +108,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -124,7 +125,7 @@ export default {
                 }
             });
         },
-
+/*
         requestPayToss() {
             const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
 
@@ -143,7 +144,7 @@ export default {
                 if (rsp.success) {
                     console.log("성공");
                     axios({
-                        url: "/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         data: {
@@ -159,7 +160,9 @@ export default {
                     this.cntCanclePay++
                 }
             });
+            
         },
+        */
     }
 }
 </script>
