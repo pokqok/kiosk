@@ -43,7 +43,7 @@ export default {
       formData.append('audio', blob);
 
   try {
-    const response = await fetch('/record', {
+    const response = await fetch('/upload', {
       method: 'POST',
       body: formData,
     });
