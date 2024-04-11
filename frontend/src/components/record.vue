@@ -42,17 +42,17 @@ export default {
       const formData = new FormData();
       formData.append('audio', blob);
 
-      try {
-        const response = await fetch('/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await response.json();
-        console.log('Upload successful:', data);
-      } catch (error) {
-        console.error('Error uploading file:', error);
-      }
-    }
+  try {
+    const response = await fetch('/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const text = await response.text(); // 텍스트로 처리
+    console.log('Upload successful:', text); // 텍스트로 출력
+  } catch (error) {
+    console.error('Error uploading file:', error);
+  }
+}
   }
 };
 </script>

@@ -179,7 +179,7 @@ app.post("/payments/verify", async (req, res) => {
 });
 
 //오디오 녹음 받기
-app.post('/upload', upload.single('audio'), (req, res) => {
+app.post('./upload', upload.single('audio'), (req, res) => {
     const audioFile = req.file;
     const tempPath = audioFile.path;
     const targetPath = `uploads/${audioFile.originalname}`;
