@@ -111,7 +111,7 @@ const credentials = JSON.parse(fs.readFileSync(credentialsPath));
 // SpeechClient를 생성할 때 credentials를 사용합니다.
 const client = new SpeechClient({ credentials });
 
-  app.post('/', upload.single('uploaded_file'), async (req, res) => {
+  app.post('/audio-upload', upload.single('uploaded_file'), async (req, res) => {
     let audioFilePath; // 변수를 try 블록 밖에서 선언합니다.
 
     try {
