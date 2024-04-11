@@ -1,8 +1,8 @@
 <template>
   <div>
     <!-- Record Button -->
-    <button id="startRecording" @click="startRecording">Start Recording</button>
-    <button id="stopRecording" @click="stopRecording">Stop Recording</button>
+    <button id="startRecording" type="button" @click="startRecording">Start Recording</button>
+    <button id="stopRecording" type="button" @click="stopRecording">Stop Recording</button>
   </div>
 </template>
 
@@ -20,7 +20,14 @@ export default {
     async startRecording() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        console.log('Got MediaStream:', stream);
+
         this.mediaRecorder = new MediaRecorder(stream);
+
+        // log media recorder
+        console.log('MediaRecorder created:', this.mediaRecorder);
+
         this.mediaRecorder.ondataavailable = event => {
           if (event.data.size > 0) {
             this.recordedChunks.push(event.data);
@@ -42,17 +49,17 @@ export default {
       const formData = new FormData();
       formData.append('audio', blob);
 
-  try {
-    const response = await fetch('/upload', {
-      method: 'POST',
-      body: formData,
-    });
-    const text = await response.text(); // 텍스트로 처리
-    console.log('Upload successful:', text); // 텍스트로 출력
-  } catch (error) {
-    console.error('Error uploading file:', error);
-  }
-}
+      try {
+        const response = await fetch('api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const text = await response.text(); // 텍스트로 처리
+        console.log('Upload successful:', text); // 텍스트로 출력
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    }
   }
 };
 </script>

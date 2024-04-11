@@ -96,10 +96,10 @@ export default {
 
         uploadFile() {
             const formData = new FormData();
-            formData.append('uploaded_file', this.file);
+            formData.append('uploaded_file', "uploads/blob");
             formData.append('nspeakers', this.numSpeakers);
 
-            fetch('/upload', {
+            fetch('api/audio-upload', {
                 method: 'POST',
                 body: formData,
             })
@@ -117,7 +117,7 @@ export default {
 
         sendMessage() {
             if (this.message === '') return;
-            this.socket.emit('chat message', this.message);
+            this.$store.socket.send('chat message', this.message);
             this.message = ''; // Clear the input after sending
         },
 

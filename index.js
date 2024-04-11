@@ -99,7 +99,6 @@ io.on('connection', (socket) => {
     });
 });
 
-
 // SpeechClient 인스턴스 생성
 // 인증 파일 경로 설정
 // JSON 파일의 경로를 환경 변수에서 가져옵니다.
@@ -115,7 +114,13 @@ const client = new SpeechClient({ credentials });
     let audioFilePath; // 변수를 try 블록 밖에서 선언합니다.
 
     try {
-        audioFilePath = req.file.path; // 변수를 할당합니다.
+
+        // 파일 처리
+        // 파일의 절대 경로를 가져옵니다.
+
+        // 현재 경로 + 파일 이름
+        audioFilePath = req.body.uploaded_file;
+        console.log('audioFilePath:', audioFilePath);
 
         const config = {
             encoding: 'LINEAR16',
@@ -179,10 +184,21 @@ app.post("/payments/verify", async (req, res) => {
 });
 
 //오디오 녹음 받기
-app.post('./upload', upload.single('audio'), (req, res) => {
+app.post('/upload', upload.single('audio'), (req, res) => {
     const audioFile = req.file;
     const tempPath = audioFile.path;
     const targetPath = `uploads/${audioFile.originalname}`;
+    console.log('tempPath:', tempPath);
+    console.log('targetPath:', targetPath);
+    
+
+    // make sure the 'uploads' directory exists
+    fs.mkdir('uploads', { recursive: true }, err => {
+        if (err) {
+            console.error('Error creating directory:', err);
+            return res.status(500).send('Error uploading file');
+        }
+    });
 
     fs.rename(tempPath, targetPath, err => {
         if (err) {

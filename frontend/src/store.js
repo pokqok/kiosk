@@ -1,6 +1,5 @@
 import { createStore } from 'vuex'
 import testdata from './assets/testdata'
-import io from 'socket.io-client'
 
 const store = createStore({
     state() {
@@ -42,19 +41,37 @@ const store = createStore({
     },
 
     actions: {
-        async initSocket(context) {
-            const socket = io();
+        async initSocket() {
+            // const socket = new WebSocket()
 
-            socket.on('jwt', function (token) {
-                context.commit('setJwt', token);
-            });
+            // // socket.on('jwt', function (token) {
+            // //     context.commit('setJwt', token);
+            // // });
 
-            socket.on('chat message', (msg) => {
-                context.commit('addMessage', msg);
-                window.scrollTo(0, document.body.scrollHeight);
-            });
+            // context.commit('setSocket', socket);
+            
+            // socket.onopen = (event) => {
+            //     console.log(event);
+            //     console.log('WS connection is stable! ~uWu~')
+            // }
 
-            context.commit('setSocket', socket);
+            // socket.onmessage = (message) => {
+            //     console.log('Got a message from the WS: ', message)
+            //     context.commit('addMessage', message);
+            //     window.scrollTo(0, document.body.scrollHeight);
+            // }
+
+            // socket.onclose = (event) => {
+            //     console.log(event);
+            //     console.log('No way, connection has been closed')
+            // }
+
+            // socket.onerror = (error) => {
+            //     console.error('Error: ', error)
+            // }
+
+            // console.log('Socket: ', socket);
+            // context.commit('setSocket', socket)
         }
     }
 })

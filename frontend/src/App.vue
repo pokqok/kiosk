@@ -7,13 +7,14 @@
 </template>
 
 <script>
-
 export default {
   name: 'App',
   data() {
     return {
       showButton: true
     }
+  },
+  onMounted() {
   }
 }
 </script>

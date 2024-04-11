@@ -8,4 +8,3 @@ import store from './store.js'
 
 let app = createApp(App)
 app.use(router).use(store).mount('#app')
-

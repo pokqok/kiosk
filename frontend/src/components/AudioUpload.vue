@@ -21,6 +21,7 @@ export default {
   methods: {
     handleFileChange(event) {
       this.selectedFile = event.target.files[0];
+      console.log('Selected file:', this.selectedFile);
     },
     submitAudio() {
       if (!this.selectedFile) {
