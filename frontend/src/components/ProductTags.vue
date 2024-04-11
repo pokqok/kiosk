@@ -33,7 +33,7 @@
       async fetchTags() {
         console.log('fetchTags called');
         try {
-          const response = await axios.get('http://192.168.0.167:3000/tags'); //여기도 본인의 ipv4 주소로 변경 부탁드립니다.
+          const response = await axios.get('/tags'); //여기도 본인의 ipv4 주소로 변경 부탁드립니다.
           this.tags = response.data;
           console.log('tags:', this.tags);
         } catch (error) {
