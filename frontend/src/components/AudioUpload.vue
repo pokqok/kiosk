@@ -29,7 +29,7 @@ export default {
       const formData = new FormData();
       formData.append('uploaded_file', this.selectedFile);
 
-      axios.post('http://192.168.0.167:3000/audio-upload', formData, { //192.168.0.167은 본인의 ipv4 주소로 변경
+      axios.post('api/audio-upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
