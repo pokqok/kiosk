@@ -42,15 +42,18 @@ export default {
     },
 
     computed: {
-        ...mapState(['productName', 'productAmount']),
+        ...mapState(['productName', 'totalPrice']),
     },
 
     mounted() {
         this.IMP.init("imp03664607");
 
         // 결제 test 용
-        this.$store.commit('setProductAmount', 100)
         this.$store.commit('setProductName', 'test')
+
+        //결제 test할때 이거 주석 풀고 쓰세요 가격 100원 됩니다.
+        // !주의! 원래 store에 있는 변수 이렇게 바꾸면 변수 관리 힘들어집니다. 가급적 지양해 주세요.
+        //this.$store.state.totalPrice = 100
     },
 
     methods: {
@@ -62,7 +65,7 @@ export default {
                 // pay_method: "kakaopay", 카카오페이만을 결제 수단으로 한다면 추가. 여러가지 존재 가능
                 merchant_uid: merchantUid,
                 name: this.productName,
-                amount: this.productAmount,
+                amount: this.totalPrice,
                 buyer_email: "Iamport@chai.finance",
                 buyer_name: "포트원 기술지원팀",
                 buyer_tel: "010-1234-5678",
@@ -98,7 +101,7 @@ export default {
                 pay_method: "kakaopay",
                 merchant_uid: merchantUid,
                 name: this.productName,
-                amount: this.productAmount,
+                amount: this.totalPrice,
                 buyer_email: "Iamport@chai.finance",
                 buyer_name: "포트원 기술지원팀",
                 buyer_tel: "010-1234-5678",
@@ -134,7 +137,7 @@ export default {
                 pay_method: "tosspay",
                 merchant_uid: merchantUid,
                 name: this.productName,
-                amount: this.productAmount,
+                amount: this.totalPrice,
                 buyer_email: "Iamport@chai.finance",
                 buyer_name: "포트원 기술지원팀",
                 buyer_tel: "010-1234-5678",
