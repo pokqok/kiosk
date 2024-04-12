@@ -1,7 +1,12 @@
 <template>
   <div class="login-page">
-    <img v-if="$route.params.mode == 'shop'" src="../assets/logo.png">
-    <img v-if="$route.params.mode == 'admin'" src="../assets/admin.png">
+
+    <div style="display: flex; justify-content: center; align-items: center;">
+      <div style="width: 15%; height: 15%;">
+        <v-img v-if="$route.params.mode == 'shop'" src="../assets/logo.png" />
+        <v-img v-if="$route.params.mode == 'admin'" src="../assets/admin.png" />
+      </div>
+    </div>
 
     <!-- ID 입력 -->
     <div class="mb-3" style="margin-left: 30%; margin-right: 30%;">
