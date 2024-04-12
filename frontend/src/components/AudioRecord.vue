@@ -18,7 +18,11 @@
       Stop Recording
     </button>
     <button @click="submitAudio">Submit</button>
+
+    <p>{{ transcription }}</p>
   </div>
+
+  <button @click="goToRootPage">메인 페이지로 돌아가기</button>
 </template>
 
 <script>
@@ -27,6 +31,7 @@ export default {
   name: "AudioRecord",
   data() {
     return {
+      transcription: "",
       mediaRecorder: null,
       recordedChunks: [],
       audio_recording: false,
@@ -108,6 +113,10 @@ export default {
             this.$store.commit("setFile", null);
           });
       }
+    },
+    goToRootPage() {
+      this.$router.push("/");
+      this.$emit("comeBack");
     },
   },
 };
