@@ -2,10 +2,32 @@
 ```
 kiosk
 ├─ .git
+│  ├─ COMMIT_EDITMSG
+│  ├─ config
+│  ├─ description
+│  ├─ FETCH_HEAD
+│  ├─ HEAD
+│  ├─ hooks
+│  │  ├─ applypatch-msg.sample
+│  │  ├─ commit-msg.sample
+│  │  ├─ fsmonitor-watchman.sample
+│  │  ├─ post-update.sample
+│  │  ├─ pre-applypatch.sample
+│  │  ├─ pre-commit.sample
+│  │  ├─ pre-merge-commit.sample
+│  │  ├─ pre-push.sample
+│  │  ├─ pre-rebase.sample
+│  │  ├─ pre-receive.sample
+│  │  ├─ prepare-commit-msg.sample
+│  │  ├─ sendemail-validate.sample
+│  │  └─ update.sample
 │  ├─ index
 │  ├─ info
+│  │  └─ exclude
 │  ├─ ORIG_HEAD
 │  └─ packed-refs
+├─ .gitattributes
+├─ .gitignore
 ├─ frontend
 │  ├─ .gitignore
 │  ├─ babel.config.js
@@ -25,6 +47,7 @@ kiosk
 │  │  ├─ components
 │  │  │  ├─ AdminPage.vue
 │  │  │  ├─ AudioUpload.vue
+│  │  │  ├─ CartModal.vue
 │  │  │  ├─ HelloWorld.vue
 │  │  │  ├─ LoginPage.vue
 │  │  │  ├─ ModeSelectPage.vue
@@ -34,8 +57,7 @@ kiosk
 │  │  │  ├─ ProductOptionModal.vue
 │  │  │  ├─ ProductTags.vue
 │  │  │  ├─ record.vue
-│  │  │  ├─ ShopPage.vue
-│  │  │  └─ TestPage.vue
+│  │  │  └─ ShopPage.vue
 │  │  ├─ main.js
 │  │  └─ store.js
 │  └─ vue.config.js
