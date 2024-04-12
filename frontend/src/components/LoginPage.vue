@@ -70,7 +70,8 @@ export default {
           if (response.data.success) {
             console.log("LOGIN SUCCESS");
             alert('로그인 완료되었습니다.');
-            this.$router.push('/shop/' + response.data.shopID); // 이동할 페이지 위치
+            this.$store.commit('setShopID', response.data.shopID)
+            this.$router.push('/mode-select'); // 이동할 페이지 위치
           } else {
             alert('로그인 실패: ' + response.data.message);
           }
