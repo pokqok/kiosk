@@ -7,20 +7,6 @@ kiosk
 │  ├─ description
 │  ├─ FETCH_HEAD
 │  ├─ HEAD
-│  ├─ hooks
-│  │  ├─ applypatch-msg.sample
-│  │  ├─ commit-msg.sample
-│  │  ├─ fsmonitor-watchman.sample
-│  │  ├─ post-update.sample
-│  │  ├─ pre-applypatch.sample
-│  │  ├─ pre-commit.sample
-│  │  ├─ pre-merge-commit.sample
-│  │  ├─ pre-push.sample
-│  │  ├─ pre-rebase.sample
-│  │  ├─ pre-receive.sample
-│  │  ├─ prepare-commit-msg.sample
-│  │  ├─ sendemail-validate.sample
-│  │  └─ update.sample
 │  ├─ index
 │  ├─ info
 │  │  └─ exclude
