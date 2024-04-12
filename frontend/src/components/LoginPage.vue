@@ -40,10 +40,11 @@ export default {
     async login() {
       if (this.$route.params.mode == 'admin') {
         try {
-          const response = await axios.post('http://localhost:3000/login/admin', {
+          const response = await axios.post('admin', {
+            //192.168.0.167:8081은 본인이 서버를 열때 나오는 Network 주소로 변경
             email: this.email,
             password: this.password,
-          });
+          })
           if (response.data.success) {
             console.log("LOGIN SUCCESS");
             alert('로그인 완료되었습니다.');
@@ -57,7 +58,7 @@ export default {
         }
       } else if (this.$route.params.mode == 'shop') {
         try {
-          const response = await axios.post('http://localhost:3000/login/shop', {
+          const response = await axios.post('shop', { 
             email: this.email,
             password: this.password,
           });

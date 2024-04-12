@@ -127,3 +127,4 @@ dist
 .pnp.*
 
 apikey.js
+credentials.json
