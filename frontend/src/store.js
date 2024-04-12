@@ -11,7 +11,6 @@ const store = createStore({
             jwt: null,
             productName: '',
             testdata: testdata,
-
             ShopID: -1,
             orderType: -1, // init -1, if == 0 is 포장, if == 1 is 매장
             cart: [],
