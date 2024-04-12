@@ -4,6 +4,10 @@ import LoginPage from "./components/LoginPage.vue";
 import TestPage from "./components/TestPage.vue";
 import ShopPage from "./components/ShopPage.vue";
 import PaymentPage from "./components/PaymentPage.vue";
+import ProductTags from "./components/ProductTags.vue";
+import ModeSelectPage from "./components/ModeSelectPage.vue";
+import OrderTypePage from "./components/OrderTypePage.vue";
+import AudioRecord from "./components/AudioRecord.vue";
 
 const routes = [
   {
@@ -27,8 +31,22 @@ const routes = [
     component: PaymentPage,
   },
   {
-    path: '/',
-    component: TestPage
+    path: '/AudioRecord',
+    name: 'AudioRecord',
+    component: AudioRecord,
+  },
+  {
+    path: '/tags',
+    name: 'ProductTags',
+    component: ProductTags,
+  },
+  {
+    path: '/mode-select',
+    component: ModeSelectPage,
+  },
+  {
+    path: '/order-type',
+    component: OrderTypePage,
   }
 ];
 

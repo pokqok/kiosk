@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const axios = require('axios');
-const { SpeechClient } = require('@google-cloud/speech');
+const {SpeechClient} = require('@google-cloud/speech').v2;
 const oracledb = require('oracledb');
 
 
@@ -103,30 +103,47 @@ const credentials = JSON.parse(fs.readFileSync(credentialsPath));
 // SpeechClient를 생성할 때 credentials를 사용합니다.
 const client = new SpeechClient({ credentials });
 
-  app.post('/', upload.single('uploaded_file'), async (req, res) => {
+app.post('/audio-upload', upload.single('uploaded_file'), async (req, res) => {
     let audioFilePath; // 변수를 try 블록 밖에서 선언합니다.
 
+
+    // 현재 경로 + 파일 이름
+    audioFilePath = req.body.uploaded_file;
+    if (audioFilePath === undefined) {
+        res.status(418).json({ success: false, message: "파일이 업로드되지 않았습니다." });
+        return;
+    }
+      
+    audioFilePath = path.join(__dirname, "uploads", audioFilePath);
+    console.log('audioFilePath:', audioFilePath);
+      
     try {
-        audioFilePath = req.file.path; // 변수를 할당합니다.
+        // 오디오 파일의 길이가 0인 경우 파일 처리 중단
 
+        const fileData = fs.readFileSync(audioFilePath);
+        if (fileData.length == 0) {
+            res.status(418).json({ success: false, message: "파일이 비어있습니다." });
+            return;
+        }
+        
         const config = {
-            encoding: 'LINEAR16',
-            languageCode: 'ko-KR', // 한국어로 설정하세요
+            autoDecodingConfig: { encoding: 'LINEAR16' },
+            languageCodes: ['ko-KR'], // 한국어로 설정하세요
+            model: 'latest_short',
         };
 
-        const audio = {
-            content: fs.readFileSync(audioFilePath).toString('base64'),
-        };
-
-        const [response] = await client.recognize({
-            audio: audio,
+        const request = {
+            recognizer: `projects/${credentials.project_id}/locations/global/recognizers/_`,
             config: config,
-        });
+            content: fileData,
+        };
+        
+        const [response] = await client.recognize(request);
 
         const transcription = response.results
             .map(result => result.alternatives[0].transcript)
             .join('\n');
-
+        
         res.json({ success: true, message: "", data: transcription });
     } catch (error) {
         console.error("파일 처리 중 오류 발생:", error);
@@ -137,6 +154,38 @@ const client = new SpeechClient({ credentials });
         }
     }
 });
+
+//오디오 녹음 받기
+app.post('/upload', upload.single('audio'), (req, res) => {
+    const audioFile = req.file;
+    const tempPath = audioFile.path;
+    const targetPath = `uploads/${audioFile.originalname}`;
+    console.log('tempPath:', tempPath);
+    console.log('targetPath:', targetPath);
+    
+
+    // make sure the 'uploads' directory exists
+    fs.mkdir('uploads', { recursive: true }, err => {
+        if (err) {
+            console.error('Error creating directory:', err);
+            return res.status(500).send('Error uploading file');
+        }
+    });
+
+    fs.rename(tempPath, targetPath, err => {
+        if (err) {
+            console.error('Error moving file:', err);
+            return res.status(500).send('Error uploading file');
+        }
+        const body = {
+            uploaded_file: `${audioFile.originalname}`,
+            text:'File uploaded successfully'
+        };
+        console.log(body);
+        res.send(body);
+    });
+});
+
 
 
 //결제
@@ -169,22 +218,6 @@ app.post("/payments/verify", async (req, res) => {
         res.status(500).send("결제 정보 검증 중 오류가 발생했습니다.");
     }
 });
-
-//오디오 녹음 받기
-app.post('/upload', upload.single('audio'), (req, res) => {
-    const audioFile = req.file;
-    const tempPath = audioFile.path;
-    const targetPath = `uploads/${audioFile.originalname}`;
-
-    fs.rename(tempPath, targetPath, err => {
-        if (err) {
-            console.error('Error moving file:', err);
-            return res.status(500).send('Error uploading file');
-        }
-        res.send('File uploaded successfully');
-    });
-});
-
 // admin 로그인
 app.post('/login/admin', (req, res) => {
     const { email, password } = req.body;
