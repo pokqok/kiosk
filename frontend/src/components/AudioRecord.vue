@@ -18,8 +18,8 @@
       Stop Recording
     </button>
     <button @click="submitAudio">Submit</button>
-
-    <p>{{ transcription }}</p>
+    <!-- Transcription -->
+    <p>인식결과:{{ transcription }}</p>
   </div>
 
   <button @click="goToRootPage">메인 페이지로 돌아가기</button>
