@@ -61,11 +61,11 @@
     </div>
 
     <div class="white-bg futter row">
-        <button @click="$emit('pickProduct')" type="button" class="btn col">
+        <button @click="$emit('pickProduct', numProduct)" type="button" class="btn col">
             <i class="bi bi-cart icon"></i>
             <p>장바구니</p>
         </button>
-        <button @click="$emit('payment')" type="button" class="btn col"><i class="bi bi-coin icon"></i>
+        <button @click="$emit('payment', numProduct)" type="button" class="btn col"><i class="bi bi-coin icon"></i>
             <p>결제</p>
         </button>
         <button @click="$emit('closeProductOptionModal')" type="button" class="btn col"><i class="bi bi-x-lg icon"></i>
