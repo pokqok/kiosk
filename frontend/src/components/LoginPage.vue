@@ -1,7 +1,12 @@
 <template>
   <div class="login-page">
-    <img v-if="$route.params.mode == 'shop'" src="../assets/logo.png">
-    <img v-if="$route.params.mode == 'admin'" src="../assets/admin.png">
+
+    <div style="display: flex; justify-content: center; align-items: center;">
+      <div style="width: 15%; height: 15%;">
+        <v-img v-if="$route.params.mode == 'shop'" src="../assets/logo.png" />
+        <v-img v-if="$route.params.mode == 'admin'" src="../assets/admin.png" />
+      </div>
+    </div>
 
     <!-- ID 입력 -->
     <div class="mb-3" style="margin-left: 30%; margin-right: 30%;">
@@ -65,7 +70,8 @@ export default {
           if (response.data.success) {
             console.log("LOGIN SUCCESS");
             alert('로그인 완료되었습니다.');
-            this.$router.push('/shop/' + response.data.shopID); // 이동할 페이지 위치
+            this.$store.commit('setShopID', response.data.shopID)
+            this.$router.push('/mode-select'); // 이동할 페이지 위치
           } else {
             alert('로그인 실패: ' + response.data.message);
           }
