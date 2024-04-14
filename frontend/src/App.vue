@@ -1,16 +1,17 @@
 <template>
-  <RouterView @comeBack="showButton = true"></RouterView>
-  <RouterLink to="/login/admin">
-    <button v-if="showButton" @click="showButton = false">
-      go admin Login
-    </button>
-  </RouterLink>
-  <RouterLink to="/login/shop">
-    <button v-if="showButton" @click="showButton = false">go shop Login</button>
-  </RouterLink>
-  <RouterLink to="/AudioRecord">
-    <button v-if="showButton" @click="showButton = false">Audio Upload</button>
-  </RouterLink>
+  <v-app>
+    <v-main>
+      <RouterView @comeBack="showButton = true"></RouterView>
+      <RouterLink to="/login/admin"> <button v-if="showButton" @click="showButton = false">go admin Login</button>
+      </RouterLink>
+      <RouterLink to="/login/shop"> <button v-if="showButton" @click="showButton = false">go shop Login</button>
+      </RouterLink>
+      <RouterLink to="/AudioRecord"> <button v-if="showButton" @click="showButton = false">Audio Upload</button>
+      </RouterLink>
+    </v-main>
+  </v-app>
+
+
 </template>
 
 <script>
