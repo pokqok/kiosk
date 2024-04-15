@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./credentials.json node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,6 +13,8 @@
     "@google-cloud/speech": "^6.5.0",
     "@portone/browser-sdk": "^0.0.5",
     "axios": "^1.6.8",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",

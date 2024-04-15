@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -29,9 +30,9 @@ const io = new Server(server, {
       methods: ["GET", "POST"],
       credentials: true
     }
-  });
+});
   
-
+console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);  // 환경 변수 테스트 출력
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
