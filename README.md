@@ -1,5 +1,3 @@
-
-```
 kiosk
 ├─ .git
 │  ├─ COMMIT_EDITMSG
@@ -51,5 +49,3 @@ kiosk
 ├─ package-lock.json
 ├─ package.json
 └─ uploads
-
-```

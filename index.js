@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -29,9 +30,9 @@ const io = new Server(server, {
       methods: ["GET", "POST"],
       credentials: true
     }
-  });
+});
   
-
+console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);  // 환경 변수 테스트 출력
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
@@ -246,6 +247,12 @@ app.post('/login/shop', (req, res) => {
         res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 });
+/*
+app.get('/api/getUniqueOrderNumber', (req, res) => {
+    orderCounter += 1;
+    res.json({orderNumber: orderCounter});
+});
+*/
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

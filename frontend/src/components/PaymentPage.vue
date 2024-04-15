@@ -59,7 +59,7 @@ export default {
     methods: {
         requestPay() {
             const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-
+            this.$store.commit('incrementOrderCounter'); // Update the order counter before payment
             this.IMP.request_pay({
                 pg: "html5_inicis.INIpayTest",
                 // pay_method: "kakaopay", 카카오페이만을 결제 수단으로 한다면 추가. 여러가지 존재 가능
@@ -85,9 +85,13 @@ export default {
                     }).then(() => {
                         console.log("성공");
                         alert("결제가 완료되었습니다.");
+                        //home 으로
+                        this.$router.push("/mode-select")
                     })
                 } else {
                     alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
+                    //decrementordercounter 추가
+                    this.$store.commit('decrementOrderCounter')
                     this.cntCanclePay++
                 }
             });
@@ -95,7 +99,7 @@ export default {
 
         requestPayKakao() {
             const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-
+            this.$store.commit('incrementOrderCounter'); // Update the order counter before payment
             this.IMP.request_pay({
                 pg: "html5_inicis.INIpayTest",
                 pay_method: "kakaopay",
@@ -121,9 +125,12 @@ export default {
                     }).then(() => {
                         console.log("성공");
                         alert("결제가 완료되었습니다.");
+                        //home 으로
+                        this.$router.push("/mode-select")
                     })
                 } else {
                     alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
+                    this.$store.commit('decrementOrderCounter')
                     this.cntCanclePay++
                 }
             });

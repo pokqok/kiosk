@@ -15,6 +15,7 @@ const store = createStore({
             orderType: -1, // init -1, if == 0 is 포장, if == 1 is 매장
             cart: [],
             totalPrice: 0,
+            orderCounter: 0,  // add this line
         }
     },
 
@@ -56,6 +57,14 @@ const store = createStore({
                 state.cart.splice(index, 1)
             }
         },
+        incrementOrderCounter(state) {
+            state.orderCounter++;
+            console.log("Order Counter: ", state.orderCounter);
+            state.productName = "주문번호 : " + state.orderCounter;  // Automatically update product name
+        },
+        decrementOrderCounter(state) {
+            state.orderCounter--;
+        }
     },
 
     actions: {
