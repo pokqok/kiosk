@@ -246,12 +246,12 @@ app.post('/login/shop', (req, res) => {
         res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 });
-
+/*
 app.get('/api/getUniqueOrderNumber', (req, res) => {
     orderCounter += 1;
     res.json({orderNumber: orderCounter});
 });
-
+*/
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
