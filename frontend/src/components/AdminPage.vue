@@ -1,5 +1,6 @@
 <template>
-  <router-view></router-view> <!-- 라우터를 통해 변경된 컴포넌트가 렌더링됩니다. -->
+  <router-view></router-view>
+  <!-- 라우터를 통해 변경된 컴포넌트가 렌더링됩니다. -->
   <v-navigation-drawer>
     <v-list-item title="실타래" subtitle="키오스크 관리"></v-list-item>
     <v-divider></v-divider>
@@ -15,31 +16,35 @@
 
 <script>
 export default {
-  name: 'AdminPage',
+  name: "AdminPage",
   methods: {
     goToRootPage() {
-      this.$router.push("/")
-      this.$emit("comeBack")
+      this.$router.push("/");
+      this.$emit("comeBack");
     },
     goToProductTags() {
-      this.$router.push("/tags")
+      this.$router.push("/tags");
     },
     goToProductManage() {
-      this.$router.push("/admin/" + this.$store.state.ShopID + "/product-manage")
+      this.$router.push(
+        "/admin/" + this.$store.state.ShopID + "/product-manage"
+      );
     },
     goToCategoyManage() {
-      this.$router.push("/admin/" + this.$store.state.ShopID + "/category-manage")
+      this.$router.push(
+        "/admin/" + this.$store.state.ShopID + "/category-manage"
+      );
     },
     goToTagManage() {
-      this.$router.push("/admin/" + this.$store.state.ShopID + "/tag-manage")
+      this.$router.push("/admin/" + this.$store.state.ShopID + "/tag-manage");
     },
     goToKioskManage() {
-      this.$router.push("/admin/" + this.$store.state.ShopID + "/kiosk-manage")
+      this.$router.push("/admin/" + this.$store.state.ShopID + "/kiosk-manage");
     },
     goToUserManage() {
-      this.$router.push("/admin/" + this.$store.state.ShopID + "/user-manage")
+      this.$router.push("/admin/" + this.$store.state.ShopID + "/user-manage");
     },
-  }
+  },
 };
 </script>
 
