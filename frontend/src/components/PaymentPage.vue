@@ -90,7 +90,6 @@ export default {
             }).then(() => {
               console.log("성공");
               alert("결제가 완료되었습니다.");
-              //when alert close push to mode select
               setTimeout(() => {
                 this.$router.push("/mode-select");
               }, 5000); // 5000 밀리초 = 5초
@@ -135,7 +134,6 @@ export default {
             }).then(() => {
               console.log("성공");
               alert("결제가 완료되었습니다.");
-              //when alert close push to mode select
               setTimeout(() => {
                 this.$router.push("/mode-select");
               }, 5000); // 5000 밀리초 = 5초
