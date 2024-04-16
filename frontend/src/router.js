@@ -1,13 +1,17 @@
 import { createWebHistory, createRouter } from "vue-router";
 import AdminPage from "./components/AdminPage.vue";
 import LoginPage from "./components/LoginPage.vue";
-import TestPage from "./components/TestPage.vue";
 import ShopPage from "./components/ShopPage.vue";
 import PaymentPage from "./components/PaymentPage.vue";
-import AudioUpload from "./components/AudioUpload.vue";
 import ProductTags from "./components/ProductTags.vue";
 import ModeSelectPage from "./components/ModeSelectPage.vue";
 import OrderTypePage from "./components/OrderTypePage.vue";
+import AudioRecord from "./components/AudioRecord.vue";
+import ProductManage from './components/ProductManage.vue';
+import CategoryManage from './components/CategoryManage.vue';
+import TagManage from './components/TagManage.vue';
+import KioskManage from './components/KioskManage.vue';
+import UserManage from "./components/UserManage.vue";
 
 const routes = [
   {
@@ -17,10 +21,32 @@ const routes = [
   {
     path: '/admin/:id',
     component: AdminPage, // 관리자 페이지 라우트 추가
-  },
-  {
-    path: '/test',
-    component: TestPage,
+    children: [
+      {
+        path: '',
+        component: ProductManage
+      },
+      {
+        path: 'product-manage',
+        component: ProductManage
+      },
+      {
+        path: 'category-manage',
+        component: CategoryManage
+      },
+      {
+        path: 'tag-manage',
+        component: TagManage
+      },
+      {
+        path: 'kiosk-manage',
+        component: KioskManage
+      },
+      {
+        path: 'user-manage',
+        component: UserManage
+      },
+    ]
   },
   {
     path: '/shop/:id',
@@ -31,9 +57,9 @@ const routes = [
     component: PaymentPage,
   },
   {
-    path: '/audio-upload',
-    name: 'AudioUpload',
-    component: AudioUpload,
+    path: '/AudioRecord',
+    name: 'AudioRecord',
+    component: AudioRecord,
   },
   {
     path: '/tags',

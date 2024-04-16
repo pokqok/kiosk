@@ -1,21 +1,35 @@
 <template>
-  <RouterView @comeBack="showButton=true"></RouterView>
-  <RouterLink to="/test"> <button v-if="showButton" @click="showButton = false">go Test</button> </RouterLink>
-  <RouterLink to="/login/admin"> <button v-if="showButton" @click="showButton = false">go admin Login</button> </RouterLink>
-  <RouterLink to="/login/shop"> <button v-if="showButton" @click="showButton = false">go shop Login</button> </RouterLink>
-  <RouterLink to="/audio-upload"> <button v-if="showButton" @click="showButton = false">Audio Upload</button> </RouterLink>
+  <v-app>
+    <v-main>
+      <RouterView @comeBack="showButton = true"></RouterView>
+      <RouterLink to="/login/admin">
+        <button v-if="showButton" @click="showButton = false">
+          go admin Login
+        </button>
+      </RouterLink>
+      <RouterLink to="/login/shop">
+        <button v-if="showButton" @click="showButton = false">
+          go shop Login
+        </button>
+      </RouterLink>
+      <RouterLink to="/AudioRecord">
+        <button v-if="showButton" @click="showButton = false">
+          Audio Upload
+        </button>
+      </RouterLink>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
-      showButton: true
-    }
-  }
-}
+      showButton: true,
+    };
+  },
+};
 </script>
 
 <style>
@@ -36,5 +50,4 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-
 </style>
