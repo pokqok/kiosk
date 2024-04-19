@@ -1,14 +1,19 @@
 <template>
   <div class="chat-gpt">
-    <h1>Chat with GPT-3.5 Turbo</h1>
-    <input
-      v-model="userInput"
-      placeholder="Enter your question here..."
-      @keyup.enter="sendChat"
-    />
-    <button @click="sendChat">Send</button>
-    <div v-if="loading">Loading...</div>
-    <p v-if="response">{{ response }}</p>
+    <h1>Ask GPT Your Coffee Choice</h1>
+    <div class="input-group">
+      <input
+        v-model="userInput"
+        placeholder="Which coffee would you like to know about?"
+        @keyup.enter="sendChat"
+        class="input-field"
+      />
+      <button @click="sendChat" class="send-button">Send</button>
+    </div>
+    <div v-if="loading" class="loading">Loading...</div>
+    <div v-if="response" class="response">
+      <p>{{ response }}</p>
+    </div>
   </div>
 </template>
 
@@ -25,7 +30,6 @@ export default {
   },
   methods: {
     sendChat() {
-      console.log("Sending chat:", this.userInput);
       this.loading = true;
       axios
         .post("/chat", {
@@ -47,12 +51,56 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .chat-gpt {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
-  margin-top: 20px;
 }
-button {
-  margin-top: 10px;
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-field {
+  width: 70%;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  color: #333;
+}
+
+.send-button {
+  padding: 10px 20px;
+  background-color: #5c67f2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.send-button:hover {
+  background-color: #4a54e1;
+}
+
+.loading {
+  color: #5c67f2;
+  font-weight: bold;
+}
+
+.response {
+  background-color: #dff0d8;
+  color: #3c763d;
+  padding: 15px;
+  margin-top: 20px;
+  border: 1px solid #d6e9c6;
+  border-radius: 5px;
 }
 </style>
