@@ -1,0 +1,4 @@
+/views = 각 페이지 역할, route와 route 경로를 index.js(/router에 있음) main.js, App.vue에서 해줬다.
+/plugins = 여기서는 vuetify.js 에서 중요한 세팅을 했었던거 같은데 암튼 중요
+/data = 페이지에 쓰이는 각 데이터를 해당 폴더내에서 데이터로 저장함, 이제 여기서 데이터 저장, 서버에 DB 연결 요청하는 로직 작성할 예정이다.
+위에 data에서 export 했으니 import로 가져오도록 했음 (script에서 가져와서 data에 넣어줌)
