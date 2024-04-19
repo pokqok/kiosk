@@ -33,9 +33,7 @@ export default {
       this.loading = true;
       axios
         .post("/chat", {
-          userInput:
-            "커피가 마시고 싶은데 아이스 아메리카노, 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마끼아토, 아이스 티 중에 선택할꺼야 내 요청은 메뉴 이름만 부탁해" +
-            this.userInput,
+          userInput: this.userInput,
         })
         .then((result) => {
           this.response = result.data.message;

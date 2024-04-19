@@ -46,14 +46,16 @@ app.post('/chat', async (req, res) => {
     console.log('Chat request received');
     const userInput = req.body.userInput;
     const messages = [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: `${userInput}에 대하여 최대한 도움이 되는 답변을 해줘.` }
+        { role: 'system', content: '너는 카페 키오스크의 메뉴 추천 기능을 가지고 있어, 너가 가진 메뉴는 아이스 아메리카노, 아이스 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마끼아토, 아이스 티, 쌍화탕 이것 뿐이야 다른건 없어 ' },
+        { role: 'user', content: `${userInput}에 대해 메뉴의 이름이랑 간단한 설명만 부탁해` },
+        { role: 'assistant', content: '알맞는 답변이 없으면 없다고 말해줘. 멋대로 추천하지마. 사과도 하지마'}
     ];
 
     try {
         const response = await axios.post("https://api.openai.com/v1/chat/completions", {
             model: 'gpt-3.5-turbo',
-            temperature: 0.5,
+            temperature: 0,
+
             messages: messages
         }, {
             headers: {
