@@ -1,15 +1,14 @@
 <template>
-  <div class="recommend-view">
-    <h1>Find the Best Drink for You!</h1>
+  <div class="chat-gpt">
+    <h1>Chat with GPT-3.5 Turbo</h1>
     <input
       v-model="userInput"
-      @keyup.enter="fetchRecommendation"
-      placeholder="Enter your preferences (e.g., 'I like something sweet and cold')"
+      placeholder="Enter your question here..."
+      @keyup.enter="sendChat"
     />
-    <button @click="fetchRecommendation">Recommend</button>
-    <p v-if="recommendedDrink">
-      Recommended Drink: <strong>{{ recommendedDrink }}</strong>
-    </p>
+    <button @click="sendChat">Send</button>
+    <div v-if="loading">Loading...</div>
+    <p v-if="response">{{ response }}</p>
   </div>
 </template>
 
@@ -20,97 +19,40 @@ export default {
   data() {
     return {
       userInput: "",
-      recommendedDrink: null,
-      drinks: [
-        {
-          name: "아이스 아메리카노",
-          description: "진한 맛과 산미가 특징, 시원하게 즐길 수 있음",
-          keywords: ["strong", "acidic", "no sweetness", "coffee", "cold"],
-        },
-        {
-          name: "바닐라 라떼",
-          description: "부드럽고 달콤한 맛, 바닐라 향이 감도는 음료",
-          keywords: ["smooth", "sweet", "vanilla", "coffee", "hot"],
-        },
-        {
-          name: "카라멜 마키아토",
-          description: "달콤한 카라멜과 부드러운 밀크의 완벽한 조화",
-          keywords: ["sweet", "caramel", "milk", "coffee", "hot"],
-        },
-        {
-          name: "그린 티 라떼",
-          description:
-            "고소한 맛과 풍부한 그린티의 향, 건강하게 즐기기 좋은 선택",
-          keywords: ["nutty", "green tea", "low sweetness", "no coffee", "hot"],
-        },
-        {
-          name: "에스프레소",
-          description: "깊고 강렬한 풍미, 커피 본연의 맛을 느낄 수 있음",
-          keywords: ["deep", "intense", "no sweetness", "coffee", "hot"],
-        },
-        {
-          name: "콜드 브루",
-          description: "부드러우면서도 강한 카페인, 산미가 적고 맛이 깊은 커피",
-          keywords: [
-            "smooth",
-            "strong caffeine",
-            "low acidity",
-            "optional sweetness",
-            "coffee",
-            "cold",
-          ],
-        },
-        {
-          name: "플랫 화이트",
-          description: "진하고 크리미한 스팀 밀크와 에스프레소의 완벽한 조화",
-          keywords: ["rich", "creamy", "low sweetness", "coffee", "hot"],
-        },
-        {
-          name: "모카 라떼",
-          description: "초콜릿 시럽을 추가하여 달콤하고 향긋한 커피 음료",
-          keywords: ["chocolate", "sweet", "coffee", "hot"],
-        },
-        {
-          name: "마끼아토",
-          description:
-            "에스프레소 위에 조금의 우유 거품을 더한 이탈리아식 커피",
-          keywords: ["espresso", "milk foam", "no sweetness", "coffee", "hot"],
-        },
-        {
-          name: "아이스 티",
-          description:
-            "다양한 향의 티를 시원하게 즐길 수 있으며, 여름에 인기 많은 음료",
-          keywords: [
-            "various flavors",
-            "optional sweetness",
-            "no coffee",
-            "cold",
-          ],
-        },
-        // Add all other drinks here
-      ],
+      response: null,
+      loading: false,
     };
   },
   methods: {
-    async fetchRecommendation() {
-      try {
-        const response = await axios.post("/recommend-drink", {
-          userInput: this.userInput,
-          drinks: this.drinks,
+    sendChat() {
+      console.log("Sending chat:", this.userInput);
+      this.loading = true;
+      axios
+        .post("/chat", {
+          userInput:
+            "커피가 마시고 싶은데 아이스 아메리카노, 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마끼아토, 아이스 티 중에 선택할꺼야 내 요청은 메뉴 이름만 부탁해" +
+            this.userInput,
+        })
+        .then((result) => {
+          this.response = result.data.message;
+          this.loading = false;
+        })
+        .catch((error) => {
+          console.error("Error sending chat:", error);
+          this.response = "Failed to get response from server.";
+          this.loading = false;
         });
-        this.recommendedDrink = response.data.recommendedDrink;
-      } catch (error) {
-        console.error("Failed to get recommendation:", error);
-        this.recommendedDrink = "Error: Could not retrieve any data.";
-      }
     },
   },
 };
 </script>
 
-<style scoped>
-.recommend-view {
+<style>
+.chat-gpt {
   text-align: center;
-  padding: 20px;
+  margin-top: 20px;
+}
+button {
+  margin-top: 10px;
 }
 </style>

@@ -18,7 +18,7 @@ module.exports = defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true
       },
-      '/recommend-drink': {
+      '/chat': {
         target: 'http://localhost:3000',
         changeOrigin: true
       },

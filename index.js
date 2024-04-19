@@ -34,30 +34,40 @@ const io = new Server(server, {
   
 console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);  // 환경 변수 테스트 출력
 
-const apiKey = process.env.OPENAI_API_KEY;
-const apiURL = 'https://api.openai.com/v1/completions';
+const apiKey = process.env.OPENAI_API_KEY;  // API Key in .env file for security
+const apiURL = 'https://api.openai.com/v1/chat/completions';
 
-app.post('/recommend-drink', async (req, res) => {
+if (!apiKey) {
+    console.error("API key is not set. Please check your .env file.");
+    process.exit(1);  // Exit if no API key is found
+}
+
+app.post('/chat', async (req, res) => {
+    console.log('Chat request received');
     const userInput = req.body.userInput;
+    const messages = [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: `${userInput}에 대하여 최대한 도움이 되는 답변을 해줘.` }
+    ];
+
     try {
-        const gptResponse = await axios.post(apiURL, {
-            model: "gpt-3.5-turbo",  // Using GPT-3.5 Turbo model
-            prompt: `Here is a list of drinks: ${JSON.stringify(req.body.drinks)}. Given the user likes ${userInput}, which drink would you recommend?`,
-            max_tokens: 100,
-            temperature: 0.7
+        const response = await axios.post("https://api.openai.com/v1/chat/completions", {
+            model: 'gpt-3.5-turbo',
+            temperature: 0.5,
+            messages: messages
         }, {
             headers: {
-                'Authorization': `Bearer ${apiKey}`
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
             }
         });
-
-        const recommendedDrink = gptResponse.data.choices[0].text.trim();
-        res.send({ recommendedDrink });
+        res.json({ message: response.data.choices[0].message.content });
     } catch (error) {
-        console.error('Error calling GPT-3.5 Turbo API:', error);
-        res.status(500).send('Failed to fetch response from GPT-3.5 Turbo API');
+        console.error('Error accessing OpenAI API:', error);
+        res.status(500).send('Failed to fetch response from OpenAI API');
     }
 });
+
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
