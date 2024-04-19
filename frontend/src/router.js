@@ -12,6 +12,7 @@ import CategoryManage from './components/CategoryManage.vue';
 import TagManage from './components/TagManage.vue';
 import KioskManage from './components/KioskManage.vue';
 import UserManage from "./components/UserManage.vue";
+import RecommendView from "./components/RecommendView.vue";
 
 const routes = [
   {
@@ -73,6 +74,10 @@ const routes = [
   {
     path: '/order-type',
     component: OrderTypePage,
+  },
+  {
+    path: '/recommend',
+    component: RecommendView,
   }
 ];
 

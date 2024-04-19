@@ -34,6 +34,31 @@ const io = new Server(server, {
   
 console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);  // 환경 변수 테스트 출력
 
+const apiKey = process.env.OPENAI_API_KEY;
+const apiURL = 'https://api.openai.com/v1/completions';
+
+app.post('/recommend-drink', async (req, res) => {
+    const userInput = req.body.userInput;
+    try {
+        const gptResponse = await axios.post(apiURL, {
+            model: "gpt-3.5-turbo",  // Using GPT-3.5 Turbo model
+            prompt: `Here is a list of drinks: ${JSON.stringify(req.body.drinks)}. Given the user likes ${userInput}, which drink would you recommend?`,
+            max_tokens: 100,
+            temperature: 0.7
+        }, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`
+            }
+        });
+
+        const recommendedDrink = gptResponse.data.choices[0].text.trim();
+        res.send({ recommendedDrink });
+    } catch (error) {
+        console.error('Error calling GPT-3.5 Turbo API:', error);
+        res.status(500).send('Failed to fetch response from GPT-3.5 Turbo API');
+    }
+});
+
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
