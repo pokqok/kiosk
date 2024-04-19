@@ -127,5 +127,5 @@ dist
 .pnp.*
 
 apikey.js
-*.json
-*.env
+credentials.json
+credentials.env
