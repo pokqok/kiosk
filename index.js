@@ -34,6 +34,43 @@ const io = new Server(server, {
   
 console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);  // 환경 변수 테스트 출력
 
+const apiKey = process.env.OPENAI_API_KEY;  // API Key in .env file for security
+const apiURL = 'https://api.openai.com/v1/chat/completions';
+
+if (!apiKey) {
+    console.error("API key is not set. Please check your .env file.");
+    process.exit(1);  // Exit if no API key is found
+}
+
+app.post('/chat', async (req, res) => {
+    console.log('Chat request received');
+    const userInput = req.body.userInput;
+    const messages = [
+        { role: 'system', content: '너는 카페 키오스크의 메뉴 추천 기능을 가지고 있어, 너가 가진 메뉴는 아이스 아메리카노, 아이스 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마끼아토, 아이스 티, 쌍화탕 이것 뿐이야 다른건 없어 ' },
+        { role: 'user', content: `${userInput}에 대해 메뉴의 이름이랑 간단한 설명만 부탁해` },
+        { role: 'assistant', content: '알맞는 답변이 없으면 없다고 말해줘. 멋대로 추천하지마. 사과도 하지마'}
+    ];
+
+    try {
+        const response = await axios.post("https://api.openai.com/v1/chat/completions", {
+            model: 'gpt-3.5-turbo',
+            temperature: 0,
+
+            messages: messages
+        }, {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        res.json({ message: response.data.choices[0].message.content });
+    } catch (error) {
+        console.error('Error accessing OpenAI API:', error);
+        res.status(500).send('Failed to fetch response from OpenAI API');
+    }
+});
+
+
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 

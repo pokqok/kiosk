@@ -17,6 +17,9 @@
           Audio Upload
         </button>
       </RouterLink>
+      <RouterLink to="/recommend">
+        <button v-if="showButton" @click="showButton = false">Recommend</button>
+      </RouterLink>
     </v-main>
   </v-app>
 </template>
