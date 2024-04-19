@@ -21,6 +21,7 @@
 import axios from "axios";
 
 export default {
+  props: ["autoQuery"],
   data() {
     return {
       userInput: "",
@@ -28,13 +29,20 @@ export default {
       loading: false,
     };
   },
+  watch: {
+    autoQuery(newVal) {
+      if (newVal) {
+        this.userInput = newVal;
+        this.sendChat(); // 자동으로 채팅을 보냄
+      }
+    },
+  },
   methods: {
     sendChat() {
+      if (!this.userInput) return; // 사용자 입력이 없으면 실행하지 않음
       this.loading = true;
       axios
-        .post("/chat", {
-          userInput: this.userInput,
-        })
+        .post("/chat", { userInput: this.userInput })
         .then((result) => {
           this.response = result.data.message;
           this.loading = false;

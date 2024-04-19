@@ -46,8 +46,8 @@ app.post('/chat', async (req, res) => {
     console.log('Chat request received');
     const userInput = req.body.userInput;
     const messages = [
-        { role: 'system', content: '너는 카페 키오스크의 메뉴 추천 기능을 가지고 있어, 너가 가진 메뉴는 아이스 아메리카노, 아이스 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마끼아토, 아이스 티, 토피넛 라떼, 버블티 이것 뿐이야 다른건 없어' },
-        { role: 'user', content: `${userInput}에 대해 메뉴의 이름이랑 간단한 설명만 부탁해 답변에 죄송합니다를 하지마` },
+        { role: 'system', content: '너는 카페 키오스크의 메뉴 추천 기능을 가지고 있어, 너가 가진 메뉴는 아이스 아메리카노, 아이스 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마끼아토, 아이스 티, 토피넛 라떼, 버블티 이것 뿐이야 다른건 없어. 추가로 모든 메뉴는 차가운거 뜨거운거 다 있어' },
+        { role: 'user', content: `${userInput}에 대해 메뉴의 이름만 부탁해 답변에 죄송합니다를 하지마` },
         { role: 'assistant', content: '알맞는 답변이 없으면 없다고 말해줘. 멋대로 추천하지마. "죄송합니다." 라는 사과를 하지마.  질문에만 대답해 줘'}
     ];
 

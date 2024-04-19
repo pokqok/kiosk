@@ -21,8 +21,6 @@
     <!-- Transcription -->
     <p>인식결과:{{ transcription }}</p>
   </div>
-
-  <button @click="goToRootPage">메인 페이지로 돌아가기</button>
 </template>
 
 <script>
@@ -104,6 +102,7 @@ export default {
           .then((response) => {
             this.transcription = response.data.data; // 서버로부터 받은 음성 인식 결과
             console.log("Transcription:", this.transcription);
+            this.$emit("transcription-complete", this.transcription); // 이벤트 발생
           })
           .catch((error) => {
             console.error("Error:", error.response.data.message);
@@ -114,14 +113,64 @@ export default {
           });
       }
     },
-    goToRootPage() {
-      this.$router.push("/");
-      this.$emit("comeBack");
-    },
   },
 };
 </script>
 
-<style>
-/* 스타일 추가 */
+<style scoped>
+/* 컴포넌트 전체 스타일 */
+div {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background: #f4f4f9;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 녹음 및 제출 버튼 스타일 */
+button {
+  padding: 10px 15px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #5c67f2;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #4a54e1;
+}
+
+/* 녹음 중지 버튼 스타일 - 빨간색으로 강조 */
+#stopRecording {
+  background-color: #ff6347;
+}
+
+#stopRecording:hover {
+  background-color: #e05335;
+}
+
+/* 인식 결과 표시 스타일 */
+p {
+  font-size: 16px;
+  color: #333;
+  background-color: #dff0d8;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #d6e9c6;
+  margin-top: 20px;
+}
+
+/* 입력 중 상태를 표시할 때 사용하는 스타일 */
+.loading {
+  color: #5c67f2;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+}
 </style>

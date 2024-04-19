@@ -13,6 +13,7 @@ import TagManage from './components/TagManage.vue';
 import KioskManage from './components/KioskManage.vue';
 import UserManage from "./components/UserManage.vue";
 import RecommendView from "./components/RecommendView.vue";
+import IntegratedComponent from "./components/IntegratedComponent.vue";
 
 const routes = [
   {
@@ -78,6 +79,11 @@ const routes = [
   {
     path: '/recommend',
     component: RecommendView,
+  }
+  ,
+  {
+    path: '/integrated',
+    component: IntegratedComponent,
   }
 ];
 
