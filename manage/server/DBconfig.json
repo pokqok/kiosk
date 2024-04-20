@@ -1,0 +1,8 @@
+{
+    "db": {
+      "host": "SEHWANCOM",
+      "user": "manager",
+      "password": "manager",
+      "database": "kiosk"
+    }
+}
