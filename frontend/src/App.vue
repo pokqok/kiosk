@@ -1,148 +1,83 @@
 <template>
-  <div>
-    <!-- File Upload Form -->
-    <form @submit.prevent="uploadFile">
-      <div>
-        <input type="file" name="uploaded_file" id="uploaded_file" @change="handleFileUpload">
-        <input type="text" placeholder="Number of speakers" v-model="nspeakers">
-        <button type="submit">Upload and Analyze</button>
-      </div>
-    </form>
-
-    <!-- Messages List -->
-    <ul>
-      <li v-for="msg in messages" :key="msg">{{ msg }}</li>
-    </ul>
-    <!-- Message Input and Send Button -->
-    <input v-model="message" autocomplete="off">
-    <button @click="sendMessage">Send</button>
-
-    <!-- Recognition Result Display -->
-    <div v-if="showResult" style="margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
-      <span>{{ resultText }}</span>
-    </div>
-
-    <!-- Payment Button -->
-    <button @click="requestPay">결제하기</button>
-  </div>
+  <v-app>
+    <v-main>
+      <RouterView @comeBack="showButton = true"></RouterView>
+      <RouterLink to="/login/admin">
+        <button v-if="showButton" @click="showButton = false">
+          go admin Login
+        </button>
+      </RouterLink>
+      <RouterLink to="/login/shop">
+        <button v-if="showButton" @click="showButton = false">
+          go shop Login
+        </button>
+      </RouterLink>
+      <!-- 나중에 쓸지는 모르겠습니다.
+      <RouterLink to="/AudioRecord">
+        <button v-if="showButton" @click="showButton = false">
+          Audio Upload
+        </button>
+      </RouterLink>
+      <RouterLink to="/recommend">
+        <button v-if="showButton" @click="showButton = false">Recommend</button>
+      </RouterLink>
+      -->
+      <RouterLink to="/integrated">
+        <button v-if="showButton" @click="showButton = false">
+          음성인식으로 추천받기
+        </button>
+      </RouterLink>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import io from 'socket.io-client';
-import axios from 'axios';
-
 export default {
-  name: 'App',
-
+  name: "App",
   data() {
     return {
-      message: '',
-      messages: [],
-      file: null, // 파일 상태를 null로 초기화
-      numSpeakers: 0,
-      resultText: '',
-      showResult: false,
-      IMP: window.IMP,
+      showButton: true,
     };
   },
 
-  mounted() {
-    this.initSocket();
-    this.IMP.init("imp03664607");
-  },
-
-  methods: {
-    initSocket() {
-      const socket = io();
-
-      socket.on('jwt', function (token) {
-        sessionStorage.setItem('jwt', token);
-      });
-
-      socket.on('chat message', (msg) => {
-        this.messages.push(msg);
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-
-      this.socket = socket;
-    },
-    
-    requestPay() {
-      const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-
-      this.IMP.request_pay({
-        pg: "html5_inicis.INIpayTest",
-        // pay_method: "kakaopay", 카카오페이만을 결제 수단으로 한다면 추가. 여러가지 존재 가능
-        merchant_uid: merchantUid,
-        name: "제발 되라",
-        amount: 100,
-        buyer_email: "Iamport@chai.finance",
-        buyer_name: "포트원 기술지원팀",
-        buyer_tel: "010-1234-5678",
-        buyer_addr: "서울특별시 강남구 삼성동",
-        buyer_postcode: "123-456",
-      }, rsp => {
-        if (rsp.success) {
-          console.log("성공");
-          axios({
-            url: "http://192.168.0.4:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-            data: {
-              imp_uid: rsp.imp_uid,
-              merchant_uid: rsp.merchant_uid
-            }
-          }).then(() => {
-            console.log("성공");
-            alert("결제가 완료되었습니다.");
-          })
-        } else {
-          alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
-        }
-      });
-    },
-
-    sendMessage() {
-      if (this.message === '') return;
-      this.socket.emit('chat message', this.message);
-      this.message = ''; // Clear the input after sending
-    },
-
-    handleFileUpload(event) {
-      this.file = event.target.files[0];
-    },
-
-    uploadFile() {
-      const formData = new FormData();
-      formData.append('uploaded_file', this.file);
-      formData.append('nspeakers', this.nspeakers);
-
-      fetch('/user', {
-        method: 'POST',
-        body: formData,
-      })
-        .then(response => response.json())
-        .then(data => {
-          this.resultText = data.success ? data.data : 'Error processing file.';
-          this.showResult = true;
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          this.resultText = 'Error submitting the form.';
-          this.showResult = true;
-        });
-    }
-  }
 };
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Avenir, Helvetica, Arial, sans-serif; /* 기본 폰트 유지 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: #2c3e50; /* 기본 텍스트 색상 유지 */
+}
+
+button {
+  margin: 10px;
+  padding: 12px 20px; /* 버튼 패딩 조정 */
+  font-size: 16px; /* 버튼 폰트 크기 조정 */
+  font-weight: bold; /* 글자 두께 bold로 설정 */
+  color: #ffffff; /* 텍스트 색상 흰색으로 설정 */
+  background-color: #3498db; /* 밝은 파란색으로 버튼 색상 설정 */
+  border: none; /* 테두리 제거 */
+  border-radius: 5px; /* 버튼의 모서리 둥글게 */
+  cursor: pointer; /* 클릭 가능한 요소 표시 */
+  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5); /* 버튼에 그림자 효과 추가 */
+  transition: background-color 0.3s, box-shadow 0.3s; /* 색상과 그림자 변화에 애니메이션 효과 */
+}
+
+button:hover {
+  background-color: #2980b9; /* 호버 시 버튼 색상 진한 파란색으로 변경 */
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.7); /* 호버 시 그림자 효과 강조 */
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none; /* Chrome, Safari에서 스피너 제거 */
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox에서 스피너 제거 */
 }
 </style>
