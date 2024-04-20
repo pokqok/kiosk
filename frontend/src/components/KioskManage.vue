@@ -4,14 +4,43 @@
     <v-btn color="primary" @click="setClear">초기화</v-btn>
   </v-subheader>
   <v-divider></v-divider>
-  <div>여기에 다양한 옵션을 넣을 수 있게 설정</div>
+  <div>여기에 다양한 옵션을 넣을 수 있게 설정g</div>
+  <v-app-bar color="pink">
+    <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+    <v-toolbar-title>앙 테스트</v-toolbar-title>
+
+    <v-spacer></v-spacer>
+
+    <v-btn icon="mdi-magnify"></v-btn>
+  </v-app-bar>
+
+  <v-main>
+    <div class="menu">
+      <v-container class="md-5">
+        <v-layout row wrap>
+          <v-flex xs12 sm6 md4 lg3 v-for="item in products" :key="item.name">
+            <v-card flat class="text-xs-center">
+              <v-responsive class="pt-4"> image </v-responsive>
+              <v-card-text>
+                <div class="subheading">{{ item.name }}</div>
+                <div class="grey--text">{{ item.price }}</div>
+              </v-card-text>
+            </v-card>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </div>
+  </v-main>
 </template>
 
 <script>
+import { product } from "@/data/PageProduct";
 export default {
   data() {
     return {
       //필요한 데이터 넣을 예정
+      products: product,
     };
   },
   methods: {

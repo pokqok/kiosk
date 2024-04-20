@@ -1,22 +1,39 @@
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
   transpileDependencies: true,
 
   devServer: {
+    host: "0.0.0.0",
+    port: "8080",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
     proxy: {
-      '/login': {
-        target: 'http://localhost:3000',
-        changeOrigin: true
+      "/login": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
       },
-      '/api': {
-        target: 'http://localhost:3000', // 실제 서버 주소
+      "/api": {
+        target: "http://localhost:3000", // 실제 서버 주소
         ws: true, // 웹소켓 프로토콜 사용 여부
         changeOrigin: true, // 필요 시 호스트 헤더를 변경
-        pathRewrite: { '^/api': '' }, // API 요청을 /api로 시작하도록 하고 실제 요청 시에는 이 부분을 제거
+        pathRewrite: { "^/api": "" }, // API 요청을 /api로 시작하도록 하고 실제 요청 시에는 이 부분을 제거
       },
-      '/tags': {
-        target: 'http://localhost:3000',
-        changeOrigin: true
+      "/tags": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+      "/chat": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+      "/category": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+      "/tag": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
       },
     },
     https: {
@@ -29,6 +46,6 @@ module.exports = defineConfig({
   pluginOptions: {
     vuetify: {
       // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
-    }
-  }
+    },
+  },
 });
