@@ -31,7 +31,7 @@ router.get('/getAllCategories', async (req, res) => {
   try {
     // MariaDB에 연결하여 쿼리 실행
     const conn = await pool.getConnection();
-    const result = await conn.query('SELECT * FROM category');
+    const result = await conn.query('SELECT * FROM CATEGORY');
     conn.release(); // 연결 해제
     console.log('가져오기 성공');
 
@@ -52,7 +52,7 @@ router.post('/add', async (req, res) => {
     
     //await conn.beginTransaction();
     await conn.query('START TRANSACTION'); //위에 뭔짓해도 안되서 그냥 직접 넣음
-    await conn.query(`INSERT INTO category (CategoryNO, CategoryName, CategoryAlias) VALUES (${categoryId},'${categoryName}', NULL)`);
+    await conn.query(`INSERT INTO CATEGORY (CategoryNO, CategoryName, CategoryAlias) VALUES (${categoryId},'${categoryName}', NULL)`);
 
     console.log('적용 성공');
     res.status(200).send('카테고리 추가 성공');
@@ -77,7 +77,7 @@ router.post('/delete', async (req, res) => {
     //await conn.beginTransaction();
 
     await conn.query('START TRANSACTION');
-    await conn.query(`DELETE FROM category WHERE id = ${categoryId}`);
+    await conn.query(`DELETE FROM CATEGORY WHERE id = ${categoryId}`);
     //commit은 apply시
   
 
@@ -107,7 +107,7 @@ router.post('/update', async (req, res) => {
 
         //await conn.beginTransaction();
         await conn.query('START TRANSACTION');
-        await conn.query(`UPDATE category SET CategoryName = '${categoryName}' WHERE CategoryNO = ${categoryId}`);
+        await conn.query(`UPDATE CATEGORY SET CategoryName = '${categoryName}' WHERE CategoryNO = ${categoryId}`);
         //await conn.commit();
 
         res.status(200).send('카테고리 수정 성공');
