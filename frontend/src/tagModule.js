@@ -1,6 +1,8 @@
 import axios from 'axios';
 
+
 const HOST = "http://localhost:3000";
+
 const tagModule = 
 {
     state(){

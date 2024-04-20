@@ -1,62 +1,24 @@
 import axios from 'axios';
-import {createStore} from 'vuex';
+//import {createStore} from 'vuex';
 
-import {product} from "@/data/PageProduct"
-//import {CategoryData} from "@/data/PageCategory.js"
-//import {tag} from "@/data/PageTags.js"
-//import {option} from "@/data/PageOptions.js"
-//import {kiosk} from "@/data/PageKioskData.js"
-//import {user} from "@/data/PageUser.js" 
-//위에 유저 데이터는 나중에 추가할 예정
-
-//import io from 'socket.io-client'
-//해당 코드는 제대로 적용시 킬 예정
 const HOST = "http://localhost:3000";
-const store = createStore({
+const categoryModule = 
+{
     state(){
         return {
-            /*
-            file: null, //csv 파일 전용
-            numSpeakers: 0,
-            messages: [],
-            socket: null,
-            jwt: null, //여기까진 잘 몰루
-            여기도 제대로 적용 시 풀 예정
-            */
-            products: product,
+            //products: product, //사실 안쓸듯?
             categorys: [],
-            //tags: tag,
-            //options: option,
-            //kioskData: kiosk,
-            //
-
         }
     },
 
     mutations: {
-        setFile(state, file) {
-            state.file = file
-        },
-        setNumSpeakers(state, value) {
-            state.numSpeakers = value
-        },
-        setSocket(state, socket) {
-            state.socket = socket;
-        },
-        addMessage(state, msg) {
-            state.messages.push(msg);
-        },
-        setJwt(state, token) {
-            state.jwt = token;
-            sessionStorage.setItem('jwt', token); // Vuex 밖에서는 sessionStorage에 저장
-        },
-        //여긴 잘 몰루
-
         //카테고리 on/off
         toggleCategory(state, categoryId) {
             const category = state.categorys.find(cat => cat.id === categoryId);
             if (category) {
-              category.isOn = !category.isOn;
+              let switchOn = category.isOn;
+              category.isOn = switchOn;
+              //바꾸지 않은 이유는, v-switch에 모델을 설정해주면, 이벤트 함수 설정 없이도 switch를 누르면 값이 바뀐다.
             }
             //만약 이부분을 DB에 추가한다면 변경해야 함
         },
@@ -74,9 +36,7 @@ const store = createStore({
         //카테고리 생성
         addCategory(state, newCategory) {
             if (newCategory.name.trim() !== '') {
-                //newCategory.id = state.categorys.length + 1;
-                //newCategory.id = state.categorys.id
-                //alias나 isON 상태는 vue에 설정한 뒤 보내기
+                //+1하는 걸 vue에서 하도록 바꿈, 10단위로 올라가는 문제가 자꾸 생김
                 state.categorys.push(newCategory);
               }
           },
@@ -112,38 +72,24 @@ const store = createStore({
     },
 
     actions: {
-        /*
-        async initSocket(context) {
-            const socket = io();
-
-            socket.on('jwt', function (token) {
-                context.commit('setJwt', token);
-            });
-
-            socket.on('chat message', (msg) => {
-                context.commit('addMessage', msg);
-                window.scrollTo(0, document.body.scrollHeight);
-            });
-
-            context.commit('setSocket', socket);
-        },
-        */
+  
         async fetchCategorys({ commit }) {
             try {
               // /categories/getAllCategories 엔드포인트에 GET 요청 보내기
-              const response = await axios.get(HOST + '/category/getAllCategories');
-
+                const response = await axios.get(HOST + '/category/getAllCategories');
+                 console.log("API Response:", response.data);  // Add this line to log the API response
               let CategoryData = [];
               // 응답에서 카테고리 데이터 추출
               const responseData = response.data;
-
+                 console.log("API Response:", response.data);  // Add this line to log the API response
               responseData.forEach(item => {
                 // 원하는 형태로 변환하여 객체 생성
                 const setcategory = {
                     id: item.CategoryNO,
                     name: item.CategoryName,
                     alias: item.CategoryAlias,
-                    isOn: false // 예시 값으로 임시 설정
+                    isOn: item.IsOn == 1 ? true : false
+                    //mariaDB는 1/0 으로 바꾸기에 이렇게 지속적인 변경이 필요하다.
                 };
                 CategoryData.push(setcategory);
             });
@@ -222,6 +168,18 @@ const store = createStore({
                 console.error('카테고리 취소 중 오류 발생:', error);
             }
         },
+
+        async toggleCategory(context, {id, isOn}) {
+            try {
+                // 서버에 카테고리 취소 요청 보내기
+                console.log(isOn);
+                await axios.post(HOST+'/category/toggle', {categoryId: id, categoryOn: isOn} );
+                // 취소 성공 시 다시 DB에서 가져와서 초기화하기
+                context.commit('toggleCategory', id);
+            } catch (error) {
+                console.error('카테고리 취소 중 오류 발생:', error);
+            }
+        },
     },
 
     getters: {
@@ -249,6 +207,6 @@ const store = createStore({
         },
     },
 
-})
+}
 
-export default store;
+export default categoryModule;

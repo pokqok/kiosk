@@ -22,6 +22,10 @@ module.exports = defineConfig({
         target: 'http://localhost:3000',
         changeOrigin: true
       },
+      '/category': {
+        target: 'http://localhost:3000',
+        changeOrigin: true
+      },
     },
     https: {
       // key와 cert 파일을 사용하여 https 서버를 실행할 수 있음

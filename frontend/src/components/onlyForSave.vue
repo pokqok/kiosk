@@ -1,7 +1,4 @@
-<template>
-
-
-</template>
+<template></template>
 
 <v-card>
     <v-card-title>새로운 입력창</v-card-title>

@@ -15,7 +15,6 @@ const axios = require('axios');
 const {SpeechClient} = require('@google-cloud/speech').v2;
 const oracledb = require('oracledb');
 
-
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -74,6 +73,7 @@ app.post('/chat', async (req, res) => {
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
+/*
 // Oracle DB 연결 정보
 const dbConfig = {
     user: 'c##manager',//이름, 지금 오라클 21c 사용중, 근데 이름에 c##을 붙여야 함 왠진 모르겠지만
@@ -81,6 +81,7 @@ const dbConfig = {
     connectString: 'SEHWANCOM:1521/xe' // Oracle 서버 주소
     //connectString: '0.0.0.0/xe' // Oracle 서버 주소
   };
+*/
 
 // 태그 목록 조회
 app.get('/tags', async (req, res) => {
@@ -284,14 +285,19 @@ app.post('/login/shop', (req, res) => {
         res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 });
-/*
-app.get('/api/getUniqueOrderNumber', (req, res) => {
-    orderCounter += 1;
-    res.json({orderNumber: orderCounter});
-});
-*/
+
+//db 연결
+const categoryRouter = require('./dto/categorys.js');
+app.use('/category', categoryRouter);
+console.log('categoryRouter:', categoryRouter);
+
+const tagRouter = require('./dto/tags.js');
+app.use('/tag', tagRouter);
+console.log('tagRouter:', tagRouter);
+
+
+
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
 server.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
-
-
+});
