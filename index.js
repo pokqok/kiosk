@@ -248,7 +248,10 @@ app.post("/upload", upload.single("audio"), (req, res) => {
 //결제
 app.post("/payments/verify", async (req, res) => {
   const { imp_uid } = req.body; // 클라이언트로부터 전달받은 imp_uid
-
+  const IMP_KEY = process.env.IMP_KEY; // REST API 키를 환경 변수에서 가져옵니다.
+  console.log("imp_uid:", imp_uid);
+  const IMP_SECRET = process.env.IMP_SECRET;
+  console.log("IMP_KEY:", IMP_KEY);
   try {
     // 1. 아임포트 Access Token 획득
     const {
@@ -256,9 +259,8 @@ app.post("/payments/verify", async (req, res) => {
         response: { access_token },
       },
     } = await axios.post("https://api.iamport.kr/users/getToken", {
-      imp_key: "2380114616885334",
-      imp_secret:
-        "HOPSUHN0O3iTWQ30k26M6vcXE081OBblGD34gVQQ5sRMHahuI0jaunCDnbgypxcl9W4jrudKyHIoDW6y",
+      imp_key: IMP_KEY,
+      imp_secret: IMP_SECRET,
     });
 
     // 2. 결제 정보 조회
@@ -306,11 +308,9 @@ app.post("/login/shop", (req, res) => {
 
 //db 연결
 const categoryRouter = require("./dto/categorys.js");
-console.log("categoryRouter:", categoryRouter);
 app.use("/category", categoryRouter);
 
 const tagRouter = require("./dto/tags.js");
-console.log("tagRouter:", tagRouter);
 app.use("/tag", tagRouter);
 
 const PORT = process.env.PORT || 3000; // 포트 번호 설정

@@ -2,7 +2,7 @@ export default [
     {
         ProductNO: 1,
         ProductName: '아메리카노',
-        Price: 4500,
+        Price: 100,
         CategoryNO: 1,
         ProductDetail: 'HP 포션',
         ProductImage: "https://picsum.photos/100?random=1",

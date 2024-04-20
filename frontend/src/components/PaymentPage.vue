@@ -80,7 +80,7 @@ export default {
           if (rsp.success) {
             console.log("성공");
             axios({
-              url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+              url: "api/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
               method: "post",
               headers: { "Content-Type": "application/json" },
               data: {
@@ -124,7 +124,7 @@ export default {
           if (rsp.success) {
             console.log("성공");
             axios({
-              url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+              url: "api/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
               method: "post",
               headers: { "Content-Type": "application/json" },
               data: {
@@ -146,44 +146,6 @@ export default {
         }
       );
     },
-    /*
-        requestPayToss() {
-            const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-
-            this.IMP.request_pay({
-                pg: "html5_inicis.INIpayTest",
-                pay_method: "tosspay",
-                merchant_uid: merchantUid,
-                name: this.productName,
-                amount: this.totalPrice,
-                buyer_email: "Iamport@chai.finance",
-                buyer_name: "포트원 기술지원팀",
-                buyer_tel: "010-1234-5678",
-                buyer_addr: "서울특별시 강남구 삼성동",
-                buyer_postcode: "123-456",
-            }, rsp => {
-                if (rsp.success) {
-                    console.log("성공");
-                    axios({
-                        url: "http://localhost:3000/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
-                        method: "post",
-                        headers: { "Content-Type": "application/json" },
-                        data: {
-                            imp_uid: rsp.imp_uid,
-                            merchant_uid: rsp.merchant_uid
-                        }
-                    }).then(() => {
-                        console.log("성공");
-                        alert("결제가 완료되었습니다.");
-                    })
-                } else {
-                    alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
-                    this.cntCanclePay++
-                }
-            });
-            
-        },
-        */
   },
 };
 </script>
