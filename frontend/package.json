@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "jest"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -20,7 +21,7 @@
     "socket.io-client": "^4.7.5",
     "vue": "^3.2.13",
     "vue-router": "^4.3.0",
-    "vuetify": "^3.5.15",
+    "vuetify": "^3.6.0-alpha.2",
     "vuex": "^4.0.2",
     "webfontloader": "^1.0.0"
   },

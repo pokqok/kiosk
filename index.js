@@ -13,7 +13,7 @@ const { Server } = require("socket.io");
 const server = http.createServer(app);
 const axios = require('axios');
 const {SpeechClient} = require('@google-cloud/speech').v2;
-const oracledb = require('oracledb');
+//const oracledb = require('oracledb');
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -84,6 +84,7 @@ const dbConfig = {
 */
 
 // 태그 목록 조회
+/*
 app.get('/tags', async (req, res) => {
   try {
     console.log('태그 목록 조회 요청이 들어왔습니다.');
@@ -103,6 +104,7 @@ app.get('/tags', async (req, res) => {
     res.status(500).send('태그 목록 조회 중 오류가 발생했습니다.');
   }
 });
+*/
 
 
 // http 요청 들어오면 frontend/dist/index.html 제공
@@ -286,14 +288,38 @@ app.post('/login/shop', (req, res) => {
     }
 });
 
+
+
+
+
+
 //db 연결
 const categoryRouter = require('./dto/categorys.js');
+
+app.use('/category', (req, res, next) => {
+    if (req.path === '/category') {
+        next(); // categoryRouter.js에 대한 요청은 허용하고 나머지는 거부합니다.
+    } else {
+        res.status(403).send('Access forbidden'); // '/category' 경로 외의 요청은 거부합니다.
+    }
+});
+
+
 app.use('/category', categoryRouter);
-console.log('categoryRouter:', categoryRouter);
+//console.log('categoryRouter:', categoryRouter);
 
 const tagRouter = require('./dto/tags.js');
+
+app.use('/tag', (req, res, next) => {
+    if (req.path === '/tag') {
+        next(); // tagRouter.js에 대한 요청은 허용하고 나머지는 거부합니다.
+    } else {
+        res.status(403).send('Access forbidden'); // '/tag' 경로 외의 요청은 거부합니다.
+    }
+});
+
 app.use('/tag', tagRouter);
-console.log('tagRouter:', tagRouter);
+//console.log('tagRouter:', tagRouter);
 
 
 

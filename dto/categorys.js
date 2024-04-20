@@ -14,6 +14,17 @@ const pool = mariadb.createPool({
   database: config.db.database,
 });
 
+
+//미들웨어 설정
+router.use('/categorys', (req, res, next) => {
+  if (req.path === '/categorys') {
+      next(); // categoryRouter.js에 대한 요청은 허용하고 나머지는 거부합니다.
+  } else {
+      res.status(403).send('Access forbidden'); // /category 경로 외의 요청은 거부합니다.
+  }
+});
+
+
 let transaction; // 공유되는 트랜잭션임
 //이걸로 apply/cancel해야 거기서 commit/rollback을 해줌
 
@@ -23,7 +34,7 @@ router.get('/getAllCategories', async (req, res) => {
     const conn = await pool.getConnection();
     const result = await conn.query('SELECT * FROM category');
     conn.release();
-    console.log('가져오기 성공');
+    console.log('DB반환 성공: ' + JSON.stringify(result));
     res.status(200).json(result);
   } catch (error) {
     console.error('카테고리 가져오기 에러:', error);
