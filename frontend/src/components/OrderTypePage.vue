@@ -11,7 +11,9 @@
       class="btn btn-outline-success custom-btn"
       @click="goToShop('shop')"
     >
+      <img :src="shopImage" alt="매장" style="width: 60px; height: 60px" />
       매장
+      <img :src="shopImage" alt="매장" style="width: 60px; height: 60px" />
     </button>
   </div>
   <div class="col-12 p-3 mb-5">
@@ -20,7 +22,9 @@
       class="btn btn-outline-success custom-btn"
       @click="goToShop('Packaging')"
     >
+      <img :src="packagingImage" alt="포장" style="width: 60px; height: 60px" />
       포장
+      <img :src="packagingImage" alt="포장" style="width: 60px; height: 60px" />
     </button>
   </div>
 
@@ -36,7 +40,12 @@
 <script>
 export default {
   name: "OrderTypePage",
-
+  data() {
+    return {
+      shopImage: require("@/assets/inside.png"),
+      packagingImage: require("@/assets/outside.png"),
+    };
+  },
   methods: {
     goToShop(type) {
       if (type == "shop") {
