@@ -45,6 +45,9 @@ export default {
         // log media recorder
         console.log("MediaRecorder created:", this.mediaRecorder);
 
+        // Start monitoring audio levels for silence detection
+        this.monitorAudioLevel(stream);
+
         this.mediaRecorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
             this.recordedChunks.push(event.data);
@@ -56,20 +59,36 @@ export default {
           this.uploadAudio(blob);
           this.audio_recording = false;
         };
+
+        // Automatically start recording when media stream is available
+        this.startRecording();
       });
   },
   methods: {
-    async startRecording() {
-      console.log("navigator:", navigator);
-      if (this.mediaRecorder) {
-        this.audio_recording = true;
-        this.mediaRecorder.start();
-      }
-    },
-    stopRecording() {
-      if (this.mediaRecorder) {
-        this.mediaRecorder.stop();
-      }
+    monitorAudioLevel(stream) {
+      const audioContext = new AudioContext();
+      const audioStream = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 32;
+      audioStream.connect(analyser);
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      const checkSilence = () => {
+        analyser.getByteFrequencyData(dataArray);
+        const average =
+          dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
+
+        if (average < 10) {
+          // Adjust this threshold as needed
+          this.stopRecording();
+        } else {
+          setTimeout(checkSilence, 1000); // Check every second
+        }
+      };
+
+      checkSilence();
     },
     async uploadAudio(blob) {
       let formData = new FormData();
@@ -111,6 +130,22 @@ export default {
           .finally(() => {
             this.$store.commit("setFile", null);
           });
+      }
+    },
+    goToRootPage() {
+      this.$router.push("/");
+      this.$emit("comeBack");
+    },
+    startRecording() {
+      console.log("navigator:", navigator);
+      if (this.mediaRecorder) {
+        this.audio_recording = true;
+        this.mediaRecorder.start();
+      }
+    },
+    stopRecording() {
+      if (this.mediaRecorder) {
+        this.mediaRecorder.stop();
       }
     },
   },
