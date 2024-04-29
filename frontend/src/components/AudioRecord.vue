@@ -137,6 +137,18 @@ export default {
       this.$router.push("/");
       this.$emit("comeBack");
     },
+    startRecording() {
+      console.log("navigator:", navigator);
+      if (this.mediaRecorder) {
+        this.audio_recording = true;
+        this.mediaRecorder.start();
+      }
+    },
+    stopRecording() {
+      if (this.mediaRecorder) {
+        this.mediaRecorder.stop();
+      }
+    },
   },
 };
 </script>
