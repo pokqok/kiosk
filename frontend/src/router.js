@@ -14,6 +14,7 @@ import KioskManage from './components/KioskManage.vue';
 import UserManage from "./components/UserManage.vue";
 import RecommendView from "./components/RecommendView.vue";
 import IntegratedComponent from "./components/IntegratedComponent.vue";
+import HelperPage from "./components/HelperPage.vue"
 //import CardTest from '@/views/CardTest.vue';
 
 const routes = [
@@ -69,6 +70,10 @@ const routes = [
     component: ShopPage,
   },
   {
+    path: '/helper/:id',
+    component: HelperPage,
+  },
+  {
     path: '/payment',
     component: PaymentPage,
   },
@@ -87,7 +92,7 @@ const routes = [
     component: ModeSelectPage,
   },
   {
-    path: '/order-type',
+    path: '/order-type/:mode',
     component: OrderTypePage,
   },
   {

@@ -54,7 +54,11 @@ export default {
         this.$store.commit("setOrderType", 1);
       }
 
-      this.$router.push("/shop/" + this.$store.state.ShopID);
+      if(this.$route.params.mode == 'common') {
+        this.$router.push("/shop/" + this.$store.state.ShopID);
+      } else if(this.$route.params.mode == 'helper') {
+        this.$router.push("/helper/" + this.$store.state.ShopID);
+      }
     },
   },
 };
