@@ -27,7 +27,6 @@
             <v-form>
               <v-row>
                   <v-col v-for="(category, index) in Categorys" :key="index" cols="12">
-
                     <v-card :color="getRandomColor()">
                       <div class="d-flex align-center justify-space-between">
                         <div>
@@ -41,11 +40,12 @@
                         class="ms-2"
                         size="small"
                         text="START RADIO"
-                        variant="outlined"
-                        @click="editCategory(category)">
+                        variant="outlined">
                            수정
                         </v-btn>
-                      </div>
+                        </div>
+
+
                      </div>
                      
                    
@@ -58,35 +58,10 @@
       
           <v-card-actions>
             <v-btn color="primary" @click="saveAndClose">저장</v-btn>
-            <!-- 
-                아래 버튼은 저장과 같은 기능이라 걍 빼둠
-                <v-btn color="error" @click="closeDialog">취소</v-btn>
-            -->
+            <v-btn color="error" @click="closeDialog">취소</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <!-- 카테고리 관리  수정창 -->
-      <v-dialog v-model="editDialog" persistent max-width="600px">
-      <v-card>
-        <v-card-title style="display: flex; justify-content: space-between;">
-          <div>카테고리 설정</div>
-                  <v-btn variant="plain" density="compact" icon="mdi-close" @click="cancelEdit"></v-btn>
-        </v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent="applyEdit">
-            <v-text-field v-model="editedCategoryName" label="카테고리 이름"></v-text-field>
-            <div style="display: flex; justify-content: space-between;">
-              <div></div>
-              <v-btn color="primary" type="submit" @click="updateCategory(selectedCategoryId)">적용</v-btn>
-              <v-btn color="error" @click="deleteCategory(selectedCategoryId)">
-                삭제 <!-- 삭제 버튼 아이콘 -->
-              </v-btn>
-            </div>
-            
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
 
   </v-subheader>
   <v-divider></v-divider>
@@ -115,29 +90,26 @@
           <div>{{ item.name }}</div>
         </td>
         <td> <v-switch v-model="item.isOn" color="green" @change="updateSwitch(item.id, item.isOn)"></v-switch> </td>
-        <!-- <td> {{ item.id }}</td> -->
       </tr>
     </tbody>
   </v-table>
 
   <v-slide-x-transition>
     <v-bottom-navigation v-if="isDataChanged" :value="value">
-      <v-btn icon @click="saveTotalChange(Categorys)">
+      <v-btn icon @click="saveTotalChange">
         <v-icon>mdi-content-save</v-icon>
       </v-btn>
-      <v-btn icon @click="closeBottom()">
+      <v-btn icon @click="closeBottom">
         <v-icon>mdi-undo</v-icon>
       </v-btn>
     </v-bottom-navigation>
   </v-slide-x-transition>
-  
 
   </template>
   
   <script>
-  //import {CategoryData}from "@/data/PageCategory.js"
+  import {CategoryData}from "@/data/PageCategory.js"
   import { isEqual } from 'lodash';
-  //import { mapActions, mapGetters } from 'vuex';
   export default {
 
     data() {
@@ -147,9 +119,6 @@
         isDataChanged: false, // 변경 여부
         //Categorys: CategoryData, //js가 아니라 이제 store.js에서 사용
         dialog: false,
-        selectedCategoryId: null,
-        editedCategoryName: '',
-        editDialog: false,
       };
     },
 
@@ -166,23 +135,24 @@
 
       // 아래는 DB에서 기본 데이터 가져오기, 적용 시 다시 가져오려면 이것을 다시 쓸 예정
       this.$store.dispatch('fetchCategorys')
+
     },
 
     watch: { //변경 여부 계속 주시
      
-      '$store.state.categoryModule.categorys': {
+      '$store.state.categorys': {
         handler(newVal, oldVal){
           console.log(newVal, oldVal)
           console.log(isEqual(newVal, oldVal))
-          
-          if (isEqual(newVal, oldVal)==true) {
+          /*
+          if (isEqual(newVal, oldVal)==false) {
             console.log('Categorys 데이터가 변경되었습니다:', newVal);
             this.isDataChanged = true;
           }else{
             //
             this.isDataChanged = false;
-          }
-          //this.isDataChanged = true;
+          }*/
+          this.isDataChanged = true;
         },
         deep: true //세부 요소 감시
       }
@@ -190,68 +160,45 @@
     },
 
     computed:{
-      //...mapGetters('categoryModule', ['Categorys', 'activeCategories']),
-      
+      //...mapGetters(['activeCategories', 'inactiveCategories']),
+       // vuex store.js로 가져오게 변경, getters임
       Categorys() {
        //return this.$store.state.categorys;
-       return this.$store.state.categoryModule.categorys;
+       return this.$store.state.categorys;
       },
 
       //아래는 활용여부 미정
       allCategories() {
-          return this.$store.getters.categoryModule.allCategories;
+          return this.$store.getters.allCategories;
       },
       getCategoryById(){
-          return this.$store.getters.categoryModule.getCategoryById;
+          return this.$store.getters.getCategoryById;
       },
       activeCategories() {
-          return this.$store.getters.categoryModule.activeCategories;
+          return this.$store.getters.activeCategories;
       },
     },
    
     methods: {
-      /*
-      ...mapActions('categoryModule', [
-        'fetchCategorys',
-        'addCategory',
-        'deleteCategory',
-        'updateCategory',
-        'applyCategory',
-        'cancelCategory',
-      ]),*/
+      //...mapActions(['addCategory', 'updateCategory', 'deleteCategory', 'replaceCategorys']), // Vuex store의 actions 사용
 
       addCategory() {
         if (this.newCategoryName.trim() !== '') {
-            const newCategory = { id: this.Categorys.length + 1, name: this.newCategoryName, alias: '', isOn: true }; // 예시 데이터
-            //DB에 auto increase가 있어도 직접 넣어줘야 오류가 안생김
+            const newCategory = { id: 123, name: this.newCategoryName, alias: '', isOn: true }; // 예시 데이터
             this.$store.dispatch('addCategory', newCategory);
-            //alert(newCategory.id);
+
             this.newCategoryName = ''; // 입력창 초기화
         }
       },
 
-      deleteCategory(selectedCategoryId) {
-        const id = selectedCategoryId;
-        //alert(selectedCategoryId);
+      deleteCategory(id) {
           this.$store.dispatch('deleteCategory', id);
-
-          this.editedCategoryName = '';
-          this.editDialog = false;
       },
 
-      updateCategory(selectedCategoryId) {
-        if (this.editedCategoryName.trim() !== '') {
-          const newName = this.editedCategoryName;
-          const newAlias = '';
-          const editedId = selectedCategoryId;
-          //alert(editedId);
-          this.$store.dispatch('updateCategory', { id: editedId, name: newName, alias: newAlias});
-          
-          this.editedCategoryName = '';
-          this.editDialog = false; // 수정 다이얼로그 닫기
-        }else{
-          alert('입력 예외');
-        }
+      updateCategory(category) {
+          const newName = 'New Name'; // 예시 데이터
+          const newAlias = 'New Alias'; // 예시 데이터
+          this.$store.dispatch('updateCategory', { id: category.id, newName, newAlias });
       },
       replaceCategories(newCategories) {
           this.$store.dispatch('replaceCategorys', newCategories);
@@ -272,60 +219,39 @@
       },
       saveAndClose() {
         // 저장 로직을 form에 구현해야 하나 생각중
-        this.closeDialog();
+      this.closeDialog();
       },
 
       getRandomColor() {
         // 랜덤한 색상 반환하는 메소드
-        //return '#' + Math.floor(Math.random()*16777215).toString(16);
-        return 'success'
+        return '#' + Math.floor(Math.random()*16777215).toString(16);
       },
 
-      updateSwitch(editedId, changedState) {
-        //isOn == !isOn;
+      updateSwitch(id, isOn) {
+        isOn == !isOn;
         //this.isDataChanged = true;
-        console.log(`카테고리 ID ${editedId}의 스위치 상태가 변경되었습니다. 새로운 상태: ${!changedState}`);
-        console.log(editedId)
-        this.$store.dispatch('toggleCategory', { id: editedId , isOn: changedState} );
+        console.log(`카테고리 ID ${id}의 스위치 상태가 변경되었습니다. 새로운 상태: ${isOn}`);
         // 아님 서버로 요청하는 로직 작성
-        //이거 store에 switch를 안쓰는듯
       },
-      
-      editCategory(category) {
-        /*
-        this.editedCategoryId = category.id;
-        this.editedCategoryName = this.Categorys.find(cat => cat.id === id).name;
-        this.editDialog = true;*/
-        this.selectedCategoryId = category.id;
-        this.editedCategoryId = category.id;
-        this.editedCategoryName = category.name;
-        this.editDialog = true;
-      },
+      /*
+       addCategory() {
+          if (this.newCategoryName.trim() !== '') {
+            // 부모 컴포넌트로부터 받은 Categorys 배열과 새로운 카테고리 이름을 전달하여 새로운 카테고리를 추가
+            const updatedCategorys = addNewCategory(this.Categorys, this.newCategoryName);
+            
+            // 부모 컴포넌트에 변경된 Categorys 배열을 emit하여 전달
+            this.$emit('add', updatedCategorys);
 
-      applyEdit() {
-        const editedCategory = this.Categorys.find(cat => cat.id === this.editedCategoryId);
-        editedCategory.name = this.editedCategoryName;
-        this.editDialog = false;
-        this.editedCategoryId = null;
-        this.editedCategoryName = '';
-      },
-
-      cancelEdit() {
-        this.editDialog = false;
-        this.editedCategoryId = null;
-        this.editedCategoryName = '';
-      },
-
-        saveTotalChange(newCategory){
-          //CategoryData.splice(0, CategoryData.length, ...this.Categorys);
-          this.$store.dispatch('applyCategory', newCategory);
-          alert('데이터 변경 적용 완료')
+            this.newCategoryName = ''; // 입력창 초기화
+          }
+        },
+        */
+        saveTotalChange(){
+          CategoryData.splice(0, CategoryData.length, ...this.Categorys);
           this.isDataChanged = false;
         },
 
         closeBottom(){
-          this.$store.dispatch('cancelCategory');
-          alert('데이터 변경 취소!')
           this.isDataChanged = false;
         },
 

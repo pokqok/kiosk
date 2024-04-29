@@ -12,6 +12,9 @@ import CategoryManage from './components/CategoryManage.vue';
 import TagManage from './components/TagManage.vue';
 import KioskManage from './components/KioskManage.vue';
 import UserManage from "./components/UserManage.vue";
+import RecommendView from "./components/RecommendView.vue";
+import IntegratedComponent from "./components/IntegratedComponent.vue";
+//import CardTest from '@/views/CardTest.vue';
 
 const routes = [
   {
@@ -46,6 +49,19 @@ const routes = [
         path: 'user-manage',
         component: UserManage
       },
+      {
+        path: '/product-manage', component: ProductManage
+      },
+      {
+        path: '/category-manage', component: CategoryManage
+      },
+      {
+        path: '/tag-manage', component: TagManage
+      },
+      {
+        path: '/kiosk-manage', component: KioskManage
+      },
+
     ]
   },
   {
@@ -73,6 +89,15 @@ const routes = [
   {
     path: '/order-type',
     component: OrderTypePage,
+  },
+  {
+    path: '/recommend',
+    component: RecommendView,
+  }
+  ,
+  {
+    path: '/integrated',
+    component: IntegratedComponent,
   }
 ];
 
