@@ -113,6 +113,10 @@ export default {
           });
       }
     },
+    goToRootPage() {
+      this.$router.push("/");
+      this.$emit("comeBack");
+    },
   },
 };
 </script>
