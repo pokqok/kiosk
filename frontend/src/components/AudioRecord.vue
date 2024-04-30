@@ -54,13 +54,13 @@ export default {
         const average =
           dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
 
-        if (average < 3 && this.audio_recording == true) {
+        if (average < 25 && this.audio_recording == true) {
           // Adjust this threshold as needed
           if (this.audio_recording) {
             this.stopRecording();
           }
-        }else{
-        setTimeout(checkSilence, 1000);} // Check every second
+        }
+        setTimeout(checkSilence, 5000);
       };
 
       checkSilence();
