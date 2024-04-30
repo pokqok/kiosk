@@ -18,6 +18,7 @@
     <div v-if="step == 1">
       <v-progress-circular indeterminate :size="60" :width="6"></v-progress-circular>
     </div>
+    <p>인식결과:{{ transcription }}</p>
     <div v-if="step == 2">
       <div class="row">
         <!-- test, 나중에 testdata대신 음성인식 추천 목록-->
