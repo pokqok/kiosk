@@ -36,33 +36,7 @@ export default {
     };
   },
   mounted() {
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: true,
-      })
-      .then((stream) => {
-        this.mediaRecorder = new MediaRecorder(stream);
-        // log media recorder
-        console.log("MediaRecorder created:", this.mediaRecorder);
-
-        // Start monitoring audio levels for silence detection
-        this.monitorAudioLevel(stream);
-
-        this.mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            this.recordedChunks.push(event.data);
-          }
-        };
-
-        this.mediaRecorder.onstop = () => {
-          let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
-          this.uploadAudio(blob);
-          this.audio_recording = false;
-        };
-
-        // Automatically start recording when media stream is available
-        this.startRecording();
-      });
+    // navigator.mediaDevices.getUserMedia({...}) 코드는 삭제
   },
   methods: {
     monitorAudioLevel(stream) {
@@ -80,12 +54,13 @@ export default {
         const average =
           dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
 
-        if (average < 10) {
+        if (average < 3 && this.audio_recording == true) {
           // Adjust this threshold as needed
-          this.stopRecording();
-        } else {
-          setTimeout(checkSilence, 1000); // Check every second
-        }
+          if (this.audio_recording) {
+            this.stopRecording();
+          }
+        }else{
+        setTimeout(checkSilence, 1000);} // Check every second
       };
 
       checkSilence();
@@ -137,15 +112,41 @@ export default {
       this.$emit("comeBack");
     },
     startRecording() {
-      console.log("navigator:", navigator);
-      if (this.mediaRecorder) {
-        this.audio_recording = true;
-        this.mediaRecorder.start();
-      }
+      // 녹음 시작 버튼 클릭 시에만 호출됨
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          this.mediaRecorder = new MediaRecorder(stream);
+
+          // Start monitoring audio levels for silence detection
+          this.monitorAudioLevel(stream);
+
+          this.mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              this.recordedChunks.push(event.data);
+            }
+          };
+
+          this.mediaRecorder.onstop = () => {
+            let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+            this.uploadAudio(blob);
+            this.audio_recording = false;
+          };
+
+          this.audio_recording = true;
+          this.mediaRecorder.start();
+          console.log("Recording started");
+        })
+        .catch((error) => {
+          console.error("Error accessing microphone:", error);
+        });
     },
     stopRecording() {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
+        console.log("stop");
+        this.submitAudio(); // Stop recording 시에 submitAudio() 함수 실행
+        console.log("submit");
       }
     },
   },
