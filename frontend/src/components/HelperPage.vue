@@ -45,7 +45,8 @@ export default {
   data() {
     return {
       step: 0,
-      transcription: ""
+      transcription: "",
+      recordedChunks: [] // recordedChunks 배열 추가
     }
   },
   computed: {
@@ -54,43 +55,55 @@ export default {
   components: {
     ProductItem,
   },
-  methods: {
-    openProductOptionModal(data) {
-      console.log(data)
-      alert("미구현")
-    },
-    
-    monitorAudioLevel(stream) {
-      const audioContext = new AudioContext();
-      const audioStream = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 32;
-      audioStream.connect(analyser);
+  mounted() {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: true,
+      })
+      .then((stream) => {
+        this.mediaRecorder = new MediaRecorder(stream);
+        // log media recorder
+        console.log("MediaRecorder created:", this.mediaRecorder);
 
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-
-      const checkSilence = () => {
-        analyser.getByteFrequencyData(dataArray);
-        const average =
-          dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
-
-        if (average < 25 && this.audio_recording == true) {
-          if (this.audio_recording) {
-            this.stopRecording();
+        this.mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            this.recordedChunks.push(event.data);
           }
-        }
-        setTimeout(checkSilence, 5000);
-      };
+        };
 
-      checkSilence();
+        this.mediaRecorder.onstop = () => {
+          let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+          this.uploadAudio(blob);
+          this.audio_recording = false;
+        };
+      });
+  },
+  methods: {
+    async startRecording() {
+      console.log("navigator:", navigator);
+      if (this.mediaRecorder) {
+        this.audio_recording = true;
+        this.mediaRecorder.start();
+        setTimeout(() => {
+          this.stopRecording(); // 5초 후에 stopRecording 메서드를 호출
+        }, 5000); // 5000ms = 5초
+      }
+    },
+    stopRecording() {
+      if (this.mediaRecorder) {
+        this.mediaRecorder.stop();
+        this.audio_recording = false;
+        setTimeout(() => {
+          this.submitAudio(); // 녹음이 종료되면 즉시 서버로 결과를 전송
+        }, 1000);
+      }
     },
     async uploadAudio(blob) {
       let formData = new FormData();
       formData.append("audio", blob);
 
       axios
-        .post("api/upload", formData)
+        .post("/api/upload", formData)
         .then((response) => {
           console.log("Response:", response);
           console.log("uploaded_file:", response.data.uploaded_file);
@@ -112,11 +125,11 @@ export default {
         formData.append("uploaded_file", this.$store.state.file);
 
         axios
-          .post("api/audio-upload", formData)
+          .post("/api/audio-upload", formData)
           .then((response) => {
-            this.transcription = response.data.data;
+            this.transcription = response.data.data; // 서버로부터 받은 음성 인식 결과
             console.log("Transcription:", this.transcription);
-            this.$emit("transcription-complete", this.transcription);
+            this.$emit("transcription-complete", this.transcription); // 이벤트 발생
           })
           .catch((error) => {
             console.error("Error:", error.response.data.message);
@@ -125,41 +138,6 @@ export default {
           .finally(() => {
             this.$store.commit("setFile", null);
           });
-      }
-    },
-    startRecording() {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-          this.mediaRecorder = new MediaRecorder(stream);
-          this.monitorAudioLevel(stream);
-
-          this.mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-              this.recordedChunks.push(event.data);
-            }
-          };
-
-          this.mediaRecorder.onstop = () => {
-            let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
-            this.uploadAudio(blob);
-            this.audio_recording = false;
-          };
-
-          this.audio_recording = true;
-          this.mediaRecorder.start();
-          console.log("Recording started");
-        })
-        .catch((error) => {
-          console.error("Error accessing microphone:", error);
-        });
-    },
-    stopRecording() {
-      if (this.mediaRecorder) {
-        this.mediaRecorder.stop();
-        console.log("stop");
-        this.submitAudio();
-        console.log("submit");
       }
     },
   },
