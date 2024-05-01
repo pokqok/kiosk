@@ -8,17 +8,22 @@
     </div>
     <h2 class="title mb-4 col-4">실타래 {{ ShopID }}</h2>
   </div>
-  <div style="margin-top: 15%;">
+  <div style="margin-top: 15%">
     <div v-if="step == 0">
       <button @click="startRecording" size="x-large" icon="$vuetify">
         <i class="bi bi-mic-fill x-lg"></i>
       </button>
-      <h3 style="margin-top: 3%;">버튼을 눌러서 음성인식을 실행해주세요</h3>
+      <h3 style="margin-top: 3%">버튼을 눌러서 음성인식을 실행해주세요</h3>
     </div>
     <div v-if="step == 1">
-      <v-progress-circular indeterminate :size="60" :width="6"></v-progress-circular>
+      <v-progress-circular
+        indeterminate
+        :size="60"
+        :width="6"
+      ></v-progress-circular>
     </div>
     <p>인식결과:{{ transcription }}</p>
+    <p>메뉴는 : {{ response }}</p>
     <div v-if="step == 2">
       <div class="row">
         <!-- test, 나중에 testdata대신 음성인식 추천 목록-->
@@ -36,21 +41,33 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from "vuex";
 import ProductItem from "./Product.vue";
 import axios from "axios";
 
 export default {
-  name: 'HelperPage',
+  props: ["autoQuery"],
+  name: "HelperPage",
   data() {
     return {
       step: 0,
       transcription: "",
-      recordedChunks: [] // recordedChunks 배열 추가
-    }
+      recordedChunks: [], // recordedChunks 배열 추가
+      userInput: "",
+      response: null,
+      loading: false,
+    };
+  },
+  watch: {
+    autoQuery(newVal) {
+      if (newVal) {
+        this.userInput = newVal;
+        this.sendChat(); // 자동으로 채팅을 보냄
+      }
+    },
   },
   computed: {
-    ...mapState(["ShopID", "testdata"])
+    ...mapState(["ShopID", "testdata"]),
   },
   components: {
     ProductItem,
@@ -81,6 +98,7 @@ export default {
   methods: {
     async startRecording() {
       console.log("navigator:", navigator);
+      console.log("녹음중");
       if (this.mediaRecorder) {
         this.audio_recording = true;
         this.mediaRecorder.start();
@@ -130,6 +148,7 @@ export default {
             this.transcription = response.data.data; // 서버로부터 받은 음성 인식 결과
             console.log("Transcription:", this.transcription);
             this.$emit("transcription-complete", this.transcription); // 이벤트 발생
+            this.sendChat();
           })
           .catch((error) => {
             console.error("Error:", error.response.data.message);
@@ -139,6 +158,21 @@ export default {
             this.$store.commit("setFile", null);
           });
       }
+    },
+    sendChat() {
+      if (!this.transcription) return; // 사용자 입력이 없으면 실행하지 않음
+      this.loading = true;
+      axios
+        .post("/api/chat", { userInput: this.transcription })
+        .then((result) => {
+          this.response = result.data.message;
+          this.loading = false;
+        })
+        .catch((error) => {
+          console.error("Error sending chat:", error);
+          this.response = "Failed to get response from server.";
+          this.loading = false;
+        });
     },
   },
 };

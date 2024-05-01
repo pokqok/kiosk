@@ -36,44 +36,47 @@ console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스
 const apiKey = process.env.OPENAI_API_KEY; // API Key in .env file for security
 const apiURL = "https://api.openai.com/v1/chat/completions";
 
+const menuItems = [
+  "아메리카노", "바닐라 라떼", "카라멜 마키아토", "그린 티 라떼", "에스프레소", "콜드 브루",
+  "플랫 화이트", "모카 라떼", "마끼아토", "아이스 티", "토피넛 라떼", "버블티"
+];
+
 if (!apiKey) {
   console.error("API key is not set. Please check your .env file.");
   process.exit(1); // Exit if no API key is found
 }
 
-app.post("/chat", async (req, res) => {
+app.post('/chat', async (req, res) => {
   console.log("Chat request received");
   const userInput = req.body.userInput;
+
   const messages = [
     {
       role: "system",
-      content:
-        "너는 카페 키오스크의 메뉴 추천 기능을 가지고 있어, 너가 가진 메뉴는 아이스 아메리카노, 아이스 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마끼아토, 아이스 티, 토피넛 라떼, 버블티 이것 뿐이야 다른건 없어. 추가로 모든 메뉴는 차가운거 뜨거운거 다 있어",
+      content: "가능한 메뉴 항목은 아메리카노, 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마키아토, 아이스 티, 토피넛 라떼, 버블티 입니다. 모든 항목은 뜨겁거나 차갑게 제공됩니다."
     },
     {
       role: "user",
-      content: `${userInput}에 대해 메뉴의 이름만 부탁해 답변에 죄송합니다를 하지마`,
+      content: userInput // 사용자의 한국어 입력
     },
     {
       role: "assistant",
-      content:
-        '알맞는 답변이 없으면 없다고 말해줘. 멋대로 추천하지마. "죄송합니다." 라는 사과를 하지마.  질문에만 대답해 줘',
-    },
+      content: "사용자의 입력에 기반하여 최대 세 가지 항목을 추천해주세요. 메뉴의 이름만 대답해주세요. 모든 대답은 한국어로 해주세요. "
+    }
   ];
 
   try {
     const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
+      'https://api.openai.com/v1/chat/completions',
       {
-        model: "gpt-3.5-turbo",
+        model: 'gpt-3.5-turbo',
         temperature: 0.2,
-
         messages: messages,
       },
       {
         headers: {
           Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       }
     );
