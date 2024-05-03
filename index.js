@@ -336,7 +336,9 @@ app.post('/chat', async (req, res) => {
 
     const parts = [
       { text: `input: ${JSON.stringify(menuItems)},${JSON.stringify(Monthly_recommendedItems)}` }, // Convert to JSON strings
-      { text: `output: 메뉴 반환 형식은 각 메뉴마다 1번부터 번호를 붙이고, 메뉴이름에 ** 메뉴 ** 를 붙이지 말아줘. \n1. 메뉴이름 - 가능한 당도 옵션 - 가능한 온도 옵션 - 카페인 여부 \n이렇게 해줘\n이외에는 필요없어\n최대 3개 까지만\n\n이달의 추천메뉴가 쿼리로 주어질때는 recommendedItems의 내용만 출력해줘` },
+      {
+        text: `output: 메뉴 반환 형식은 각 메뉴마다 1번부터 번호를 붙이고, 메뉴이름에 ** 메뉴 ** 를 붙이지 말아줘. \n1. 메뉴이름 - 당도 : 가능한 당도 옵션 - 온도 : 가능한 온도 옵션 - 카페인 여부 \n 2. 메뉴이름 - 당도 : 가능한 당도 옵션 - 온도 : 가능한 온도 옵션 \n 이렇게 해줘\n이외에는 필요없어\n최대 3개 까지만\n\n이달의 추천메뉴가 쿼리로 주어질때는 recommendedItems의 내용만 출력해줘. ## 차가운 음료 메뉴: 이렇게 꾸미지 않아도 괜찮아.
+        만약 특정 옵션 테이블 중 알맞는 옵션이 사전에 제공이 되어있으면 그것만 출력해줘. 만약 메뉴 이름이 정확한게 왔으면 그것만 출력해줘. 예를 들어서 바닐라 라떼, 이런식으로 오면 바닐라 라떼에 대한것만 출력해.` },
       { text: `input: ${userInput}` },
       { text: "output: " },
     ];

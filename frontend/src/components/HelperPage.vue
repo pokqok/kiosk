@@ -22,8 +22,8 @@
         :width="6"
       ></v-progress-circular>
     </div>
-    <p>인식결과:{{ transcription }}</p>
-    <p>메뉴는 : {{ response }}</p>
+    <p>인식결과: <span v-html="formattedTranscription"></span></p>
+    <p><span v-html="formattedResponse"></span></p>
     <div v-if="step == 2">
       <div class="row">
         <!-- test, 나중에 testdata대신 음성인식 추천 목록-->
@@ -39,7 +39,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { mapState } from "vuex";
 import ProductItem from "./Product.vue";
@@ -68,6 +67,16 @@ export default {
   },
   computed: {
     ...mapState(["ShopID", "testdata"]),
+    formattedTranscription() {
+      // 줄바꿈을 <br>로 변환
+      return this.transcription
+        ? this.transcription.replace(/\n/g, "<br>")
+        : "";
+    },
+    formattedResponse() {
+      // 줄바꿈을 <br>로 변환
+      return this.response ? this.response.replace(/\n/g, "<br>") : "";
+    },
   },
   components: {
     ProductItem,
@@ -165,14 +174,8 @@ export default {
       axios
         .post("/api/chat", { userInput: this.transcription })
         .then((result) => {
-          // 결과 형식 지정
-          const formattedMessage = result.data.message
-            .split(/(?<=\d\.)\s+/) // "2. "와 같은 패턴을 기준으로 분할하고 숫자와 마침표를 유지
-            .filter(Boolean)
-            .map((item) => item.trim())
-            .join("\n");
-
-          this.response = formattedMessage;
+          this.response = result.data.message;
+          console.log("Response:", this.response);
           this.loading = false;
         })
         .catch((error) => {
