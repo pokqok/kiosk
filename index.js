@@ -202,7 +202,9 @@ const dbConfig = {
 // node --version # Should be >= 18
 // npm install @google/generative-ai
 const MODEL_NAME = "gemini-1.5-pro-latest";
-const API_KEY = "AIzaSyAWM2k1T_EGdM0GarClTDSJcqIKXcQ0dbU"; // Replace with your actual API key
+process.env.GOOGLE_APPLICATION_CREDENTIALS;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;; // Replace with your actual API key
+console.log("API_KEY:", GEMINI_API_KEY);
 
 
 const menuItems = [
@@ -339,7 +341,7 @@ app.post('/chat', async (req, res) => {
       { text: "output: " },
     ];
 
-    const genAI = new GoogleGenerativeAI(API_KEY);
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
     const result = await model.generateContent({
       contents: [{ role: "user", parts }],
