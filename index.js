@@ -14,6 +14,8 @@ const server = http.createServer(app);
 const axios = require("axios");
 const { SpeechClient } = require("@google-cloud/speech").v2;
 const oracledb = require("oracledb");
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
+const wordnet = require('wordnet')
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -33,6 +35,8 @@ const io = new Server(server, {
 
 console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스트 출력
 
+
+/* gpt-3.5-turbo 모델을 사용하여 챗봇 기능 구현
 const apiKey = process.env.OPENAI_API_KEY; // API Key in .env file for security
 const apiURL = "https://api.openai.com/v1/chat/completions";
 
@@ -176,6 +180,8 @@ app.post('/chat', async (req, res) => {
     res.status(500).send("Failed to fetch response from OpenAI API");
   }
 });
+* /
+
 
 // Vue.js 빌드 결과물을 제공하는 미들웨어 설정
 // app.use(express.static(path.join(__dirname, "frontend/dist")));
@@ -189,6 +195,166 @@ const dbConfig = {
     //connectString: '0.0.0.0/xe' // Oracle 서버 주소
   };
 */
+
+
+// 제미니 api
+
+// node --version # Should be >= 18
+// npm install @google/generative-ai
+const MODEL_NAME = "gemini-1.5-pro-latest";
+const API_KEY = "AIzaSyAWM2k1T_EGdM0GarClTDSJcqIKXcQ0dbU"; // Replace with your actual API key
+
+
+const menuItems = [
+  {
+    name: "아메리카노", 
+    sweetnessOptions: ["무가당", "적당함", "달콤한"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운",
+    caffeinated: true
+  },
+  {
+    name: "바닐라 라떼", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운",
+    caffeinated: true
+  },
+  {
+    name: "카라멜 마키아토", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운",
+    caffeinated: true
+  },
+  {
+    name: "그린 티 라떼", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운",
+    caffeinated: true
+  },
+  {
+    name: "에스프레소", 
+    sweetnessOptions: ["무가당"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["뜨거운"],
+    defaultTemperature: "뜨거운",
+    caffeinated: true
+  },
+  {
+    name: "콜드 브루", 
+    sweetnessOptions: ["무가당", "적당함"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["차가운"],
+    defaultTemperature: "차가운",
+    caffeinated: true
+  },
+  {
+    name: "플랫 화이트", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한"],
+    defaultTemperature: "뜨거운",
+    caffeinated: true
+  },
+  {
+    name: "모카 라떼", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운",
+    caffeinated: true
+  },
+  {
+    name: "마끼아토", 
+    sweetnessOptions: ["무가당", "적당함"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["뜨거운", "미지근한"],
+    defaultTemperature: "뜨거운",
+    caffeinated: true
+  },
+  {
+    name: "아이스 티", 
+    sweetnessOptions: ["무가당", "적당함", "달콤한"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["차가운"],
+    defaultTemperature: "차가운",
+    caffeinated: false
+  },
+  {
+    name: "토피넛 라떼", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한"],
+    defaultTemperature: "뜨거운",
+    caffeinated: false
+  },
+  {
+    name: "버블티", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["차가운"],
+    defaultTemperature: "차가운",
+    caffeinated: false
+  }
+];
+
+const Monthly_recommendedItems = [
+  {
+    name: "레몬 두부 피자",
+    sweetness: "적당함",
+    temperature: "뜨거운",
+    caffeinated: false
+  }
+];
+
+app.post('/chat', async (req, res) => {
+  try {
+    const userInput = req.body.userInput;
+    console.log("Chat request received:", userInput);
+
+    const generationConfig = {
+      temperature: 1,
+      topK: 0,
+      topP: 0.95,
+      maxOutputTokens: 8192,
+    };
+
+    const safetySettings = [
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+    ];
+
+    const parts = [
+      { text: `input: ${JSON.stringify(menuItems)},${JSON.stringify(Monthly_recommendedItems)}` }, // Convert to JSON strings
+      { text: `output: 메뉴 반환 형식은 각 메뉴마다 1번부터 번호를 붙이고, 메뉴이름에 ** 메뉴 ** 를 붙이지 말아줘. \n1. 메뉴이름 - 가능한 당도 옵션 - 가능한 온도 옵션 - 카페인 여부 \n이렇게 해줘\n이외에는 필요없어\n최대 3개 까지만\n\n이달의 추천메뉴가 쿼리로 주어질때는 recommendedItems의 내용만 출력해줘` },
+      { text: `input: ${userInput}` },
+      { text: "output: " },
+    ];
+
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+    const result = await model.generateContent({
+      contents: [{ role: "user", parts }],
+      generationConfig,
+      safetySettings,
+    });
+
+    const response = result.response;
+    console.log("Response:", response);
+    res.json({ message: response.text() });
+  } catch (error) {
+    console.error("Error communicating with Gemini API:", error);
+    res.status(500).json({ message: "Failed to get response from server." });
+  }
+});
 
 // 태그 목록 조회
 app.get("/tags", async (req, res) => {
@@ -407,6 +573,6 @@ const tagRouter = require("./dto/tags.js");
 app.use("/tag", tagRouter);
 
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+  server.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
