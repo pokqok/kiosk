@@ -37,9 +37,99 @@ const apiKey = process.env.OPENAI_API_KEY; // API Key in .env file for security
 const apiURL = "https://api.openai.com/v1/chat/completions";
 
 const menuItems = [
-  "아메리카노", "바닐라 라떼", "카라멜 마키아토", "그린 티 라떼", "에스프레소", "콜드 브루",
-  "플랫 화이트", "모카 라떼", "마끼아토", "아이스 티", "토피넛 라떼", "버블티"
+  { 
+    name: "아메리카노", 
+    sweetnessOptions: ["무가당", "적당함", "달콤한"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "바닐라 라떼", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "카라멜 마키아토", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "그린 티 라떼", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "에스프레소", 
+    sweetnessOptions: ["무가당"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["뜨거운"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "콜드 브루", 
+    sweetnessOptions: ["무가당", "적당함"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["차가운"],
+    defaultTemperature: "차가운"
+  },
+  { 
+    name: "플랫 화이트", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "모카 라떼", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "마끼아토", 
+    sweetnessOptions: ["무가당", "적당함"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["뜨거운", "미지근한"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "아이스 티", 
+    sweetnessOptions: ["무가당", "적당함", "달콤한"],
+    defaultSweetness: "무가당",
+    temperatureOptions: ["차가운"],
+    defaultTemperature: "차가운"
+  },
+  { 
+    name: "토피넛 라떼", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["뜨거운", "미지근한"],
+    defaultTemperature: "뜨거운"
+  },
+  { 
+    name: "버블티", 
+    sweetnessOptions: ["적당함", "달콤한"],
+    defaultSweetness: "적당함",
+    temperatureOptions: ["차가운"],
+    defaultTemperature: "차가운"
+  }
 ];
+const recommendedItems = [
+  {
+    name: "레몬 두부 피자",
+    sweetness: "적당함",
+    temperature: "뜨거운"
+  }
+];
+
 
 if (!apiKey) {
   console.error("API key is not set. Please check your .env file.");
