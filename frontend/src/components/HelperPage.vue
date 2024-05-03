@@ -165,7 +165,14 @@ export default {
       axios
         .post("/api/chat", { userInput: this.transcription })
         .then((result) => {
-          this.response = result.data.message;
+          // 결과 형식 지정
+          const formattedMessage = result.data.message
+            .split(/(?<=\d\.)\s+/) // "2. "와 같은 패턴을 기준으로 분할하고 숫자와 마침표를 유지
+            .filter(Boolean)
+            .map((item) => item.trim())
+            .join("\n");
+
+          this.response = formattedMessage;
           this.loading = false;
         })
         .catch((error) => {
