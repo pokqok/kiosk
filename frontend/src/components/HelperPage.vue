@@ -1,3 +1,5 @@
+<!-- HelperPage.vue -->
+
 <template>
   <div class="head-container row">
     <div class="col-4">
@@ -25,95 +27,101 @@
     <p>인식결과: <span v-html="formattedTranscription"></span></p>
     <p><span v-html="formattedResponse"></span></p>
     <div v-if="step == 2">
-      <div class="row">
-        <!-- test, 나중에 testdata대신 음성인식 추천 목록-->
+      <div v-if="loading">추천 중...</div>
+      <div v-else class="row">
         <ProductItem
-          :product="testdata[i]"
+          v-for="item in filteredItems"
+          :product="item"
           class="col-3"
           @selectProduct="openProductOptionModal($event)"
-          v-for="i in 3"
-          :key="i"
+          :key="item.ProductNO"
         ></ProductItem>
         <h3>추천 메뉴입니다</h3>
       </div>
     </div>
+    <!-- 옵션 모달 -->
+    <ProductOptionModal
+      v-if="showProductOptionModal"
+      :selectedProduct="selectedProduct"
+      @closeProductOptionModal="closeProductOptionModal"
+    />
   </div>
 </template>
+
 <script>
 import { mapState } from "vuex";
 import ProductItem from "./Product.vue";
+import ProductOptionModal from "./ProductOptionModal.vue";
 import axios from "axios";
+import menuData from "@/assets/testdata.js";
 
 export default {
   props: ["autoQuery"],
   name: "HelperPage",
+  components: {
+    ProductItem,
+    ProductOptionModal,
+  },
   data() {
     return {
       step: 0,
       transcription: "",
-      recordedChunks: [], // recordedChunks 배열 추가
+      recordedChunks: [],
       userInput: "",
       response: null,
       loading: false,
+      filteredItems: [],
+      selectedProduct: null,
+      showProductOptionModal: false,
+      testdata: menuData,
     };
   },
   watch: {
     autoQuery(newVal) {
       if (newVal) {
         this.userInput = newVal;
-        this.sendChat(); // 자동으로 채팅을 보냄
+        this.sendChat();
       }
     },
   },
   computed: {
-    ...mapState(["ShopID", "testdata"]),
+    ...mapState(["ShopID"]),
     formattedTranscription() {
-      // 줄바꿈을 <br>로 변환
       return this.transcription
         ? this.transcription.replace(/\n/g, "<br>")
         : "";
     },
     formattedResponse() {
-      // 줄바꿈을 <br>로 변환
       return this.response ? this.response.replace(/\n/g, "<br>") : "";
     },
   },
-  components: {
-    ProductItem,
-  },
   mounted() {
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: true,
-      })
-      .then((stream) => {
-        this.mediaRecorder = new MediaRecorder(stream);
-        // log media recorder
-        console.log("MediaRecorder created:", this.mediaRecorder);
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      this.mediaRecorder = new MediaRecorder(stream);
+      console.log("MediaRecorder created:", this.mediaRecorder);
 
-        this.mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            this.recordedChunks.push(event.data);
-          }
-        };
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.recordedChunks.push(event.data);
+        }
+      };
 
-        this.mediaRecorder.onstop = () => {
-          let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
-          this.uploadAudio(blob);
-          this.audio_recording = false;
-        };
-      });
+      this.mediaRecorder.onstop = () => {
+        let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+        this.uploadAudio(blob);
+        this.audio_recording = false;
+        this.step = 1; // 프로그레스 인디케이터 표시
+      };
+    });
   },
   methods: {
     async startRecording() {
-      console.log("navigator:", navigator);
-      console.log("녹음중");
       if (this.mediaRecorder) {
         this.audio_recording = true;
         this.mediaRecorder.start();
         setTimeout(() => {
-          this.stopRecording(); // 5초 후에 stopRecording 메서드를 호출
-        }, 5000); // 5000ms = 5초
+          this.stopRecording();
+        }, 5000);
       }
     },
     stopRecording() {
@@ -121,7 +129,7 @@ export default {
         this.mediaRecorder.stop();
         this.audio_recording = false;
         setTimeout(() => {
-          this.submitAudio(); // 녹음이 종료되면 즉시 서버로 결과를 전송
+          this.submitAudio();
         }, 1000);
       }
     },
@@ -132,10 +140,7 @@ export default {
       axios
         .post("/api/upload", formData)
         .then((response) => {
-          console.log("Response:", response);
-          console.log("uploaded_file:", response.data.uploaded_file);
           this.$store.commit("setFile", response.data.uploaded_file);
-          console.log("file: ", this.$store.state.file);
         })
         .catch((error) => {
           console.error("Error uploading file:", error);
@@ -143,10 +148,10 @@ export default {
       this.recordedChunks = [];
     },
     submitAudio() {
-      if (this.audio_recording == true) {
-        return alert("녹음 중에는 파일을 올릴 수 없습니다.");
+      if (this.audio_recording) {
+        alert("녹음 중에는 파일을 올릴 수 없습니다.");
       } else if (this.$store.state.file == null) {
-        return alert("녹음된 파일이 없습니다.");
+        alert("녹음된 파일이 없습니다.");
       } else {
         let formData = new FormData();
         formData.append("uploaded_file", this.$store.state.file);
@@ -154,9 +159,8 @@ export default {
         axios
           .post("/api/audio-upload", formData)
           .then((response) => {
-            this.transcription = response.data.data; // 서버로부터 받은 음성 인식 결과
-            console.log("Transcription:", this.transcription);
-            this.$emit("transcription-complete", this.transcription); // 이벤트 발생
+            this.transcription = response.data.data;
+            this.$emit("transcription-complete", this.transcription);
             this.sendChat();
           })
           .catch((error) => {
@@ -169,7 +173,7 @@ export default {
       }
     },
     sendChat() {
-      if (!this.transcription) return; // 사용자 입력이 없으면 실행하지 않음
+      if (!this.transcription) return;
       this.loading = true;
       axios
         .post("/api/chat", { userInput: this.transcription })
@@ -177,15 +181,38 @@ export default {
           this.response = result.data.message;
           console.log("Response:", this.response);
           this.loading = false;
+          this.step = 2;
+
+          // 응답을 바탕으로 아이템 필터링
+          const responseItems = this.response.split("\n").map((line) => {
+            const match = line.match(/\.\s*(.*?)\s*-/);
+            return match ? match[1] : null;
+          });
+
+          // testdata.js 데이터에서 응답에 포함된 항목만 추출
+          this.filteredItems = this.testdata.filter((item) =>
+            responseItems.includes(item.ProductName)
+          );
         })
         .catch((error) => {
           console.error("Error sending chat:", error);
           this.response = "Failed to get response from server.";
           this.loading = false;
+          this.step = 2;
         });
+    },
+    openProductOptionModal(product) {
+      this.selectedProduct = product;
+      this.showProductOptionModal = true;
+    },
+    closeProductOptionModal() {
+      this.selectedProduct = null;
+      this.showProductOptionModal = false;
     },
   },
 };
 </script>
 
-<style></style>
+<style>
+/* 스타일 추가 가능 */
+</style>
