@@ -41,17 +41,21 @@
     </div>
     <!-- 옵션 모달 -->
     <ProductOptionModal
-      v-if="showProductOptionModal"
-      :selectedProduct="selectedProduct"
       @closeProductOptionModal="closeProductOptionModal"
+      @payment="payment"
+      @pickProduct="pickProduct"
+      :selectedProduct="selectedProduct"
+      v-if="showOptionModal"
     />
+    <CartModal @subProduct="subProduct" @payment="payment" v-if="showCartModal" />
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import ProductItem from "./Product.vue";
 import ProductOptionModal from "./ProductOptionModal.vue";
+import CartModal from "./CartModal.vue";
 import axios from "axios";
 import menuData from "@/assets/testdata.js";
 
@@ -61,6 +65,7 @@ export default {
   components: {
     ProductItem,
     ProductOptionModal,
+    CartModal,
   },
   data() {
     return {
@@ -72,8 +77,9 @@ export default {
       loading: false,
       filteredItems: [],
       selectedProduct: null,
-      showProductOptionModal: false,
       testdata: menuData,
+      showOptionModal: false,
+      showCartModal: false,
     };
   },
   watch: {
@@ -85,7 +91,7 @@ export default {
     },
   },
   computed: {
-    ...mapState(["ShopID"]),
+    ...mapState(["testdata", "ShopID", "orderType", "cart"]),
     formattedTranscription() {
       return this.transcription
         ? this.transcription.replace(/\n/g, "<br>")
@@ -113,8 +119,14 @@ export default {
         this.step = 1; // 프로그레스 인디케이터 표시
       };
     });
+    
+    if (this.cart.length != 0) {
+      this.showCartModal = true;
+    }
   },
   methods: {
+    ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
+
     async startRecording() {
       if (this.mediaRecorder) {
         this.audio_recording = true;
@@ -203,11 +215,41 @@ export default {
     },
     openProductOptionModal(product) {
       this.selectedProduct = product;
-      this.showProductOptionModal = true;
+      this.showOptionModal = true;
+      this.showCartModal = false;
     },
     closeProductOptionModal() {
       this.selectedProduct = null;
       this.showProductOptionModal = false;
+    },
+    payment($event) {
+      if ($event !== undefined) {
+        for (let i = 0; i < $event; i++) {
+          this.addCart(this.selectedProduct);
+          this.setTotalPrice(this.selectedProduct.Price);
+        }
+      }
+      this.showOptionModal = false;
+      this.showCartModal = false;
+      this.$router.push("/payment");
+    },
+
+    pickProduct($event) {
+      this.showOptionModal = false;
+      for (let i = 0; i < $event; i++) {
+        this.addCart(this.selectedProduct);
+        this.setTotalPrice(this.selectedProduct.Price);
+      }
+
+      this.showCartModal = true;
+    },
+
+    subProduct($event) {
+      this.subCart($event);
+      this.setTotalPrice(-$event.Price);
+      if (this.cart.length == 0) {
+        this.showCartModal = false;
+      }
     },
   },
 };
