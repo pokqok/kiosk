@@ -35,168 +35,6 @@ const io = new Server(server, {
 
 console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스트 출력
 
-
-/* gpt-3.5-turbo 모델을 사용하여 챗봇 기능 구현
-const apiKey = process.env.OPENAI_API_KEY; // API Key in .env file for security
-const apiURL = "https://api.openai.com/v1/chat/completions";
-
-const menuItems = [
-  { 
-    name: "아메리카노", 
-    sweetnessOptions: ["무가당", "적당함", "달콤한"],
-    defaultSweetness: "무가당",
-    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "바닐라 라떼", 
-    sweetnessOptions: ["적당함", "달콤한"],
-    defaultSweetness: "적당함",
-    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "카라멜 마키아토", 
-    sweetnessOptions: ["적당함", "달콤한"],
-    defaultSweetness: "적당함",
-    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "그린 티 라떼", 
-    sweetnessOptions: ["적당함", "달콤한"],
-    defaultSweetness: "적당함",
-    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "에스프레소", 
-    sweetnessOptions: ["무가당"],
-    defaultSweetness: "무가당",
-    temperatureOptions: ["뜨거운"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "콜드 브루", 
-    sweetnessOptions: ["무가당", "적당함"],
-    defaultSweetness: "무가당",
-    temperatureOptions: ["차가운"],
-    defaultTemperature: "차가운"
-  },
-  { 
-    name: "플랫 화이트", 
-    sweetnessOptions: ["적당함", "달콤한"],
-    defaultSweetness: "적당함",
-    temperatureOptions: ["뜨거운", "미지근한"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "모카 라떼", 
-    sweetnessOptions: ["적당함", "달콤한"],
-    defaultSweetness: "적당함",
-    temperatureOptions: ["뜨거운", "미지근한", "차가운"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "마끼아토", 
-    sweetnessOptions: ["무가당", "적당함"],
-    defaultSweetness: "무가당",
-    temperatureOptions: ["뜨거운", "미지근한"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "아이스 티", 
-    sweetnessOptions: ["무가당", "적당함", "달콤한"],
-    defaultSweetness: "무가당",
-    temperatureOptions: ["차가운"],
-    defaultTemperature: "차가운"
-  },
-  { 
-    name: "토피넛 라떼", 
-    sweetnessOptions: ["적당함", "달콤한"],
-    defaultSweetness: "적당함",
-    temperatureOptions: ["뜨거운", "미지근한"],
-    defaultTemperature: "뜨거운"
-  },
-  { 
-    name: "버블티", 
-    sweetnessOptions: ["적당함", "달콤한"],
-    defaultSweetness: "적당함",
-    temperatureOptions: ["차가운"],
-    defaultTemperature: "차가운"
-  }
-];
-const recommendedItems = [
-  {
-    name: "레몬 두부 피자",
-    sweetness: "적당함",
-    temperature: "뜨거운"
-  }
-];
-
-
-if (!apiKey) {
-  console.error("API key is not set. Please check your .env file.");
-  process.exit(1); // Exit if no API key is found
-}
-
-app.post('/chat', async (req, res) => {
-  console.log("Chat request received");
-  const userInput = req.body.userInput;
-
-  const messages = [
-    {
-      role: "system",
-      content: "가능한 메뉴 항목은 아메리카노, 바닐라 라떼, 카라멜 마키아토, 그린 티 라떼, 에스프레소, 콜드 브루, 플랫 화이트, 모카 라떼, 마키아토, 아이스 티, 토피넛 라떼, 버블티 입니다. 모든 항목은 뜨겁거나 차갑게 제공됩니다."
-    },
-    {
-      role: "user",
-      content: userInput // 사용자의 한국어 입력
-    },
-    {
-      role: "assistant",
-      content: "사용자의 입력에 기반하여 최대 세 가지 항목을 추천해주세요. 메뉴의 이름만 대답해주세요. 모든 대답은 한국어로 해주세요. "
-    }
-  ];
-
-  try {
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        temperature: 0.2,
-        messages: messages,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    res.json({ message: response.data.choices[0].message.content });
-  } catch (error) {
-    console.error("Error accessing OpenAI API:", error);
-    res.status(500).send("Failed to fetch response from OpenAI API");
-  }
-});
-* /
-
-
-// Vue.js 빌드 결과물을 제공하는 미들웨어 설정
-// app.use(express.static(path.join(__dirname, "frontend/dist")));
-
-/*
-// Oracle DB 연결 정보
-const dbConfig = {
-    user: 'c##manager',//이름, 지금 오라클 21c 사용중, 근데 이름에 c##을 붙여야 함 왠진 모르겠지만
-    password: '123456',
-    connectString: 'SEHWANCOM:1521/xe' // Oracle 서버 주소
-    //connectString: '0.0.0.0/xe' // Oracle 서버 주소
-  };
-*/
-
-
 // 제미니 api
 
 // node --version # Should be >= 18
@@ -343,6 +181,12 @@ const menuItems = [
         temperatureOptions: ["차가운"],
         defaultTemperature: "차가운",
         caffeinated: true,
+    },
+    {
+      name: "레몬 두부 피자",
+      sweetness: "적당함",
+      temperature: "뜨거운",
+      caffeinated: false
     },
 ];
 

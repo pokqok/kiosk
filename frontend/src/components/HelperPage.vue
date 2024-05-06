@@ -25,7 +25,7 @@
       ></v-progress-circular>
     </div>
     <p>인식결과: <span v-html="formattedTranscription"></span></p>
-    <p><span v-html="formattedResponse"></span></p>
+    <!--<p><span v-html="formattedResponse"></span></p>-->
     <div v-if="step == 2">
       <div v-if="loading">추천 중...</div>
       <div v-else class="row">
@@ -36,7 +36,17 @@
           @selectProduct="openProductOptionModal($event)"
           :key="item.ProductNO"
         ></ProductItem>
-        <h3>추천 메뉴입니다</h3>
+        <h3>
+          <v-btn
+            @click="startRecording"
+            color="accent"
+            large
+            dark
+            class="mx-auto d-block mt-3"
+            >추가로 주문하기</v-btn
+          >
+        </h3>
+        <!-- 수정된 추가로 주문하기 버튼 -->
       </div>
     </div>
     <!-- 옵션 모달 -->
@@ -47,7 +57,11 @@
       :selectedProduct="selectedProduct"
       v-if="showOptionModal"
     />
-    <CartModal @subProduct="subProduct" @payment="payment" v-if="showCartModal" />
+    <CartModal
+      @subProduct="subProduct"
+      @payment="payment"
+      v-if="showCartModal"
+    />
   </div>
 </template>
 
@@ -119,7 +133,7 @@ export default {
         this.step = 1; // 프로그레스 인디케이터 표시
       };
     });
-    
+
     if (this.cart.length != 0) {
       this.showCartModal = true;
     }
