@@ -146,6 +146,16 @@ export default {
         }
       );
     },
+    savePaymentData(merchantUid, totalPrice) {
+      axios.post('/api/payments/save', {
+        merchant_uid: merchantUid,
+        total_price: totalPrice,
+      }).then(response => {
+        console.log('Payment data saved successfully:', response);
+      }).catch(error => {
+        console.error('Failed to save payment data:', error);
+      });
+    },
   },
 };
 </script>
