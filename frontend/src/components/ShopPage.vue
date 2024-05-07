@@ -4,9 +4,9 @@
     <nav id="navbar-menu" class="navbar row px-3 mb-3">
       <ul class="nav nav-pills">
         <!-- test 나중에 6 대신 카테고리 -->
-        <li class="nav-item col custom-item" v-for="i in 6" :key="i">
-          <a class="custom-link" :href="'#CategoryTitle' + i"
-            >Category {{ i }}</a
+        <li class="nav-item col custom-item" v-for="i in categories" :key="i">
+          <a class="custom-link" :href="'#CategoryTitle' + i.name"
+            >Category {{ i.name }}</a
           >
         </li>
       </ul>
@@ -24,17 +24,17 @@
     tabindex="0"
   >
     <!-- test, 나중에 6 대신 카테고리 -->
-    <div class="category-container" v-for="i in 6" :key="i">
-      <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i">
-        {{ i }} 번째 카테고리
+    <div class="category-container" v-for="i in categories" :key="i">
+      <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i.name">
+        #{{ i.name }} 
       </h4>
       <div class="row">
         <!-- test, 나중에 testdata대신 카테고리에 있는 메뉴목록 -->
         <ProductItem
-          :product="product"
+          :product="products"
           class="col-3"
           @selectProduct="openProductOptionModal($event)"
-          v-for="product in testdata"
+          v-for="product in products"
           :key="product"
         ></ProductItem>
       </div>
@@ -72,6 +72,22 @@ export default {
 
   computed: {
     ...mapState(["testdata", "ShopID", "orderType", "cart"]),
+
+    tags(){
+      return this.$store.state.kioskModule.tags;
+    },
+    categories(){
+      return this.$store.state.kioskModule.categories;
+    },
+    options(){
+      return this.$store.state.kioskModule.options;
+    },
+    products(){
+      return this.$store.state.kioskModule.products;
+    },
+    tagMenu(){
+      return this.$store.state.kioskModule.tagMenu;
+    },
   },
 
   components: {
@@ -99,6 +115,15 @@ export default {
     //     alert('orderType error')
     // }
   },
+  async created() {
+      // 데이터를 비동기적으로 로드
+      this.$store.dispatch('fetchCategories');
+      this.$store.dispatch('fetchTags')
+      this.$store.dispatch('fetchOptions');
+      this.$store.dispatch('fetchProducts');
+      this.$store.dispatch('fetchTagMenu');
+
+    },
 
   methods: {
     ...mapMutations(["addCart", "subCart", "setTotalPrice"]),

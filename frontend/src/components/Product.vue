@@ -1,11 +1,11 @@
 <template>
   <div class="product" @click="$emit('selectProduct', product)">
     <div class="product-img-container">
-      <img class="product-img" :src="product.ProductImage" alt="" />
+      <img class="product-img" :src="product.image" alt="" />
     </div>
     <div class="product-info">
-      <p class="product-name">{{ product.ProductName }}</p>
-      <p class="product-price">{{ product.Price }} 원</p>
+      <p class="product-name">{{ product.name }}</p>
+      <p class="product-price">{{ product.price }} 원</p>
     </div>
   </div>
 </template>

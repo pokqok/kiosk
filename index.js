@@ -287,6 +287,17 @@ app.post("/payments/verify", async (req, res) => {
     res.status(500).send("결제 정보 검증 중 오류가 발생했습니다.");
   }
 });
+
+//DB에결제 정보 넣기
+app.post("/payments/", async (req, res) => {
+
+  try {
+   
+  } catch (error) {
+    console.error("결제 정보 검증 중 오류 발생:", error);
+    res.status(500).send("결제 정보 검증 중 오류가 발생했습니다.");
+  }
+});
 // admin 로그인
 app.post("/login/admin", (req, res) => {
   const { email, password } = req.body;
@@ -315,6 +326,10 @@ app.use("/category", categoryRouter);
 
 const tagRouter = require("./dto/tags.js");
 app.use("/tag", tagRouter);
+
+
+const kioskRouter = require("./dto/shopData.js");
+app.use("/kiosk", kioskRouter);
 
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
 server.listen(PORT, () => {

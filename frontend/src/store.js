@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 import testdata from './assets/testdata'
 import categoryModule from './categoryModule';
 import tagModule from './tagModule';
+import kioskModule from './kioskModule';
 
 const store = createStore({
     state() {
@@ -71,6 +72,7 @@ const store = createStore({
     modules: {
         categoryModule: categoryModule, // categoryModule을 Vuex 스토어에 등록
         tagModule: tagModule,
+        kioskModule: kioskModule,
         // 다른 모듈도 필요하다면 여기에 추가합니다.
     },
 
