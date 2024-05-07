@@ -22,11 +22,6 @@
       <i class="bi bi-chat-fill pay-icon"></i>
       <p>카카오 페이</p>
     </button>
-    <!--  <button @click="requestPayToss" type="button" class="btn btn-light col-4">
-            <i class="bi bi-fonts pay-icon"></i>
-            <p>토스 페이</p>
-        </button>
-        -->
   </div>
 </template>
 
@@ -40,7 +35,7 @@ export default {
   data() {
     return {
       IMP: window.IMP,
-      cntCanclePay: 0, //결제 눌렀다 취소하면 왜인지 뒤로가기가 한번에 안먹혀서 추가
+      cntCanclePay: 0,
     };
   },
 
@@ -50,23 +45,14 @@ export default {
 
   mounted() {
     this.IMP.init("imp03664607");
-
-    // 결제 test 용
-    this.$store.commit("setProductName", "test");
-
-    //결제 test할때 이거 주석 풀고 쓰세요 가격 100원 됩니다.
-    // !주의! 원래 store에 있는 변수 이렇게 바꾸면 변수 관리 힘들어집니다. 가급적 지양해 주세요.
-    //this.$store.state.totalPrice = 100
   },
 
   methods: {
     requestPay() {
-      const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-      this.$store.commit("incrementOrderCounter"); // Update the order counter before payment
+      const merchantUid = "merchant_" + new Date().getTime();
       this.IMP.request_pay(
         {
           pg: "html5_inicis.INIpayTest",
-          // pay_method: "kakaopay", 카카오페이만을 결제 수단으로 한다면 추가. 여러가지 존재 가능
           merchant_uid: merchantUid,
           name: this.productName,
           amount: this.totalPrice,
@@ -78,25 +64,22 @@ export default {
         },
         (rsp) => {
           if (rsp.success) {
-            console.log("성공");
-            axios({
-              url: "api/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
-              method: "post",
-              headers: { "Content-Type": "application/json" },
-              data: {
+            axios
+              .post("api/payments/verify", {
                 imp_uid: rsp.imp_uid,
                 merchant_uid: rsp.merchant_uid,
-              },
-            }).then(() => {
-              console.log("성공");
-              alert("결제가 완료되었습니다.");
-              setTimeout(() => {
-                this.$router.push("/mode-select");
-              }, 5000); // 5000 밀리초 = 5초
-            });
+              })
+              .then((verifyResponse) => {
+                if (verifyResponse.status === 200) {
+                  this.savePaymentData(merchantUid, this.totalPrice);
+                  alert("결제가 완료되었습니다.");
+                  this.$router.push("/mode-select");
+                } else {
+                  alert("결제 검증 실패");
+                }
+              });
           } else {
             alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
-            //decrementordercounter 추가
             this.$store.commit("decrementOrderCounter");
             this.cntCanclePay++;
           }
@@ -105,8 +88,7 @@ export default {
     },
 
     requestPayKakao() {
-      const merchantUid = "merchant_" + new Date().getTime(); // Generate unique order number
-      this.$store.commit("incrementOrderCounter"); // Update the order counter before payment
+      const merchantUid = "merchant_" + new Date().getTime();
       this.IMP.request_pay(
         {
           pg: "html5_inicis.INIpayTest",
@@ -122,22 +104,26 @@ export default {
         },
         (rsp) => {
           if (rsp.success) {
-            console.log("성공");
             axios({
-              url: "api/payments/verify", // ipconfig 이후 본인의 ipv4주소로 변경
+              url: "api/payments/verify",
               method: "post",
               headers: { "Content-Type": "application/json" },
               data: {
                 imp_uid: rsp.imp_uid,
                 merchant_uid: rsp.merchant_uid,
               },
-            }).then(() => {
-              console.log("성공");
-              alert("결제가 완료되었습니다.");
-              setTimeout(() => {
+            })
+              .then(() => {
+                this.savePaymentData(merchantUid, this.totalPrice);
+                alert("결제가 완료되었습니다.");
                 this.$router.push("/mode-select");
-              }, 5000); // 5000 밀리초 = 5초
-            });
+              })
+              .catch((error) => {
+                console.error("Error verifying payment:", error);
+                alert(`결제 검증 실패: ${error.message}`);
+                this.$store.commit("decrementOrderCounter");
+                this.cntCanclePay++;
+              });
           } else {
             alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
             this.$store.commit("decrementOrderCounter");
@@ -146,15 +132,19 @@ export default {
         }
       );
     },
+
     savePaymentData(merchantUid, totalPrice) {
-      axios.post('/api/payments/save', {
-        merchant_uid: merchantUid,
-        total_price: totalPrice,
-      }).then(response => {
-        console.log('Payment data saved successfully:', response);
-      }).catch(error => {
-        console.error('Failed to save payment data:', error);
-      });
+      axios
+        .post("/api/payments/save", {
+          merchant_uid: merchantUid,
+          total_price: totalPrice,
+        })
+        .then((response) => {
+          console.log("Payment data saved successfully:", response);
+        })
+        .catch((error) => {
+          console.error("Failed to save payment data:", error);
+        });
     },
   },
 };
