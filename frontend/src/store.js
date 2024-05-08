@@ -55,6 +55,7 @@ const store = createStore({
             state.cart.push(product)
         },
         subCart(state, product){
+            //this.selectedProduct.name, $event.price
             const index = state.cart.indexOf(product)
             if (index != -1) {
                 state.cart.splice(index, 1)

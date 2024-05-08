@@ -51,11 +51,12 @@ const kioskModule = {
               tag: item.TagNO,
               image: item.DetImage,
               alias: item.DetAlias,
-              orderNo: item.orderNo
+              orderNo: item.orderNo,
+              duplicate: item.isDup, //중복여부, true면 중복 허용 = 체크박스로 구현
           };
           optionData.push(setOption);
         });
-        commit('setOptions', response.data);
+        commit('setOptions', optionData);
       } catch (error) {
         console.error('옵션 목록을 가져오는 중 에러:', error);
       }

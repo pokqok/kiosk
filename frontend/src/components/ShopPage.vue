@@ -31,11 +31,11 @@
       <div class="row">
         <!-- test, 나중에 testdata대신 카테고리에 있는 메뉴목록 -->
         <ProductItem
-          :product="products"
-          class="col-3"
-          @selectProduct="openProductOptionModal($event)"
-          v-for="product in products"
-          :key="product"
+        v-for="item in filteredProducts(i.id)"
+        :key="item.id"
+        :product="item"
+        class="col-3"
+        @selectProduct="openProductOptionModal($event)"
         ></ProductItem>
       </div>
       <hr />
@@ -48,6 +48,8 @@
     @pickProduct="pickProduct"
     :selectedProduct="selectedProduct"
     v-if="showOptionModal"
+    :tag = "filteredTagsByProductId().tags"
+    :option = "filteredTagsByProductId().options"
   />
 
   <CartModal @subProduct="subProduct" @payment="payment" v-if="showCartModal" />
@@ -88,6 +90,33 @@ export default {
     tagMenu(){
       return this.$store.state.kioskModule.tagMenu;
     },
+
+    filteredTagsByProductId() {
+      return () => {
+        if (!this.selectedProduct) return { tags: [], options: [] }; // 선택된 상품이 없으면 빈 배열 반환
+
+        const productId = this.selectedProduct.id; // 선택된 상품의 ID 가져오기
+        const matchedTags = this.tagMenu.filter(tag => tag.productId === productId); // productId와 일치하는 tagMenu 찾기
+        
+    
+        const matchedTagIds = matchedTags.map(tag => tag.tagId); // 일치하는 tag의 tagId 추출
+        const filteredTags = this.tags.filter(tag => matchedTagIds.includes(tag.id)); // tagId와 일치하는 tag 필터링
+      
+        console.log('옵션들:',this.options);
+        const matchedOptionIds = [];
+          matchedTagIds.forEach(tag => {
+            const options = this.options.filter(option => option.tag == tag);
+            matchedOptionIds.push(...options.map(option => option.id));
+          });
+          // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
+          const filteredOptions = this.options.filter(option => matchedOptionIds.includes(option.id));
+          console.log("선택 상품의 태그들 현황: ",filteredTags);
+          console.log("선택 상품의 태그의 옵션들: ",filteredOptions);
+          //return { tags: matchedTags, options: filteredOptions };
+          return { tags: filteredTags, options: filteredOptions };
+      };
+    },
+
   },
 
   components: {
@@ -130,15 +159,37 @@ export default {
 
     openProductOptionModal(data) {
       this.selectedProduct = data;
+      console.log("선택 상품: ",this.selectedProduct);
       this.showOptionModal = true;
       this.showCartModal = false;
     },
 
+    //카테고리별 품목 가져오기 
+    filteredProducts(categoryId) {
+      //console.log("가져온 카테고리 아이디: ",categoryId)
+      //console.log("가져온 상품: ",this.products.filter(product => product.category == categoryId))
+      return this.products.filter(product => product.category == categoryId);
+    },
+    /*
+    //computed로 옮김
+    filteredTagsByProductId(selectedProduct) {
+      return () => {
+        if (!selectedProduct) return []; // 선택된 상품이 없으면 빈 배열 반환
+
+        const productId = selectedProduct.id; // 선택된 상품의 ID 가져오기
+        const matchedTags = this.tagMenu.filter(tag => tag.productId == productId); // productId와 일치하는 tagMenu 찾기
+        
+        const matchedTagIds = matchedTags.map(tag => tag.tagId); // 일치하는 tag의 tagId 추출
+        const filteredTags = this.tags.filter(tag => matchedTagIds.includes(tag.id)); // tagId와 일치하는 tag 필터링
+        return filteredTags;
+      };
+    },*/
+
     payment($event) {
       if ($event !== undefined) {
         for (let i = 0; i < $event; i++) {
-          this.addCart(this.selectedProduct);
-          this.setTotalPrice(this.selectedProduct.Price);
+          this.addCart(parseInt(this.selectedProduct));
+          this.setTotalPrice(parseInt(this.selectedProduct.price));
         }
       }
       this.showOptionModal = false;
@@ -146,14 +197,27 @@ export default {
       this.$router.push("/payment");
     },
 
+    /*
+      pickProduct($event) {
+        this.showOptionModal = false;
+        console.log("개수: ",$event.num);
+        console.log("가격:",$event.price)
+        for (let i = 0; i < $event.num; i++) {
+          this.addCart($event.price);
+          this.setTotalPrice($event.price);
+        }
+        this.showCartModal = true;
+      },
+    */
     pickProduct($event) {
-      this.showOptionModal = false;
-      for (let i = 0; i < $event; i++) {
-        this.addCart(this.selectedProduct);
-        this.setTotalPrice(this.selectedProduct.Price);
-      }
-
-      this.showCartModal = true;
+        this.showOptionModal = false;
+        console.log("개수: ",$event.num);
+        console.log("가격:",$event.price);
+        for (let i = 0; i < $event.num; i++) {
+          this.addCart({productName:this.selectedProduct.name, productPrice: $event.price});
+          this.setTotalPrice($event.price);
+        }
+        this.showCartModal = true;
     },
 
     closeProductOptionModal() {
