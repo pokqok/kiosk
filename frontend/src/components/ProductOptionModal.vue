@@ -3,7 +3,7 @@
     <div class="white-bg">
       <div class="option-container">
         <div class="row">
-          <img :src="selectedProduct.ProductImage" class="col-4" alt="" />
+          <img :src="selectedProduct.image" class="col-4" alt="" />
           <button
             class="btn btn-outline-dark vol-btn col-2"
             type="button"
@@ -21,20 +21,23 @@
             <i class="bi bi-arrow-down"></i>
           </button>
           <hr />
-          <p>{{ price * numProduct }}원</p>
+          <!-- {{ (parseInt(selectedProduct.price) + optionPrice) * numProduct }} -->
+          <p>{{ totalPrice }}원</p>
           <hr />
         </div>
 
         <!-- 옵션 테스트 -->
         <!-- 체크박스 그룹 -->
-        <div
+
+        <!-- 
+           <div
           class="container"
-          v-for="(checkboxOption, i) in checkBoxOptions"
-          :key="i"
+          v-for="tagOption in tag"
+          :key="tagOption.id"
         >
-          <div class="row">
+          <div class="row" v-for="item in tag" :key="item.id">
             <div class="col">
-              <h4>{{ optionTitle[i] }}</h4>
+              <h4>{{ tagOption.name }}</h4>
             </div>
           </div>
           <div class="row">
@@ -43,55 +46,56 @@
               role="group"
               aria-label="Basic checkbox toggle button group"
             >
-              <div class="col" v-for="(option, j) in checkboxOption" :key="j">
+              <div class="col" v-for="options in option" :key="options.id">
                 <input
                   type="checkbox"
                   class="btn-check"
-                  :id="'btncheck' + i + '-' + j"
+                  :id="'btncheck' + tagOption.id + '-' + options.id"
                   autocomplete="off"
                 />
                 <label
                   class="btn btn-outline-dark col-12"
-                  :for="'btncheck' + i + '-' + j"
-                  >{{ option }}</label
+                  :for="'btncheck' + tagOption.id  + '-' + options.id"
+                  >{{ options.name }}</label
                 >
                 <hr />
               </div>
             </div>
           </div>
         </div>
-
+        -->
+       
         <!-- 라디오버튼 그룹 -->
         <div
           class="container"
-          v-for="(radioOption, i) in radioOptions"
-          :key="i"
+          v-for="tags in tag"
+          :key="tags.id"
         >
           <div class="row">
-            <div class="col">
-              <h4>{{ optionTitle[i + checkBoxOptions.length] }}</h4>
-            </div>
+            <h4>{{ tags.name }}</h4>
           </div>
-          <div class="row">
-            <div
+          <div class="row" >
+            <div 
               class="btn-group btn-group-lg"
               role="group"
               aria-label="Basic radio toggle button group"
             >
-              <div class="col" v-for="(option, j) in radioOption" :key="j">
-                <input
-                  type="radio"
-                  class="btn-check"
-                  :name="'btnradio' + i"
-                  :id="'btnradio' + i + '-' + j"
-                  autocomplete="off"
-                />
-                <label
-                  class="btn btn-outline-dark col-12"
-                  :for="'btnradio' + i + '-' + j"
-                  >{{ option }}</label
-                >
-                <hr />
+              <div class="col" v-for="options in getOptionByID(tags)" :key="options.id">
+                <!-- v-if="options.tag == tags.id"-->
+                  <input 
+                    type="radio"
+                    class="btn-check"
+                    :name="'btnradio' + tags.id"
+                    :id="'btnradio' + tags.id + '-' + options.id"
+                    autocomplete="off"
+                    @click="setOptionPrice(tags.id, options.price)"
+                  />
+                  <label
+                    class="btn btn-outline-dark col-12"
+                    :for="'btnradio' + tags.id+ '-' + options.id"
+                    >{{ options.name }} </label
+                  >
+                  <hr />
               </div>
             </div>
           </div>
@@ -102,13 +106,15 @@
 
   <div class="white-bg futter row">
     <button
-      @click="$emit('pickProduct', numProduct)"
+      @click="$emit('pickProduct', {num: numProduct, price: (parseInt(this.selectedProduct.price) + optionPrice)})"
       type="button"
       class="btn col"
     >
       <i class="bi bi-cart icon"></i>
       <p>장바구니</p>
     </button>
+
+    <!-- 결제페이지에도 수정 예정-->
     <button @click="$emit('payment', numProduct)" type="button" class="btn col">
       <i class="bi bi-coin icon"></i>
       <p>결제</p>
@@ -130,9 +136,11 @@ export default {
   data() {
     return {
       numProduct: 1,
-      price: this.selectedProduct.Price,
+      price: parseInt(this.selectedProduct.price),
+      optionPrices: {},
 
       //test Data
+      /*
       optionTitle: ["안녕", "하세", "요", "이것", "은", "테스트", "최애"],
       checkBoxOptions: [
         [1, 2, 3],
@@ -144,20 +152,45 @@ export default {
         ["ㄱ", "ㄴ", "ㄷ"],
         ["Yes", "No"],
         ["족발", "피자", "보쌈", "치킨"],
-      ],
+      ],*/
+
     };
   },
   props: {
     selectedProduct: Object,
+    tag: Object,
+    option: Object,
   },
-
+  computed:{
+    optionPrice() {
+      let totalPrice = 0;
+      // optionPrices 객체의 각 값을 합산합니다.
+      for (const tagId in this.optionPrices) {
+        totalPrice += parseInt(this.optionPrices[tagId]);
+      }
+      return totalPrice;
+    },
+    totalPrice(){
+      return (this.price + this.optionPrice)*this.numProduct;
+    }
+  },
   methods: {
     subNumProduct() {
+      console.log("태그 테스트:",this.tag);
+      console.log("옵션 테스트:", this.option)
       if (this.numProduct <= 1) {
         alert("1개 이하로 주문 하실 수 없습니다");
       } else {
         this.numProduct--;
       }
+    },
+    getOptionByID(tag){
+      return this.option.filter(option => option.tag === tag.id);
+    },
+    setOptionPrice(tagId, price) {
+      // 해당 태그에 대한 optionPrice를 업데이트합니다.
+      this.optionPrices[tagId] = price;
+      console.log("가격 근황",this.optionPrice)
     },
   },
 };
