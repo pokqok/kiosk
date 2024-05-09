@@ -9,7 +9,7 @@
     <button
       type="button"
       class="btn btn-outline-success custom-btn"
-      @click="$router.push('/order-type')"
+      @click="goToNext('common')"
     >
       일반 주문
     </button>
@@ -18,7 +18,7 @@
     <button
       type="button"
       class="btn btn-outline-success custom-btn"
-      @click="goToHelper"
+      @click="goToNext('helper')"
     >
       도우미 모드
     </button>
@@ -57,8 +57,8 @@ export default {
   name: "ModeSelectPage",
 
   methods: {
-    goToHelper() {
-      alert("미구현");
+    goToNext(mode) {
+      this.$router.push('/order-type/'+mode)
     },
   },
 
