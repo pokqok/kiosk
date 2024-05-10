@@ -99,6 +99,8 @@ export default {
       analyser: null,
       microphone: null,
       volumeCheckInterval: null,
+      silenceTimer: null,
+      silenceDuration: 2000, // 무음 지속 시간 (2초)
     };
   },
   watch: {
@@ -124,13 +126,11 @@ export default {
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       this.mediaRecorder = new MediaRecorder(stream);
       console.log("MediaRecorder created:", this.mediaRecorder);
-
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           this.recordedChunks.push(event.data);
         }
       };
-
       this.mediaRecorder.onstop = () => {
         let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
         this.uploadAudio(blob);
@@ -138,32 +138,20 @@ export default {
         this.step = 1; // 프로그레스 인디케이터 표시
       };
     });
-
-    if (this.cart.length != 0) {
-      this.showCartModal = true;
-    }
   },
   methods: {
     ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
 
     initializeMicrophone() {
-      // AudioContext 생성
       this.audioContext = new (window.AudioContext ||
         window.webkitAudioContext)();
-
-      // 마이크 스트림 받기
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then((stream) => {
-          // 마이크 스트림을 AudioContext에 연결
           this.microphone = this.audioContext.createMediaStreamSource(stream);
-
-          // 분석기 생성
           this.analyser = this.audioContext.createAnalyser();
           this.analyser.fftSize = 256;
           this.microphone.connect(this.analyser);
-
-          // 일정 주기로 음량 체크
           this.volumeCheckInterval = setInterval(this.checkVolume, 100);
         })
         .catch((error) => {
@@ -171,38 +159,36 @@ export default {
         });
     },
     checkVolume() {
-      // 주파수 데이터를 받아와서 음량 확인
       const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
       this.analyser.getByteFrequencyData(dataArray);
-
-      // 평균 음량 계산
       const avgVolume =
         dataArray.reduce((acc, cur) => acc + cur, 0) / dataArray.length;
-
-      // 최소 음량보다 작으면 녹음 중지
       if (avgVolume < this.minVolume * 255) {
-        this.stopRecording();
+        if (!this.silenceTimer) {
+          this.silenceTimer = setTimeout(() => {
+            this.stopRecording();
+          }, this.silenceDuration);
+        }
+      } else {
+        if (this.silenceTimer) {
+          clearTimeout(this.silenceTimer);
+          this.silenceTimer = null;
+        }
       }
     },
-    async startRecording() {
-      if (this.mediaRecorder) {
-        if (this.mediaRecorder.state === "recording") {
-          console.log("Already recording.");
-          return;
-        }
-
+    startRecording() {
+      if (this.mediaRecorder && this.mediaRecorder.state !== "recording") {
         this.audio_recording = true;
         this.mediaRecorder.start();
-        setTimeout(() => {
-          this.stopRecording();
-        }, 5000);
       }
     },
     stopRecording() {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
         this.audio_recording = false;
-        clearInterval(this.volumeCheckInterval); // 음량 체크 중지
+        clearInterval(this.volumeCheckInterval);
+        clearTimeout(this.silenceTimer);
+        this.silenceTimer = null;
         setTimeout(() => {
           this.submitAudio();
         }, 1000);
