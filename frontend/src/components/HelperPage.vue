@@ -94,6 +94,11 @@ export default {
       testdata: menuData,
       showOptionModal: false,
       showCartModal: false,
+      minVolume: 0.5, // 일정 이하로 감지할 최소 음량
+      audioContext: null,
+      analyser: null,
+      microphone: null,
+      volumeCheckInterval: null,
     };
   },
   watch: {
@@ -141,8 +146,51 @@ export default {
   methods: {
     ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
 
+    initializeMicrophone() {
+      // AudioContext 생성
+      this.audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
+
+      // 마이크 스트림 받기
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          // 마이크 스트림을 AudioContext에 연결
+          this.microphone = this.audioContext.createMediaStreamSource(stream);
+
+          // 분석기 생성
+          this.analyser = this.audioContext.createAnalyser();
+          this.analyser.fftSize = 256;
+          this.microphone.connect(this.analyser);
+
+          // 일정 주기로 음량 체크
+          this.volumeCheckInterval = setInterval(this.checkVolume, 100);
+        })
+        .catch((error) => {
+          console.error("Error accessing microphone:", error);
+        });
+    },
+    checkVolume() {
+      // 주파수 데이터를 받아와서 음량 확인
+      const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+      this.analyser.getByteFrequencyData(dataArray);
+
+      // 평균 음량 계산
+      const avgVolume =
+        dataArray.reduce((acc, cur) => acc + cur, 0) / dataArray.length;
+
+      // 최소 음량보다 작으면 녹음 중지
+      if (avgVolume < this.minVolume * 255) {
+        this.stopRecording();
+      }
+    },
     async startRecording() {
       if (this.mediaRecorder) {
+        if (this.mediaRecorder.state === "recording") {
+          console.log("Already recording.");
+          return;
+        }
+
         this.audio_recording = true;
         this.mediaRecorder.start();
         setTimeout(() => {
@@ -154,6 +202,7 @@ export default {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
         this.audio_recording = false;
+        clearInterval(this.volumeCheckInterval); // 음량 체크 중지
         setTimeout(() => {
           this.submitAudio();
         }, 1000);
