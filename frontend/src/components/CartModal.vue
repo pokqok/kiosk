@@ -25,7 +25,8 @@
         <p class="m-0">{{ parseInt(totalPrice) }}원</p>
       </div>
       <button
-        @click="$emit('payment', cart)"
+
+        @click="$emit('payment', totalPrice)"
         type="button"
         class="btn btn-outline-primary btn-fixed col-4 shadow"
       >

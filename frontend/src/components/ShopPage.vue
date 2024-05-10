@@ -155,7 +155,7 @@ export default {
     },
 
   methods: {
-    ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
+    ...mapMutations(["addCart", "subCart", "setTotalPrice", "setProductName"]), //결제 시 이름 넣기 추가
 
     openProductOptionModal(data) {
       this.selectedProduct = data;
@@ -190,9 +190,13 @@ export default {
       console.log("가격:",$event.price);
       if ($event !== undefined) {
         for (let i = 0; i < $event.num; i++) {
-          this.addCart({productName:this.selectedProduct.name, productPrice: $event.price});
+          this.addCart({productName:this.selectedProduct.name, productPrice: $event.price, option:$event.option});
           this.setTotalPrice($event.price);
         }
+        this.setProductName(this.selectedProduct.name) //이름 추가하기
+      }else{
+        this.setProductName('다중 메뉴')//이름 추가하기
+        //나중에 이름 추가하는거 좀더 상세히(개수랑 종류까지 다 포함) == 서버에 데이터 넘겨주는걸 하기 위해서 필요
       }
       this.showOptionModal = false;
       this.showCartModal = false;
@@ -216,7 +220,7 @@ export default {
         console.log("개수: ",$event.num);
         console.log("가격:",$event.price);
         for (let i = 0; i < $event.num; i++) {
-          this.addCart({productName:this.selectedProduct.name, productPrice: $event.price});
+          this.addCart({productName:this.selectedProduct.name, productPrice: $event.price, option:$event.option});
           this.setTotalPrice($event.price);
         }
         this.showCartModal = true;
