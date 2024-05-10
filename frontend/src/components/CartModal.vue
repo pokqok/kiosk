@@ -11,7 +11,7 @@
           :key="item"
           style="align-items: center"
         >
-          <p class="col-10 m-0">{{ item.ProductName }} - {{ item.Price }}원</p>
+          <p class="col-10 m-0">{{ item.productName }} - {{ item.productPrice }}원</p>
           <button
             type="button"
             class="btn btn-outline-danger col-2"
@@ -22,7 +22,7 @@
         </div>
       </div>
       <div class="col-1 price-fixed shadow">
-        <p class="m-0">{{ totalPrice }}원</p>
+        <p class="m-0">{{ parseInt(totalPrice) }}원</p>
       </div>
       <button
         @click="$emit('payment')"

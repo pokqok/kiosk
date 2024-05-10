@@ -64,11 +64,18 @@ export default {
       if (this.mediaRecorder) {
         this.audio_recording = true;
         this.mediaRecorder.start();
+        setTimeout(() => {
+          this.stopRecording(); // 5초 후에 stopRecording 메서드를 호출
+        }, 5000); // 5000ms = 5초
       }
     },
     stopRecording() {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
+        this.audio_recording = false;
+        setTimeout(() => {
+          this.submitAudio(); // 녹음이 종료되면 즉시 서버로 결과를 전송
+        }, 1000);
       }
     },
     async uploadAudio(blob) {

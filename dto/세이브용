@@ -1,19 +1,11 @@
 <template>
-  <div>
-    <v-progress-linear
-      v-if="loading"
-      :height="10"
-      color="primary"
-      indeterminate
-    ></v-progress-linear>
-    <div v-else class="product" @click="$emit('selectProduct', product)">
-      <div class="product-img-container">
-        <img class="product-img" :src="getImageSrc(product)" alt="" />
-      </div>
-      <div class="product-info">
-        <p class="product-name">{{ product.name }}</p>
-        <p class="product-price">{{ parseInt(product.price) }} 원</p>
-      </div>
+  <div class="product" @click="$emit('selectProduct', product)">
+    <div class="product-img-container">
+      <img class="product-img" :src="getImageSrc(item)" alt="" />
+    </div>
+    <div class="product-info">
+      <p class="product-name">{{ item.name }}</p>
+      <p class="product-price">{{ item.price }} 원</p>
     </div>
   </div>
 </template>
@@ -21,21 +13,20 @@
 <script>
 export default {
   name: "ProductItem",
+
   props: {
     product: Object,
-    
+    //item: Object,
   },
   data() {
-    return {
-      loading: true, // 데이터 로딩 상태를 나타내는 변수
-    };
+    return{
+      item: this.product,
+    }
   },
   mounted() {
-    // 로딩 애니메이션, 일단은 시간으로 넣음
-    // 실제 로직은 실제 데이터 로드에 따라 구현
-    setTimeout(() => {
-      this.loading = false; // 데이터 로딩 완료 후 로딩 상태 변경
-    }, 100);
+    // 컴포넌트가 마운트된 후에 데이터가 완전히 로드된 것을 확인합니다.
+    console.log("컴포넌트가 마운트되었습니다.");
+    console.log("로드된 데이터 확인: ", this.product);
   },
   methods: {
     getImageSrc(item) {

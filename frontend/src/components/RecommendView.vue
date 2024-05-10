@@ -42,7 +42,7 @@ export default {
       if (!this.userInput) return; // 사용자 입력이 없으면 실행하지 않음
       this.loading = true;
       axios
-        .post("/chat", { userInput: this.userInput })
+        .post("/api/chat", { userInput: this.userInput })
         .then((result) => {
           this.response = result.data.message;
           this.loading = false;

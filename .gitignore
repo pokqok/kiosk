@@ -129,3 +129,4 @@ dist
 apikey.js
 credentials.json
 credentials.env
+DBconfig.json
