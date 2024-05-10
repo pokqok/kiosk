@@ -186,10 +186,12 @@ export default {
     },*/
 
     payment($event) {
+      console.log("개수: ",$event.num);
+      console.log("가격:",$event.price);
       if ($event !== undefined) {
-        for (let i = 0; i < $event; i++) {
-          this.addCart(parseInt(this.selectedProduct));
-          this.setTotalPrice(parseInt(this.selectedProduct.price));
+        for (let i = 0; i < $event.num; i++) {
+          this.addCart({productName:this.selectedProduct.name, productPrice: $event.price});
+          this.setTotalPrice($event.price);
         }
       }
       this.showOptionModal = false;
@@ -229,7 +231,7 @@ export default {
 
     subProduct($event) {
       this.subCart($event);
-      this.setTotalPrice(-$event.Price);
+      this.setTotalPrice(-$event.productPrice);
       if (this.cart.length == 0) {
         this.showCartModal = false;
       }

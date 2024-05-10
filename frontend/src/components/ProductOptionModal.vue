@@ -115,7 +115,7 @@
     </button>
 
     <!-- 결제페이지에도 수정 예정-->
-    <button @click="$emit('payment', numProduct)" type="button" class="btn col">
+    <button @click="$emit('payment', {num: numProduct, price: (parseInt(this.selectedProduct.price) + optionPrice)})" type="button" class="btn col">
       <i class="bi bi-coin icon"></i>
       <p>결제</p>
     </button>
