@@ -1,7 +1,14 @@
-import { createStore } from 'vuex'
-import testdata from './assets/testdata'
+import { createStore } from 'vuex';
+//테스트 데이터
+import testdata from './assets/testdata';
+import {product} from './data/PageProduct.js';
+import {tag} from './data/PageTags.js';
+import {option} from './data/PageOptions.js';
+import {category} from './data/PageCategory.js'
+import {tagMenu} from './data/PageTagMenu.js'
 import categoryModule from './categoryModule';
 import tagModule from './tagModule';
+//실제 사용 모듈
 import kioskModule from './kioskModule';
 
 const store = createStore({
@@ -13,7 +20,15 @@ const store = createStore({
             socket: null,
             jwt: null,
             productName: '',
+
+            //테스트 데이터들
             testdata: testdata,
+            testProduct: product,
+            testTag: tag,
+            testOption: option,
+            testCategory: category,
+            testTagMenu: tagMenu,
+            //
             ShopID: -1,
             orderType: -1, // init -1, if == 0 is 포장, if == 1 is 매장
             cart: [],
