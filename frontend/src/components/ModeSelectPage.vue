@@ -9,7 +9,6 @@
     <div>
       <v-btn
         @click="goToNext('common')"
-        large
         block
         class="pa-12"
       >
@@ -20,7 +19,6 @@
     <div>
       <v-btn
         @click="goToNext('helper')"
-        large
         block
         class="mt-10 pa-12"
       >
@@ -29,7 +27,6 @@
       </v-btn>
     </div>
   </v-container>
-  <svg-icon type="mdi" :path="path"></svg-icon>
 
   <!-- 미구현 -->
   <v-flex xs12 sm6 class="py-2">

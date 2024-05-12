@@ -5,36 +5,34 @@
 
   <div style="margin-top: 10%"></div>
 
-  <div class="col-12 p-3">
-    <button
-      type="button"
-      class="btn btn-outline-success custom-btn"
-      @click="goToShop('shop')"
-    >
-      <img :src="shopImage" alt="매장" style="width: 60px; height: 60px" />
+  <v-container>
+    <div>
+      <v-btn
+        @click="goToShop('shop')"
+        block
+        class="pa-12"
+      >
+      <i class="bi bi-shop" style="font-size: 2rem; margin-right: 10px;"></i>
       매장
-      <img :src="shopImage" alt="매장" style="width: 60px; height: 60px" />
-    </button>
-  </div>
-  <div class="col-12 p-3 mb-5">
-    <button
-      type="button"
-      class="btn btn-outline-success custom-btn"
+      </v-btn>
+    </div>
+    <div>
+      <v-btn
       @click="goToShop('Packaging')"
-    >
-      <img :src="packagingImage" alt="포장" style="width: 60px; height: 60px" />
+        block
+        class="mt-10 pa-12"
+      >
+      <i class="bi bi-bag" style="font-size: 2rem; margin-right: 10px;"></i>
       포장
-      <img :src="packagingImage" alt="포장" style="width: 60px; height: 60px" />
-    </button>
-  </div>
+      </v-btn>
+    </div>
+  </v-container>
 
-  <button
-    type="button"
-    class="btn btn-outline-secondary rounded-pill btn-lg"
+  <v-btn
     @click="$router.go(-1)"
   >
     <i class="bi bi-arrow-90deg-left"></i>
-  </button>
+  </v-btn>
 </template>
 
 <script>
