@@ -16,6 +16,37 @@
         <i class="bi bi-mic-fill x-lg"></i>
       </button>
       <h3 style="margin-top: 3%">버튼을 눌러서 음성인식을 실행해주세요</h3>
+      <!-- 볼륨 미터 추가 -->
+      <!-- 이후에 쓸 수 도 있는 레이아웃
+      <div v-if="showVolumeMeter" class="volume-meter-container">
+        <div class="outer-meter">
+          <div
+            :style="{ width: volumeMeterWidth + 'px' }"
+            class="inner-meter"
+          ></div>
+        </div>
+      </div> -->
+      <div
+        v-if="showVolumeMeter"
+        style="display: flex; justify-content: center; margin-top: 10px"
+      >
+        <div
+          style="
+            background-color: grey;
+            height: 20px;
+            width: 100%;
+            max-width: 200px;
+          "
+        >
+          <div
+            :style="{
+              height: '100%',
+              backgroundColor: 'green',
+              width: volumeMeterWidth + 'px',
+            }"
+          ></div>
+        </div>
+      </div>
     </div>
     <div v-if="step == 1">
       <v-progress-circular
@@ -46,7 +77,28 @@
             >추가로 주문하기</v-btn
           >
         </h3>
-        <!-- 수정된 추가로 주문하기 버튼 -->
+        <!-- 볼륨 미터 추가 -->
+        <div
+          v-if="showVolumeMeter"
+          style="display: flex; justify-content: center; margin-top: 10px"
+        >
+          <div
+            style="
+              background-color: grey;
+              height: 20px;
+              width: 100%;
+              max-width: 200px;
+            "
+          >
+            <div
+              :style="{
+                height: '100%',
+                backgroundColor: 'green',
+                width: volumeMeterWidth + 'px',
+              }"
+            ></div>
+          </div>
+        </div>
       </div>
     </div>
     <!-- 옵션 모달 -->
@@ -73,6 +125,8 @@ import CartModal from "./CartModal.vue";
 import axios from "axios";
 import menuData from "@/assets/testdata.js";
 
+let lastVolume = 0; // 이전 볼륨 값을 저장하기 위한 변수
+
 export default {
   props: ["autoQuery"],
   name: "HelperPage",
@@ -94,6 +148,12 @@ export default {
       testdata: menuData,
       showOptionModal: false,
       showCartModal: false,
+      // 오디오 분석을 위한 추가 데이터
+      audioContext: null,
+      analyser: null,
+      dataArray: null,
+      volumeMeterWidth: 0, // 볼륨 미터의 폭을 저장
+      showVolumeMeter: false,
     };
   },
   watch: {
@@ -142,9 +202,28 @@ export default {
     ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
 
     async startRecording() {
-      if (this.mediaRecorder) {
+      if (this.mediaRecorder && !this.audio_recording) {
+        this.showVolumeMeter = true;
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+
+        // 오디오 컨텍스트 및 분석기 설정
+        this.audioContext = new AudioContext();
+        this.analyser = this.audioContext.createAnalyser();
+        this.streamSource = this.audioContext.createMediaStreamSource(stream);
+        this.streamSource.connect(this.analyser);
+        this.analyser.fftSize = 256;
+        this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+
+        // 볼륨 미터 업데이트 함수 호출
+        this.updateVolumeMeter();
+
+        // 미디어 레코더 시작
         this.audio_recording = true;
         this.mediaRecorder.start();
+
+        // 녹음 자동 종료 로직
         setTimeout(() => {
           this.stopRecording();
         }, 5000);
@@ -154,6 +233,7 @@ export default {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
         this.audio_recording = false;
+        this.showVolumeMeter = false; // 볼륨 미터 숨기기
         setTimeout(() => {
           this.submitAudio();
         }, 1000);
@@ -227,6 +307,28 @@ export default {
           this.step = 2;
         });
     },
+
+    updateVolumeMeter() {
+      requestAnimationFrame(this.updateVolumeMeter);
+      this.analyser.getByteFrequencyData(this.dataArray);
+      let sum = this.dataArray.reduce((a, b) => a + b, 0);
+      let average = sum / this.dataArray.length;
+
+      let scaleFactor = 1.5; // 스케일링 팩터
+      let maxVolumeWidth = 200; // 최대 너비
+      let newWidth = Math.min(maxVolumeWidth, average * scaleFactor);
+
+      // 볼륨이 감소하는 경우, 빠르게 반응
+      if (newWidth < lastVolume) {
+        this.volumeMeterWidth = newWidth;
+      } else {
+        // 볼륨이 증가하거나 같을 때는 부드럽게 증가
+        this.volumeMeterWidth = (lastVolume + newWidth) / 2;
+      }
+
+      lastVolume = newWidth; // 현재 볼륨을 이전 볼륨으로 저장
+    },
+
     openProductOptionModal(product) {
       this.selectedProduct = product;
       this.showOptionModal = true;
@@ -270,5 +372,24 @@ export default {
 </script>
 
 <style>
-/* 스타일 추가 가능 */
+.volume-meter-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.outer-meter {
+  background-color: #ccc; /* 더 부드러운 그레이 색상 */
+  height: 20px;
+  width: 100%;
+  max-width: 200px;
+  border-radius: 10px; /* 둥근 모서리 추가 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 부드러운 그림자 추가 */
+  overflow: hidden; /* 내부 요소가 밖으로 나가지 않도록 */
+}
+.inner-meter {
+  height: 100%;
+  background: linear-gradient(to right, #4caf50, #8bc34a); /* 그라디언트 배경 */
+  transition: width 0.05s ease-out; /* 감소할 때 더 빠른 반응 */
+}
 </style>
