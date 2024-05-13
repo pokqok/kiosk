@@ -63,14 +63,14 @@
 
 <script>
 import { product } from "@/data/PageProduct";
-import { CategoryData } from "@/data/PageCategory.js";
+import { category } from "@/data/PageCategory.js";
 export default {
   data() {
     return {
       search: "",
       selectedCategorys: [],
       //Categorys: CategoryData,
-      Categorys: CategoryData,
+      Categorys: category,
       products: product,
     };
   },
