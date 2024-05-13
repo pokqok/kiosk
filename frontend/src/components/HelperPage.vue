@@ -11,6 +11,9 @@
     <h2 class="title mb-4 col-4">실타래 {{ ShopID }}</h2>
   </div>
   <div style="margin-top: 15%">
+    <audio ref="menuAudio" :src="menuAudioSource" type="audio/mp3"></audio>
+    <audio ref="addAudio" :src="addAudioSource" type="audio/mp3"></audio>
+    <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
     <div v-if="step == 0">
       <button @click="startRecording" size="x-large" icon="$vuetify">
         <i class="bi bi-mic-fill x-lg"></i>
@@ -54,12 +57,43 @@
         :size="60"
         :width="6"
       ></v-progress-circular>
+      <p>인식결과: <span v-html="formattedTranscription"></span></p>
     </div>
-    <p>인식결과: <span v-html="formattedTranscription"></span></p>
     <!--<p><span v-html="formattedResponse"></span></p>-->
     <div v-if="step == 2">
+      <p>인식결과: <span v-html="formattedTranscription"></span></p>
+      <!-- 볼륨 미터 추가 -->
+      <div
+        v-if="showVolumeMeter"
+        style="display: flex; justify-content: center; margin-top: 10px"
+      >
+        <div
+          style="
+            background-color: grey;
+            height: 20px;
+            width: 100%;
+            max-width: 200px;
+          "
+        >
+          <div
+            :style="{
+              height: '100%',
+              backgroundColor: 'green',
+              width: volumeMeterWidth + 'px',
+            }"
+          ></div>
+        </div>
+      </div>
       <div v-if="loading">추천 중...</div>
       <div v-else class="row">
+        <v-btn
+          @click="startRecording"
+          color="accent"
+          large
+          dark
+          class="mx-auto d-block mt-3"
+          >추가로 주문하기</v-btn
+        >
         <ProductItem
           v-for="item in filteredItems"
           :product="item"
@@ -67,38 +101,6 @@
           @selectProduct="openProductOptionModal($event)"
           :key="item.ProductNO"
         ></ProductItem>
-        <h3>
-          <v-btn
-            @click="startRecording"
-            color="accent"
-            large
-            dark
-            class="mx-auto d-block mt-3"
-            >추가로 주문하기</v-btn
-          >
-        </h3>
-        <!-- 볼륨 미터 추가 -->
-        <div
-          v-if="showVolumeMeter"
-          style="display: flex; justify-content: center; margin-top: 10px"
-        >
-          <div
-            style="
-              background-color: grey;
-              height: 20px;
-              width: 100%;
-              max-width: 200px;
-            "
-          >
-            <div
-              :style="{
-                height: '100%',
-                backgroundColor: 'green',
-                width: volumeMeterWidth + 'px',
-              }"
-            ></div>
-          </div>
-        </div>
       </div>
     </div>
     <!-- 옵션 모달 -->
@@ -154,6 +156,9 @@ export default {
       dataArray: null,
       volumeMeterWidth: 0, // 볼륨 미터의 폭을 저장
       showVolumeMeter: false,
+      menuAudioSource: require("@/assets/음성인식 설명.mp3"), // 경로 설정
+      addAudioSource: require("@/assets/추가주문.mp3"),
+      optionAudioSource: require("@/assets/옵션.mp3"),
     };
   },
   watch: {
@@ -161,6 +166,12 @@ export default {
       if (newVal) {
         this.userInput = newVal;
         this.sendChat();
+      }
+    },
+    step(newVal) {
+      if (newVal === 2) {
+        console.log("2번 확인");
+        this.playAddAudio();
       }
     },
   },
@@ -197,9 +208,27 @@ export default {
     if (this.cart.length != 0) {
       this.showCartModal = true;
     }
+    // wait 0.3 seconds
+    setTimeout(() => {
+      this.playMenuAudio(); // 오디오 재생 함수 호출
+    }, 300);
   },
   methods: {
     ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
+
+    playMenuAudio() {
+      this.$refs.menuAudio.play().catch((error) => {
+        console.error("Audio play failed:", error);
+        // 오디오 재생 실패 처리 로직
+      });
+    },
+
+    playAddAudio() {
+      this.$refs.addAudio.play().catch((error) => {
+        console.error("Audio play failed:", error);
+        // 오디오 재생 실패 처리 로직
+      });
+    },
 
     async startRecording() {
       if (this.mediaRecorder && !this.audio_recording) {
@@ -330,6 +359,7 @@ export default {
     },
 
     openProductOptionModal(product) {
+      this.playOptionAudio(); // 옵션 오디오 재생을 먼저 실행
       this.selectedProduct = product;
       this.showOptionModal = true;
       this.showCartModal = false;
@@ -366,6 +396,12 @@ export default {
       if (this.cart.length == 0) {
         this.showCartModal = false;
       }
+    },
+    playOptionAudio() {
+      const audio = new Audio(this.optionAudioSource);
+      audio.play().catch((error) => {
+        console.error("Option audio play failed:", error);
+      });
     },
   },
 };
