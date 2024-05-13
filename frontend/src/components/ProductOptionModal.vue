@@ -64,38 +64,38 @@
           </div>
         </div>
         -->
-       
+
         <!-- 라디오버튼 그룹 -->
-        <div
-          class="container"
-          v-for="tags in tag"
-          :key="tags.id"
-        >
+        <div class="container" v-for="tags in tag" :key="tags.id">
           <div class="row">
             <h4>{{ tags.name }}</h4>
           </div>
-          <div class="row" >
-            <div 
+          <div class="row">
+            <div
               class="btn-group btn-group-lg"
               role="group"
               aria-label="Basic radio toggle button group"
             >
-              <div class="col" v-for="options in getOptionByID(tags)" :key="options.id">
+              <div
+                class="col"
+                v-for="options in getOptionByID(tags)"
+                :key="options.id"
+              >
                 <!-- v-if="options.tag == tags.id"-->
-                  <input 
-                    type="radio"
-                    class="btn-check"
-                    :name="'btnradio' + tags.id"
-                    :id="'btnradio' + tags.id + '-' + options.id"
-                    autocomplete="off"
-                    @click="setOptionPrice(tags.id, options.price)"
-                  />
-                  <label
-                    class="btn btn-outline-dark col-12"
-                    :for="'btnradio' + tags.id+ '-' + options.id"
-                    >{{ options.name }} </label
-                  >
-                  <hr />
+                <input
+                  type="radio"
+                  class="btn-check"
+                  :name="'btnradio' + tags.id"
+                  :id="'btnradio' + tags.id + '-' + options.id"
+                  autocomplete="off"
+                  @click="setOptionPrice(tags.id, options.price)"
+                />
+                <label
+                  class="btn btn-outline-dark col-12"
+                  :for="'btnradio' + tags.id + '-' + options.id"
+                  >{{ options.name }}
+                </label>
+                <hr />
               </div>
             </div>
           </div>
@@ -106,7 +106,13 @@
 
   <div class="white-bg futter row">
     <button
-      @click="$emit('pickProduct', {num: numProduct, price: (parseInt(this.selectedProduct.price) + optionPrice), option: optionPrice})"
+      @click="
+        $emit('pickProduct', {
+          num: numProduct,
+          price: parseInt(this.selectedProduct.price) + optionPrice,
+          option: optionPrice,
+        })
+      "
       type="button"
       class="btn col"
     >
@@ -115,7 +121,17 @@
     </button>
 
     <!-- 결제페이지에도 수정 예정-->
-    <button @click="$emit('payment', {num: numProduct, price: (parseInt(this.selectedProduct.price) + optionPrice), option: optionPrice})" type="button" class="btn col">
+    <button
+      @click="
+        $emit('payment', {
+          num: numProduct,
+          price: parseInt(this.selectedProduct.price) + optionPrice,
+          option: optionPrice,
+        })
+      "
+      type="button"
+      class="btn col"
+    >
       <i class="bi bi-coin icon"></i>
       <p>결제</p>
     </button>
@@ -153,7 +169,6 @@ export default {
         ["Yes", "No"],
         ["족발", "피자", "보쌈", "치킨"],
       ],*/
-
     };
   },
   props: {
@@ -161,7 +176,7 @@ export default {
     tag: Object,
     option: Object,
   },
-  computed:{
+  computed: {
     optionPrice() {
       let totalPrice = 0;
       // optionPrices 객체의 각 값을 합산합니다.
@@ -170,27 +185,27 @@ export default {
       }
       return totalPrice;
     },
-    totalPrice(){
-      return (this.price + this.optionPrice)*this.numProduct;
-    }
+    totalPrice() {
+      return (this.price + this.optionPrice) * this.numProduct;
+    },
   },
   methods: {
     subNumProduct() {
-      console.log("태그 테스트:",this.tag);
-      console.log("옵션 테스트:", this.option)
+      console.log("태그 테스트:", this.tag);
+      console.log("옵션 테스트:", this.option);
       if (this.numProduct <= 1) {
         alert("1개 이하로 주문 하실 수 없습니다");
       } else {
         this.numProduct--;
       }
     },
-    getOptionByID(tag){
-      return this.option.filter(option => option.tag === tag.id);
+    getOptionByID(tag) {
+      return this.option.filter((option) => option.tag === tag.id);
     },
     setOptionPrice(tagId, price) {
       // 해당 태그에 대한 optionPrice를 업데이트합니다.
       this.optionPrices[tagId] = price;
-      console.log("가격 근황",this.optionPrice)
+      console.log("가격 근황", this.optionPrice);
     },
   },
 };

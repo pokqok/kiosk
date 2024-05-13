@@ -1,6 +1,16 @@
 <template>
   <div class="head-container row">
     <div class="col-4">
+      <audio
+        ref="paymentAudio"
+        :src="paymentAudioSource"
+        type="audio/mp3"
+      ></audio>
+      <audio
+        ref="paymentCompletedAudio"
+        :src="paymentCompletedAudioSource"
+        type="audio/mp3"
+      ></audio>
       <button
         @click="$router.go(-1 - 2 * cntCanclePay)"
         type="button"
@@ -36,6 +46,8 @@ export default {
     return {
       IMP: window.IMP,
       cntCanclePay: 0,
+      paymentAudioSource: require("@/assets/결제 방법 선택.mp3"),
+      paymentCompletedAudioSource: require("@/assets/결제 완료.mp3"),
     };
   },
 
@@ -45,9 +57,22 @@ export default {
 
   mounted() {
     this.IMP.init("imp03664607");
+    this.playPaymentAudio();
   },
 
   methods: {
+    playPaymentAudio() {
+      this.$refs.paymentAudio.play();
+    },
+    playPaymentCompletedAudio() {
+      this.$refs.paymentCompletedAudio.play();
+    },
+    stopPaymentAudio() {
+      this.$refs.paymentAudio.pause();
+    },
+    stopPaymentCompletedAudio() {
+      this.$refs.paymentCompletedAudio.pause();
+    },
     requestPay() {
       const merchantUid = "merchant_" + new Date().getTime();
       this.IMP.request_pay(
@@ -74,6 +99,7 @@ export default {
                 if (verifyResponse.status === 200) {
                   this.savePaymentData(merchantUid, this.totalPrice);
                   alert("결제가 완료되었습니다.");
+                  this.playPaymentCompletedAudio();
                   this.$router.push("/mode-select");
                 } else {
                   alert("결제 검증 실패");
@@ -117,6 +143,7 @@ export default {
               .then(() => {
                 this.savePaymentData(merchantUid, this.totalPrice);
                 alert("결제가 완료되었습니다.");
+                this.playPaymentCompletedAudio();
                 this.$router.push("/mode-select");
               })
               .catch((error) => {
