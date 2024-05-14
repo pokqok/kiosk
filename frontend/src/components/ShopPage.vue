@@ -6,7 +6,18 @@
       style="position: fixed; z-index: 1000;"
       id="navbar-menu"
     >
-      <v-toolbar-title><h2>실타래 {{ ShopID }}</h2></v-toolbar-title>
+      <v-col cols="4">
+        <v-btn
+          @click="goToBack"
+          style="background-color: #009688;"
+          >
+          <i class="bi bi-x-lg icon"></i>
+          <p>취소</p>
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <v-toolbar-title><h2>실타래 {{ ShopID }}</h2></v-toolbar-title>
+      </v-col>
       <template v-slot:extension>
         <v-tabs
           v-model="tab"
@@ -197,7 +208,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["addCart", "subCart", "setTotalPrice", "setProductName"]), //결제 시 이름 넣기 추가
+    ...mapMutations(["addCart", "subCart", "setTotalPrice", "setProductName", "orderType"]), //결제 시 이름 넣기 추가
 
     handleScroll() {
       //db연결 시
@@ -288,6 +299,15 @@ export default {
         this.showCartModal = false;
       }
     },
+
+    goToBack(){
+      if(this.orderType == 0){
+        this.$router.push("/order-type/common")
+      }else{
+        this.$router.push("/order-type/helper")
+      }
+      
+    }
   },
 };
 </script>

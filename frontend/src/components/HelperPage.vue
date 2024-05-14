@@ -116,8 +116,6 @@ export default {
       addAudioSource: require("@/assets/추가주문.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
       minVolume: 0.5, // 일정 이하로 감지할 최소 음량
-      audioContext: null,
-      analyser: null,
       microphone: null,
       volumeCheckInterval: null,
       silenceTimer: null,
@@ -212,7 +210,9 @@ export default {
         this.analyser.fftSize = 256;
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         this.updateVolumeMeter();
-=======
+      }
+    },
+// =======
     initializeMicrophone() {
       this.audioContext = new (window.AudioContext ||
         window.webkitAudioContext)();
@@ -247,12 +247,12 @@ export default {
         }
       }
     },
-    startRecording() {
-      if (this.mediaRecorder && this.mediaRecorder.state !== "recording") {
-        this.audio_recording = true;
-        this.mediaRecorder.start();
-      }
-    },
+    // startRecording() {
+    //   if (this.mediaRecorder && this.mediaRecorder.state !== "recording") {
+    //     this.audio_recording = true;
+    //     this.mediaRecorder.start();
+    //   }
+    // },
     stopRecording() {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
