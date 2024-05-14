@@ -7,12 +7,15 @@
       indeterminate
     ></v-progress-linear>
     <div v-else class="product" @click="$emit('selectProduct', product)">
+
       <div class="product-img-container">
         <img class="product-img" :src="getImageSrc(product)" alt="" />
+
       </div>
       <div class="product-info">
         <p class="product-name">{{ product.name }}</p>
         <p class="product-price">{{ parseInt(product.price) }} 원</p>
+
       </div>
     </div>
   </div>
