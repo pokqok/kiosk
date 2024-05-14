@@ -115,6 +115,13 @@ export default {
       menuAudioSource: require("@/assets/음성인식 설명.mp3"),
       addAudioSource: require("@/assets/추가주문.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
+      minVolume: 0.5, // 일정 이하로 감지할 최소 음량
+      audioContext: null,
+      analyser: null,
+      microphone: null,
+      volumeCheckInterval: null,
+      silenceTimer: null,
+      silenceDuration: 2000, // 무음 지속 시간 (2초)
     };
   },
   watch: {
@@ -135,6 +142,7 @@ export default {
   mounted() {
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       this.mediaRecorder = new MediaRecorder(stream);
+      console.log("MediaRecorder created:", this.mediaRecorder);
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) this.recordedChunks.push(event.data);
       };
@@ -204,11 +212,45 @@ export default {
         this.analyser.fftSize = 256;
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         this.updateVolumeMeter();
+=======
+    initializeMicrophone() {
+      this.audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          this.microphone = this.audioContext.createMediaStreamSource(stream);
+          this.analyser = this.audioContext.createAnalyser();
+          this.analyser.fftSize = 256;
+          this.microphone.connect(this.analyser);
+          this.volumeCheckInterval = setInterval(this.checkVolume, 100);
+        })
+        .catch((error) => {
+          console.error("Error accessing microphone:", error);
+        });
+    },
+    checkVolume() {
+      const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+      this.analyser.getByteFrequencyData(dataArray);
+      const avgVolume =
+        dataArray.reduce((acc, cur) => acc + cur, 0) / dataArray.length;
+      if (avgVolume < this.minVolume * 255) {
+        if (!this.silenceTimer) {
+          this.silenceTimer = setTimeout(() => {
+            this.stopRecording();
+          }, this.silenceDuration);
+        }
+      } else {
+        if (this.silenceTimer) {
+          clearTimeout(this.silenceTimer);
+          this.silenceTimer = null;
+        }
+      }
+    },
+    startRecording() {
+      if (this.mediaRecorder && this.mediaRecorder.state !== "recording") {
         this.audio_recording = true;
         this.mediaRecorder.start();
-        setTimeout(() => {
-          this.stopRecording();
-        }, 5000);
       }
     },
     stopRecording() {
@@ -216,6 +258,9 @@ export default {
         this.mediaRecorder.stop();
         this.audio_recording = false;
         this.showVolumeMeter = false;
+        clearInterval(this.volumeCheckInterval);
+        clearTimeout(this.silenceTimer);
+        this.silenceTimer = null;
         setTimeout(() => {
           this.submitAudio();
         }, 1000);
