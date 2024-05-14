@@ -1,40 +1,38 @@
 <template>
   <div>
-    <div class="futter cart-container row align-items-center shadow">
-      <div
-        class="col-6 gy-2 rounded align-items-center p-3"
-        style="background-color: #ffffff"
+  <v-row class="futter cart-container align-center shadow">
+    <v-col cols="6" class="align-center" style="background-color: #ffffff">
+      <v-row
+        v-for="item in cart"
+        :key="item"
+        class="align-center"
+        style="margin-left: 10%;"
       >
-        <div
-          class="row mb-1"
-          v-for="item in cart"
-          :key="item"
-          style="align-items: center"
+        <p>{{ item.productName }} - {{ item.productPrice }}원</p>
+        <v-spacer></v-spacer>
+        <v-btn          
+          @click="$emit('subProduct', item)"
         >
-          <p class="col-10 m-0">{{ item.productName }} - {{ item.productPrice }}원</p>
-          <button
-            type="button"
-            class="btn btn-outline-danger col-2"
-            @click="$emit('subProduct', item)"
-          >
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-      </div>
-      <div class="col-1 price-fixed shadow">
-        <p class="m-0">{{ parseInt(totalPrice) }}원</p>
-      </div>
-      <button
+          <v-icon>bi-x-lg</v-icon>
+        </v-btn>
+      </v-row>
+    </v-col>
+    <v-col cols="1" class="price-fixed shadow">
+      <p>{{ parseInt(totalPrice) }}원</p>
+    </v-col>
+    <v-btn
+      @click="$emit('payment', totalPrice)"
+      class="btn-fixed shadow"
+      width="30%"
+      height="10%"
+      style="margin-right: 5%;"
+    >
+      <v-icon left size="x-large" style="margin-right: 10%;">bi-coin</v-icon>
+      <p> 결제</p>
+    </v-btn>
+  </v-row>
+</div>
 
-        @click="$emit('payment', totalPrice)"
-        type="button"
-        class="btn btn-outline-primary btn-fixed col-4 shadow"
-      >
-        <i class="bi bi-coin icon"></i>
-        <p>결제</p>
-      </button>
-    </div>
-  </div>
 </template>
 
 <script>
