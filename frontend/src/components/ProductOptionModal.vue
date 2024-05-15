@@ -1,150 +1,122 @@
 <template>
-  <div class="black-bg">
-    <div class="white-bg">
-      <div class="option-container">
-        <div class="row">
-          <img :src="selectedProduct.image" class="col-4" alt="" />
-          <button
-            class="btn btn-outline-dark vol-btn col-2"
-            type="button"
-            style="margin-left: 10%"
-            @click="numProduct++"
-          >
-            <i class="bi bi-arrow-up"></i>
-          </button>
-          <p class="col-2" style="margin-top: 5%">{{ numProduct }}</p>
-          <button
-            class="btn btn-outline-dark vol-btn col-2"
-            type="button"
-            @click="subNumProduct"
-          >
-            <i class="bi bi-arrow-down"></i>
-          </button>
-          <hr />
-          <!-- {{ (parseInt(selectedProduct.price) + optionPrice) * numProduct }} -->
-          <p>{{ totalPrice }}원</p>
-          <hr />
-        </div>
-
-        <!-- 옵션 테스트 -->
-        <!-- 체크박스 그룹 -->
-
-        <!-- 
-           <div
-          class="container"
-          v-for="tagOption in tag"
-          :key="tagOption.id"
-        >
-          <div class="row" v-for="item in tag" :key="item.id">
-            <div class="col">
-              <h4>{{ tagOption.name }}</h4>
+  <v-dialog
+    v-model="temp"
+    width="80%"
+    height="80%"
+    persistent
+    style="overflow-y: scroll;"
+    >
+    <v-card>
+      <v-container fluid>
+        <v-row>
+          <v-col cols="12" md="6">
+            <div class="d-flex justify-center">
+              <v-img
+              :src="getImageSrc(selectedProduct)"
+              aspect-ratio="1.7"
+              contain
+              style="margin-top: 10%;"></v-img>
             </div>
-          </div>
-          <div class="row">
-            <div
-              class="btn-group btn-group-lg"
-              role="group"
-              aria-label="Basic checkbox toggle button group"
-            >
-              <div class="col" v-for="options in option" :key="options.id">
-                <input
-                  type="checkbox"
-                  class="btn-check"
-                  :id="'btncheck' + tagOption.id + '-' + options.id"
-                  autocomplete="off"
-                />
-                <label
-                  class="btn btn-outline-dark col-12"
-                  :for="'btncheck' + tagOption.id  + '-' + options.id"
-                  >{{ options.name }}</label
-                >
-                <hr />
-              </div>
+          </v-col>
+          <v-col md="6">
+            <v-row class="d-flex justify-center mt-5">
+                <h2>{{ selectedProduct.name }}</h2>
+            </v-row>
+            <v-row>
+              <v-col
+              class="d-flex justify-center"
+              style="display: flex; flex-direction: column; align-items: center;"
+              cols="4">
+                <v-btn icon @click="subNumProduct">
+                  <v-icon>mdi-minus</v-icon>
+                </v-btn>
+                <p>제거</p>
+              </v-col>
+              <v-col class="d-flex justify-center mt-5" cols="4">
+                <span>{{ numProduct }}</span>
+              </v-col>
+              <v-col
+              class="d-flex justify-center"
+              style="display: flex; flex-direction: column; align-items: center;"
+              cols="4">
+                <v-btn icon @click="numProduct++">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+                <p>추가</p>
+              </v-col>
+            </v-row>
+            <v-divider class="my-4"></v-divider>
+            <div class="text-center">
+              <h3>{{ totalPrice }}원</h3>
             </div>
-          </div>
-        </div>
-        -->
-
-        <!-- 라디오버튼 그룹 -->
-        <div class="container" v-for="tags in tag" :key="tags.id">
-          <div class="row">
-            <h4>{{ tags.name }}</h4>
-          </div>
-          <div class="row">
-            <div
-              class="btn-group btn-group-lg"
-              role="group"
-              aria-label="Basic radio toggle button group"
-            >
-              <div
-                class="col"
+            <v-divider class="my-4"></v-divider>
+            <div v-for="(tags, i) in tag" :key="tags.id" class="my-3">
+              <div class="text-h6">{{ tags.name }}</div>
+              <v-btn-toggle
+              v-model="selectedOption[i]"
+              color="primary"
+              mandatory
+              dense>
+                <v-btn
                 v-for="options in getOptionByID(tags)"
                 :key="options.id"
-              >
-                <!-- v-if="options.tag == tags.id"-->
-                <input
-                  type="radio"
-                  class="btn-check"
-                  :name="'btnradio' + tags.id"
-                  :id="'btnradio' + tags.id + '-' + options.id"
-                  autocomplete="off"
-                  @click="setOptionPrice(tags.id, options.price)"
-                />
-                <label
-                  class="btn btn-outline-dark col-12"
-                  :for="'btnradio' + tags.id + '-' + options.id"
-                  >{{ options.name }}
-                </label>
-                <hr />
-              </div>
+                @click="setOptionPrice(tags.id, options.price)">
+                  {{ options.name }}
+                </v-btn>
+              </v-btn-toggle>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="white-bg futter row">
-    <button
-      @click="
-        $emit('pickProduct', {
-          num: numProduct,
-          price: parseInt(this.selectedProduct.price) + optionPrice,
-          option: optionPrice,
-        })
-      "
-      type="button"
-      class="btn col"
-    >
-      <i class="bi bi-cart icon"></i>
-      <p>장바구니</p>
-    </button>
-
-    <!-- 결제페이지에도 수정 예정-->
-    <button
-      @click="
-        $emit('payment', {
-          num: numProduct,
-          price: parseInt(this.selectedProduct.price) + optionPrice,
-          option: optionPrice,
-        })
-      "
-      type="button"
-      class="btn col"
-    >
-      <i class="bi bi-coin icon"></i>
-      <p>결제</p>
-    </button>
-    <button
-      @click="$emit('closeProductOptionModal')"
-      type="button"
-      class="btn col"
-    >
-      <i class="bi bi-x-lg icon"></i>
-      <p>취소</p>
-    </button>
-  </div>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-card-actions class="justify-end mb-12 mr-5">
+        <v-row>
+          <v-col cols="4">
+            <v-btn
+            block
+            height="175%"
+            color="green darken-1"
+            text
+            @click="$emit('pickProduct', {
+                num: numProduct,
+                price: parseInt(this.selectedProduct.price) + optionPrice,
+                option: optionPrice,
+              })">
+              <v-icon left>mdi-cart</v-icon>
+              <h3>장바구니</h3>
+            </v-btn>
+          </v-col>
+          <v-col cols="4">
+            <v-btn
+            block
+            height="175%"
+            color="blue darken-1"
+            text
+            @click="$emit('payment', {
+                num: numProduct,
+                price: parseInt(this.selectedProduct.price) + optionPrice,
+                option: optionPrice,
+              })">
+              <v-icon left>mdi-cash</v-icon>
+              <h3>결제</h3>
+            </v-btn>
+          </v-col>
+          <v-col cols="4">
+            <v-btn
+            block
+            height="175%"
+            color="grey"
+            text
+            @click="$emit('closeProductOptionModal')">
+              <v-icon left>mdi-close</v-icon>
+              <h3>취소</h3>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
+
 
 <script>
 export default {
@@ -154,21 +126,8 @@ export default {
       numProduct: 1,
       price: parseInt(this.selectedProduct.price),
       optionPrices: {},
-
-      //test Data
-      /*
-      optionTitle: ["안녕", "하세", "요", "이것", "은", "테스트", "최애"],
-      checkBoxOptions: [
-        [1, 2, 3],
-        ["a", "b", "c", "d"],
-        ["x", "y", "z"],
-      ],
-      radioOptions: [
-        ["q", "w", "e", "r"],
-        ["ㄱ", "ㄴ", "ㄷ"],
-        ["Yes", "No"],
-        ["족발", "피자", "보쌈", "치킨"],
-      ],*/
+      temp: true,
+      selectedOption: []
     };
   },
   props: {
@@ -207,6 +166,15 @@ export default {
       this.optionPrices[tagId] = price;
       console.log("가격 근황", this.optionPrice);
     },
+    getImageSrc(selectedProduct) {
+      // 이미지 경로가 비어있을 경우 빈 이미지를 반환하고,
+      // 비어있지 않을 경우 제품 이미지 경로를 반환합니다.
+      //return image ? image:"https://picsum.photos/100?random=1";
+      console.log("가져온 데이터 테스트: ",selectedProduct)
+      
+      console.log("가져온 이름들 ",selectedProduct.id)
+      return "https://picsum.photos/100?random=1";
+    },
   },
 };
 </script>
@@ -220,46 +188,17 @@ div {
   box-sizing: border-box;
 }
 
-.black-bg {
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  position: fixed;
-  padding: 20px;
-
-  top: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.white-bg {
-  width: 50%;
+.futter {
   background: white;
   border-radius: 8px;
-  padding: 20px;
-  max-height: 90%;
-  overflow-y: auto;
-  overflow-x: visible;
-}
-
-.futter {
   width: 100%;
   height: 15%;
   position: fixed;
   bottom: 0;
-  z-index: 1001;
+  z-index: 9999;
 }
 
 .icon {
   font-size: xx-large;
-}
-
-.option-container {
-  margin: 5%;
-}
-
-.vol-btn {
-  margin-bottom: 20%;
 }
 </style>

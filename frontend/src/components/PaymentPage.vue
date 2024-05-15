@@ -1,38 +1,51 @@
 <template>
-  <div class="head-container row">
-    <div class="col-4">
-      <audio
-        ref="paymentAudio"
-        :src="paymentAudioSource"
-        type="audio/mp3"
-      ></audio>
-      <audio
-        ref="paymentCompletedAudio"
-        :src="paymentCompletedAudioSource"
-        type="audio/mp3"
-      ></audio>
-      <button
-        @click="$router.go(-1 - 2 * cntCanclePay)"
-        type="button"
-        class="btn btn-light"
-      >
-        <i class="bi bi-x-lg icon"></i>
-        <p>취소</p>
-      </button>
-    </div>
-    <h2 class="title col-4">결제 방법 선택</h2>
+  <div class="head-container">
+    <v-row>
+      <v-col cols="4">
+        <audio
+          ref="paymentAudio"
+          :src="paymentAudioSource"
+          type="audio/mp3"
+        ></audio>
+        <audio
+          ref="paymentCompletedAudio"
+          :src="paymentCompletedAudioSource"
+          type="audio/mp3"
+        ></audio>
+        <v-btn
+          @click="$router.go(-1 - 2 * cntCanclePay)"
+          style="background-color: #009688;"
+          >
+          <i class="bi bi-x-lg icon"></i>
+          <p>취소</p>
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <h2 class="title col-4">결제 방법 선택</h2>
+      </v-col>
+    </v-row>
   </div>
 
-  <div class="row" style="margin-top: 12%">
-    <button @click="requestPay" type="button" class="btn btn-light col-4">
-      <i class="bi bi-credit-card pay-icon"></i>
-      <p>카드 결제</p>
-    </button>
-    <button @click="requestPayKakao" type="button" class="btn btn-light col-4">
-      <i class="bi bi-chat-fill pay-icon"></i>
-      <p>카카오 페이</p>
-    </button>
-  </div>
+  <v-container>
+    <v-row style="margin-top: 12%;">
+      <v-col cols="4">
+        <v-btn @click="requestPay" block height="150%">
+          <span style="display: flex; flex-direction: column; align-items: center;">
+            <i class="bi bi-credit-card pay-icon"></i>
+            <h2 style="margin: 0;">카드 결제</h2>
+          </span>
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <v-btn @click="requestPayKakao" block height="150%">
+          <span style="display: flex; flex-direction: column; align-items: center;">
+            <i class="bi bi-chat-fill pay-icon"></i>
+            <h2 style="margin: 0;">카카오 페이</h2>
+          </span>
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>

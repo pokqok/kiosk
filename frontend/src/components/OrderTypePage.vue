@@ -29,7 +29,7 @@
   </v-container>
 
   <v-btn
-    @click="$router.go(-1)"
+    @click="goToBack"
   >
     <i class="bi bi-arrow-90deg-left"></i>
   </v-btn>
@@ -58,6 +58,9 @@ export default {
         this.$router.push("/helper/" + this.$store.state.ShopID);
       }
     },
+    goToBack() {
+      this.$router.push("/mode-select")
+    }
   },
 };
 </script>
