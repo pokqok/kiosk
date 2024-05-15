@@ -1,128 +1,122 @@
 <template>
   <v-dialog
-      v-model="temp"
-      height="90%"
-      >
-    <v-card
-      width="80%"
-      max-height="90%"
-      style="overflow-y: auto; margin-left: 10%"
-      >
-      <v-container>
-          <v-row>
-            <v-col cols="4">
-              <div class="product-img-container">
-                <img class="product-img" :src="getImageSrc(selectedProduct)" alt="" />
-              </div>
-            </v-col>
-            <v-row
-              style="margin-left: 15%; margin-top: 35px;"
-            >
-              <v-col cols="3">
-                <v-btn @click="subNumProduct">
-                  <i class="bi bi-arrow-down"></i>
+    v-model="temp"
+    width="80%"
+    height="80%"
+    persistent
+    style="overflow-y: scroll;"
+    >
+    <v-card>
+      <v-container fluid>
+        <v-row>
+          <v-col cols="12" md="6">
+            <div class="d-flex justify-center">
+              <v-img
+              :src="getImageSrc(selectedProduct)"
+              aspect-ratio="1.7"
+              contain
+              style="margin-top: 10%;"></v-img>
+            </div>
+          </v-col>
+          <v-col md="6">
+            <v-row class="d-flex justify-center mt-5">
+                <h2>{{ selectedProduct.name }}</h2>
+            </v-row>
+            <v-row>
+              <v-col
+              class="d-flex justify-center"
+              style="display: flex; flex-direction: column; align-items: center;"
+              cols="4">
+                <v-btn icon @click="subNumProduct">
+                  <v-icon>mdi-minus</v-icon>
                 </v-btn>
+                <p>제거</p>
               </v-col>
-              <v-col cols="2">
-                <p>{{ numProduct }}</p>
+              <v-col class="d-flex justify-center mt-5" cols="4">
+                <span>{{ numProduct }}</span>
               </v-col>
-              <v-col cols="2">
-                <v-btn @click="numProduct++">
-                  <i class="bi bi-arrow-up"></i>
+              <v-col
+              class="d-flex justify-center"
+              style="display: flex; flex-direction: column; align-items: center;"
+              cols="4">
+                <v-btn icon @click="numProduct++">
+                  <v-icon>mdi-plus</v-icon>
                 </v-btn>
+                <p>추가</p>
               </v-col>
             </v-row>
-          </v-row>
-
-          <v-divider
-            :thickness="2"
-            class="border-opacity-100"
-            color="info"
-            ></v-divider
-          >
-          <div style="text-align: center; font-size: 20px;">
-            <h3>{{ totalPrice }}원</h3>
-          </div>
-          <v-divider
-            :thickness="2"
-            class="border-opacity-100"
-            color="info"
-            ></v-divider
-          >
-
-          <div
-            class="d-flex flex-column align-center bg-grey-lighten-4 pa-6"
-            v-for="tags, i in tag" :key="tags.id">
-            <pre class="pt-2"><h4>{{ tags.name }}</h4></pre>
-            <v-btn-toggle
+            <v-divider class="my-4"></v-divider>
+            <div class="text-center">
+              <h3>{{ totalPrice }}원</h3>
+            </div>
+            <v-divider class="my-4"></v-divider>
+            <div v-for="(tags, i) in tag" :key="tags.id" class="my-3">
+              <div class="text-h6">{{ tags.name }}</div>
+              <v-btn-toggle
               v-model="selectedOption[i]"
               color="primary"
               mandatory
-            >
-              <v-btn
+              dense>
+                <v-btn
                 v-for="options in getOptionByID(tags)"
                 :key="options.id"
-                :id="'btnradio' + tags.id + '-' + options.id"
-                @click="setOptionPrice(tags.id, options.price)"
-                > {{ options.name }} </v-btn
-              >
-            </v-btn-toggle>
-            <v-divider
-              :thickness="2"
-              class="border-opacity-100"
-              color="info"
-            ></v-divider> 
-          </div>
-        </v-container>
-      </v-card>
-  </v-dialog>
-
-  <div class="futter">
-    <v-container>
-      <v-row>
-        <v-col cols="4">
-          <v-btn
-            size="x-large"
-            height="70px"
+                @click="setOptionPrice(tags.id, options.price)">
+                  {{ options.name }}
+                </v-btn>
+              </v-btn-toggle>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-card-actions class="justify-end mb-12 mr-5">
+        <v-row>
+          <v-col cols="4">
+            <v-btn
             block
+            height="175%"
+            color="green darken-1"
+            text
             @click="$emit('pickProduct', {
-              num: numProduct,
-              price: parseInt(this.selectedProduct.price) + optionPrice,
-              option: optionPrice,
+                num: numProduct,
+                price: parseInt(this.selectedProduct.price) + optionPrice,
+                option: optionPrice,
               })">
-            <i class="bi bi-cart icon"></i>
-            <p>장바구니</p>
-          </v-btn>
-        </v-col>
-        <!-- 결제페이지에도 수정 예정-->
-        <v-col cols="4">
-          <v-btn
-            size="x-large"
-            height="70px"
+              <v-icon left>mdi-cart</v-icon>
+              <h3>장바구니</h3>
+            </v-btn>
+          </v-col>
+          <v-col cols="4">
+            <v-btn
             block
+            height="175%"
+            color="blue darken-1"
+            text
             @click="$emit('payment', {
-              num: numProduct,
-              price: parseInt(this.selectedProduct.price) + optionPrice,
-              option: optionPrice,
+                num: numProduct,
+                price: parseInt(this.selectedProduct.price) + optionPrice,
+                option: optionPrice,
               })">
-            <i class="bi bi-coin icon"></i>
-            <p>결제</p>
-          </v-btn>
-        </v-col>
-        <v-col cols="4">
-          <v-btn
-            size="x-large"
-            height="70px"
+              <v-icon left>mdi-cash</v-icon>
+              <h3>결제</h3>
+            </v-btn>
+          </v-col>
+          <v-col cols="4">
+            <v-btn
             block
+            height="175%"
+            color="grey"
+            text
             @click="$emit('closeProductOptionModal')">
-            <i class="bi bi-x-lg icon"></i>
-            <p>취소</p>
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
+              <v-icon left>mdi-close</v-icon>
+              <h3>취소</h3>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
+
 
 <script>
 export default {
