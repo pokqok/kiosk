@@ -13,7 +13,18 @@
     <audio ref="addAudio" :src="addAudioSource" type="audio/mp3"></audio>
     <audio ref="optionAudio" :src="optionAudioSource" type="audio/mp3"></audio>
     <div v-if="step == 0">
-      <button @click="startRecording" size="x-large" icon="$vuetify">
+      <button
+        @click="startRecording"
+        size="x-large"
+        icon="$vuetify"
+        style="
+          font-size: 24px;
+          padding: 10px;
+          width: 50%;
+          height: 50vh;
+          background-color: green;
+        "
+      >
         <i class="bi bi-mic-fill x-lg"></i>
       </button>
       <h3 style="margin-top: 3%">버튼을 눌러서 음성인식을 실행해주세요</h3>
@@ -116,8 +127,6 @@ export default {
       addAudioSource: require("@/assets/추가주문.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
       minVolume: 0.5, // 일정 이하로 감지할 최소 음량
-      audioContext: null,
-      analyser: null,
       microphone: null,
       volumeCheckInterval: null,
       silenceTimer: null,
@@ -158,6 +167,7 @@ export default {
       this.playMenuAudio();
     }, 300);
   },
+
   methods: {
     ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
     stopAllAudios() {
@@ -212,7 +222,12 @@ export default {
         this.analyser.fftSize = 256;
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         this.updateVolumeMeter();
-=======
+
+        // 볼륨 체크 타이머 설정
+        this.volumeCheckInterval = setInterval(this.checkVolume, 100);
+      }
+    },
+
     initializeMicrophone() {
       this.audioContext = new (window.AudioContext ||
         window.webkitAudioContext)();
@@ -234,23 +249,21 @@ export default {
       this.analyser.getByteFrequencyData(dataArray);
       const avgVolume =
         dataArray.reduce((acc, cur) => acc + cur, 0) / dataArray.length;
-      if (avgVolume < this.minVolume * 255) {
+
+      // 평균 볼륨이 특정 값(예: 100) 이하인지 확인
+      if (avgVolume < 100) {
+        // 일정 시간 동안 볼륨이 특정 값 이하로 유지되면 중지
         if (!this.silenceTimer) {
           this.silenceTimer = setTimeout(() => {
             this.stopRecording();
-          }, this.silenceDuration);
+          }, 2000); // 2초
         }
       } else {
+        // 볼륨이 특정 값 이상인 경우 타이머 초기화
         if (this.silenceTimer) {
           clearTimeout(this.silenceTimer);
           this.silenceTimer = null;
         }
-      }
-    },
-    startRecording() {
-      if (this.mediaRecorder && this.mediaRecorder.state !== "recording") {
-        this.audio_recording = true;
-        this.mediaRecorder.start();
       }
     },
     stopRecording() {
