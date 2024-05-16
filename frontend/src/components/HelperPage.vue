@@ -28,24 +28,11 @@
         <i class="bi bi-mic-fill x-lg"></i>
       </button>
       <h3 style="margin-top: 3%">버튼을 눌러서 음성인식을 실행해주세요</h3>
-      <div
-        v-if="showVolumeMeter"
-        style="display: flex; justify-content: center; margin-top: 10px"
-      >
-        <div
-          style="
-            background-color: grey;
-            height: 20px;
-            width: 100%;
-            max-width: 200px;
-          "
-        >
+      <div v-if="showVolumeMeter" class="volume-meter-container">
+        <div class="outer-meter">
           <div
-            :style="{
-              height: '100%',
-              backgroundColor: 'green',
-              width: volumeMeterWidth + 'px',
-            }"
+            :style="{ width: volumeMeterWidth + 'px' }"
+            class="inner-meter"
           ></div>
         </div>
       </div>
@@ -69,6 +56,17 @@
           class="mx-auto d-block mt-3"
           >추가로 주문하기</v-btn
         >
+        <!-- 볼륨 미터 추가 -->
+
+        <div v-if="showVolumeMeter" class="volume-meter-container">
+          <div class="outer-meter">
+            <div
+              :style="{ width: volumeMeterWidth + 'px' }"
+              class="inner-meter"
+            ></div>
+          </div>
+        </div>
+
         <ProductItem
           v-for="item in filteredItems"
           :product="item"
@@ -228,6 +226,7 @@ export default {
       }
     },
 
+
     initializeMicrophone() {
       this.audioContext = new (window.AudioContext ||
         window.webkitAudioContext)();
@@ -266,6 +265,7 @@ export default {
         }
       }
     },
+    
     stopRecording() {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
