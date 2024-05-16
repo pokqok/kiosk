@@ -4,12 +4,12 @@
       <RouterView @comeBack="showButton = true"></RouterView>
       <RouterLink to="/login/admin">
         <button v-if="showButton" @click="showButton = false">
-          go admin Login
+          관리자 로그인
         </button>
       </RouterLink>
       <RouterLink to="/login/shop">
         <button v-if="showButton" @click="showButton = false">
-          go shop Login
+          상점 로그인
         </button>
       </RouterLink>
       <!-- 나중에 쓸지는 모르겠습니다.
@@ -22,11 +22,12 @@
         <button v-if="showButton" @click="showButton = false">Recommend</button>
       </RouterLink>
       -->
-      <RouterLink to="/integrated">
+      <!--<RouterLink to="/integrated">
         <button v-if="showButton" @click="showButton = false">
           음성인식으로 추천받기
         </button>
       </RouterLink>
+      -->
     </v-main>
   </v-app>
 </template>
@@ -39,7 +40,6 @@ export default {
       showButton: true,
     };
   },
-
 };
 </script>
 
