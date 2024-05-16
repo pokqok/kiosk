@@ -1,28 +1,51 @@
 <template>
-  <div class="head-container row">
-    <div class="col-4">
-      <button
-        @click="$router.go(-1 - 2 * cntCanclePay)"
-        type="button"
-        class="btn btn-light"
-      >
-        <i class="bi bi-x-lg icon"></i>
-        <p>취소</p>
-      </button>
-    </div>
-    <h2 class="title col-4">결제 방법 선택</h2>
+  <div class="head-container">
+    <v-row>
+      <v-col cols="4">
+        <audio
+          ref="paymentAudio"
+          :src="paymentAudioSource"
+          type="audio/mp3"
+        ></audio>
+        <audio
+          ref="paymentCompletedAudio"
+          :src="paymentCompletedAudioSource"
+          type="audio/mp3"
+        ></audio>
+        <v-btn
+          @click="$router.go(-1 - 2 * cntCanclePay)"
+          style="background-color: #009688;"
+          >
+          <i class="bi bi-x-lg icon"></i>
+          <p>취소</p>
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <h2 class="title col-4">결제 방법 선택</h2>
+      </v-col>
+    </v-row>
   </div>
 
-  <div class="row" style="margin-top: 12%">
-    <button @click="requestPay" type="button" class="btn btn-light col-4">
-      <i class="bi bi-credit-card pay-icon"></i>
-      <p>카드 결제</p>
-    </button>
-    <button @click="requestPayKakao" type="button" class="btn btn-light col-4">
-      <i class="bi bi-chat-fill pay-icon"></i>
-      <p>카카오 페이</p>
-    </button>
-  </div>
+  <v-container>
+    <v-row style="margin-top: 12%;">
+      <v-col cols="4">
+        <v-btn @click="requestPay" block height="150%">
+          <span style="display: flex; flex-direction: column; align-items: center;">
+            <i class="bi bi-credit-card pay-icon"></i>
+            <h2 style="margin: 0;">카드 결제</h2>
+          </span>
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <v-btn @click="requestPayKakao" block height="150%">
+          <span style="display: flex; flex-direction: column; align-items: center;">
+            <i class="bi bi-chat-fill pay-icon"></i>
+            <h2 style="margin: 0;">카카오 페이</h2>
+          </span>
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -36,6 +59,8 @@ export default {
     return {
       IMP: window.IMP,
       cntCanclePay: 0,
+      paymentAudioSource: require("@/assets/결제 방법 선택.mp3"),
+      paymentCompletedAudioSource: require("@/assets/결제 완료.mp3"),
     };
   },
 
@@ -45,9 +70,22 @@ export default {
 
   mounted() {
     this.IMP.init("imp03664607");
+    this.playPaymentAudio();
   },
 
   methods: {
+    playPaymentAudio() {
+      this.$refs.paymentAudio.play();
+    },
+    playPaymentCompletedAudio() {
+      this.$refs.paymentCompletedAudio.play();
+    },
+    stopPaymentAudio() {
+      this.$refs.paymentAudio.pause();
+    },
+    stopPaymentCompletedAudio() {
+      this.$refs.paymentCompletedAudio.pause();
+    },
     requestPay() {
       const merchantUid = "merchant_" + new Date().getTime();
       this.IMP.request_pay(
@@ -55,6 +93,7 @@ export default {
           pg: "html5_inicis.INIpayTest",
           merchant_uid: merchantUid,
           name: this.productName,
+          //goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -73,6 +112,7 @@ export default {
                 if (verifyResponse.status === 200) {
                   this.savePaymentData(merchantUid, this.totalPrice);
                   alert("결제가 완료되었습니다.");
+                  this.playPaymentCompletedAudio();
                   this.$router.push("/mode-select");
                 } else {
                   alert("결제 검증 실패");
@@ -116,6 +156,7 @@ export default {
               .then(() => {
                 this.savePaymentData(merchantUid, this.totalPrice);
                 alert("결제가 완료되었습니다.");
+                this.playPaymentCompletedAudio();
                 this.$router.push("/mode-select");
               })
               .catch((error) => {

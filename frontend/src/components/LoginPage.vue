@@ -7,40 +7,34 @@
       </div>
     </div>
 
-    <!-- ID 입력 -->
-    <div class="mb-3" style="margin-left: 30%; margin-right: 30%">
-      <label for="basic-url" class="form-label" style="margin-right: 100%"
-        >ID</label
-      >
-      <input
-        type="text"
-        class="form-control"
-        id="email"
+    <v-form
+    ref="form"
+    v-model="valid"
+    lazy-validation
+    style="margin-left: 25%; margin-right: 25%;"
+    >
+      <v-text-field
         v-model="email"
-        placeholder="Enter your ID here"
-      />
-    </div>
+        :rules="IDRules"
+        label="ID"
+        required
+      ></v-text-field>
 
-    <!-- Password 입력 -->
-    <div class="mb-3" style="margin-left: 30%; margin-right: 30%">
-      <label for="basic-url" class="form-label" style="margin-right: 100%"
-        >Password</label
-      >
-      <input
-        type="password"
-        class="form-control"
-        id="password"
+      <v-text-field
         v-model="password"
-        placeholder="Enter your Password here"
-      />
-    </div>
+        :rules="passwordRules"
+        label="password"
+        required
+      ></v-text-field>
 
-    <!-- login 버튼 -->
-    <div>
-      <button type="button" class="btn btn-success" @click="login">
+      <v-btn
+        :disabled="!valid"
+        color="success"
+        @click="login"
+      >
         Login
-      </button>
-    </div>
+      </v-btn>
+    </v-form>
 
     <button @click="goToRootPage">메인 페이지로 돌아가기</button>
   </div>
@@ -54,6 +48,13 @@ export default {
     return {
       email: "",
       password: "",
+      valid: true,
+      IDRules: [
+        v => !!v || 'ID is required',
+      ],
+      passwordRules: [
+        v => !!v || 'Password is required',
+      ],
     };
   },
   methods: {
