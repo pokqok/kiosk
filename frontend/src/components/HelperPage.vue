@@ -255,7 +255,6 @@ export default {
   },
   mounted() {
   
-
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       this.mediaRecorder = new MediaRecorder(stream);
       console.log("MediaRecorder created:", this.mediaRecorder);
@@ -349,23 +348,36 @@ export default {
           console.log("Response:", this.response);
           this.loading = false;
           this.step = 2;
+       
+     
 
-          // 응답을 바탕으로 아이템 필터링
-          const responseItems = this.response.split("\n").map((line) => {
-            const match = line.match(/\.\s*(.*?)\s*-/);
-            return match ? match[1] : null;
-          });
+          // // 응답을 바탕으로 아이템 필터링
+          // const responseItems = this.response.split("\n").map((line) => {
+          //   const match = line.match(/\[(.*?)\]/);
+          //   console.log("추가적 처리중입니다");
+          //   return match ? match[1] : null;
+          // });
+
+          const responseItems = this.response.match(/\[(\d+(?:,\s*\d+)*)\]/m);
+
+          // if (responseItems) {
+          //     const matchString = responseItems[1];
+          //     const productIds = matchString.split(',').map(id => parseInt(id.trim()));
+          //     console.log("최종 배열 값: ", productIds);
+          // } else {
+          //     console.log("배열 찾기 실패");
+          // }
+
+          //const matchItem = this.response.match(/productId:\s*\[([^\]]+)\]/);
+          // let match = str.match(/\[(.*?)\]/);
+         // let totalArray = matchArray ? result.split(",").map(Number) : [];
 
           // testdata.js 데이터에서 응답에 포함된 항목만 추출
-          console.log("this is what you Got: ",responseItems);
+          console.log("this is what you Got: ",responseItems[1]);
            this.filteredItems = this.products.filter((item) =>
-             responseItems.includes(item.id)
+             responseItems[1].includes(item.id)
            );
-          //DB에서 가져온것들 로 하는 코드
-          
-          // this.filteredItems = this.changeData(this.products).filter((item) =>
-          //   responseItems.includes(item.ProductName)
-          // );
+        
         })
         .catch((error) => {
           console.error("Error sending chat:", error);
