@@ -46,14 +46,14 @@
             <div class="d-flex align-center">
               <img
                 v-if="item.image"
-                :src="item.image"
+                :src="getImageUrl(item.image)"
                 alt="Product Image"
                 class="mr-2"
                 style="max-width: 50px; max-height: 50px"
               />
               <div>
                 <div>{{ item.name }}</div>
-                <div>{{ item.price }}</div>
+                <div>{{ parseInt(item.price) }}</div>
               </div>
             </div>
           </td>
@@ -75,9 +75,10 @@
 </template>
 
 <script>
-import { product } from "@/data/PageProduct";
+//import { product } from "@/data/PageProduct";
 import { CategoryData } from "@/data/PageCategory.js";
 import FileUploadModal from "@/components/FileUploadModal.vue";
+import { mapState,} from "vuex";
 
 export default {
   components: {
@@ -88,10 +89,22 @@ export default {
       search: "",
       selectedCategorys: [],
       Categorys: CategoryData,
-      products: product,
+      //products: product,
       showModal: false,
       selectedProductId: null
     };
+  },
+  computed: {
+    //...mapState(["testdata", "ShopID", "orderType", "cart"]),
+    //테스트 데이터 추가 버전
+    ...mapState(["testProduct","testTag","testOption","testCategory","testTagMenu", "ShopID", "orderType", "cart"]),
+    products(){
+      return this.$store.state.kioskModule.products;
+    },
+  },
+  async created() {
+      // 데이터를 비동기적으로 로드
+      this.$store.dispatch('fetchProducts');
   },
   methods: {
     searchItems() {
@@ -106,7 +119,13 @@ export default {
       if (productIndex !== -1) {
         this.$set(this.products, productIndex, updatedProduct);
       }
-    }
+    },
+    getImageUrl(imageFileName) {
+      // public/image/ 디렉토리에서 이미지를 가져옵니다.
+      console.log(`../../public/image/${imageFileName}`);
+      
+      return `/image/${imageFileName}`;
+    },
   }
 };
 </script>

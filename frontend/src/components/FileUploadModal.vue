@@ -63,9 +63,10 @@ export default {
         const formData = new FormData();
         formData.append('file', this.file);
         formData.append('productId', this.productId);
+        formData.append('overwrite', 'true'); // 이미지를 덮어씌울지 여부
         console.log("업로드 파일", this.file);
         console.log("아이디", this.productId);
-        formData.append('overwrite', 'true');
+        
         try {
           const response = await axios.post('http://localhost:3000/image/uploadImage', formData, {
             headers: {
@@ -73,6 +74,7 @@ export default {
             }
           });
           this.$emit('upload-success', response.data);
+          this.$store.dispatch('fetchProducts');
           this.close();
         } catch (error) {
           console.error('Error uploading file:', error);

@@ -185,7 +185,6 @@ export default {
       this.$store.dispatch('fetchTagMenu');
 
     },
-
   methods: {
     ...mapMutations(["addCart", "subCart", "setTotalPrice", "setProductName"]), //결제 시 이름 넣기 추가
 
