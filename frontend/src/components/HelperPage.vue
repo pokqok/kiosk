@@ -142,6 +142,18 @@ export default {
   },
   computed: mapState(["testdata", "ShopID", "orderType", "cart"]),
   mounted() {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      this.mediaRecorder = new MediaRecorder(stream);
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) this.recordedChunks.push(event.data);
+      };
+      this.mediaRecorder.onstop = () => {
+        let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+        this.uploadAudio(blob);
+        this.audio_recording = false;
+        this.step = 1;
+      };
+    });
     this.initializeMediaRecorder();
     if (this.cart.length != 0) this.showCartModal = true;
     setTimeout(this.playMenuAudio, 300);
