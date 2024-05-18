@@ -199,6 +199,9 @@ export default {
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         this.updateVolumeMeter();
         this.volumeCheckInterval = setInterval(this.checkVolume, 100);
+        this.recordedChunks = []; // Ensure recordedChunks is reset
+        this.mediaRecorder.start(); // Start the media recorder
+        this.audio_recording = true;
       }
     },
     initializeMediaRecorder() {
@@ -207,10 +210,12 @@ export default {
         .then((stream) => {
           this.mediaRecorder = new MediaRecorder(stream);
           this.mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) this.recordedChunks.push(event.data);
+            if (event.data.size > 0) {
+              this.recordedChunks.push(event.data);
+            }
           };
           this.mediaRecorder.onstop = () => {
-            console.log("on stop");
+            console.log("Recording stopped.");
             const blob = new Blob(this.recordedChunks, { type: "audio/wav" });
             this.uploadAudio(blob);
             this.audio_recording = false;
@@ -228,7 +233,7 @@ export default {
         this.dataArray.length;
       console.log("Average volume:", avgVolume); // 볼륨 확인용 로그
 
-      if (avgVolume < 100) {
+      if (avgVolume < 45) {
         if (!this.silenceTimer) {
           console.log("Starting silence timer"); // 타이머 시작 로그
           this.silenceTimer = setTimeout(() => {
