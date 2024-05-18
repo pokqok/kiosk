@@ -1,5 +1,3 @@
-<!-- HelperPage.vue -->
-
 <template>
   <div class="head-container row">
     <div class="col-4">
@@ -11,11 +9,33 @@
     <h2 class="title mb-4 col-4">실타래 {{ ShopID }}</h2>
   </div>
   <div style="margin-top: 15%">
+    <audio ref="menuAudio" :src="menuAudioSource" type="audio/mp3"></audio>
+    <audio ref="addAudio" :src="addAudioSource" type="audio/mp3"></audio>
+    <audio ref="optionAudio" :src="optionAudioSource" type="audio/mp3"></audio>
     <div v-if="step == 0">
-      <button @click="startRecording" size="x-large" icon="$vuetify">
+      <button
+        @click="startRecording"
+        size="x-large"
+        icon="$vuetify"
+        style="
+          font-size: 24px;
+          padding: 10px;
+          width: 50%;
+          height: 50vh;
+          background-color: green;
+        "
+      >
         <i class="bi bi-mic-fill x-lg"></i>
       </button>
       <h3 style="margin-top: 3%">버튼을 눌러서 음성인식을 실행해주세요</h3>
+      <div v-if="showVolumeMeter" class="volume-meter-container">
+        <div class="outer-meter">
+          <div
+            :style="{ width: volumeMeterWidth + 'px' }"
+            class="inner-meter"
+          ></div>
+        </div>
+      </div>
     </div>
     <div v-if="step == 1">
       <v-progress-circular
@@ -23,12 +43,27 @@
         :size="60"
         :width="6"
       ></v-progress-circular>
+      <p>인식결과: <span v-html="formattedTranscription"></span></p>
     </div>
-    <p>인식결과: <span v-html="formattedTranscription"></span></p>
-    <!--<p><span v-html="formattedResponse"></span></p>-->
     <div v-if="step == 2">
       <div v-if="loading">추천 중...</div>
       <div v-else class="row">
+        <v-btn
+          @click="startRecording"
+          color="accent"
+          large
+          dark
+          class="mx-auto d-block mt-3"
+          >추가로 주문하기</v-btn
+        >
+        <div v-if="showVolumeMeter" class="volume-meter-container">
+          <div class="outer-meter">
+            <div
+              :style="{ width: volumeMeterWidth + 'px' }"
+              class="inner-meter"
+            ></div>
+          </div>
+        </div>
         <ProductItem
           v-for="item in filteredItems"
           :product="item"
@@ -36,20 +71,8 @@
           @selectProduct="openProductOptionModal($event)"
           :key="item.ProductNO"
         ></ProductItem>
-        <h3>
-          <v-btn
-            @click="startRecording"
-            color="accent"
-            large
-            dark
-            class="mx-auto d-block mt-3"
-            >추가로 주문하기</v-btn
-          >
-        </h3>
-        <!-- 수정된 추가로 주문하기 버튼 -->
       </div>
     </div>
-    <!-- 옵션 모달 -->
     <ProductOptionModal
       @closeProductOptionModal="closeProductOptionModal"
       @payment="payment"
@@ -76,24 +99,32 @@ import menuData from "@/assets/testdata.js";
 export default {
   props: ["autoQuery"],
   name: "HelperPage",
-  components: {
-    ProductItem,
-    ProductOptionModal,
-    CartModal,
-  },
+  emits: ["comeBack"],
+  components: { ProductItem, ProductOptionModal, CartModal },
   data() {
     return {
       step: 0,
       transcription: "",
       recordedChunks: [],
-      userInput: "",
-      response: null,
       loading: false,
       filteredItems: [],
       selectedProduct: null,
       testdata: menuData,
       showOptionModal: false,
       showCartModal: false,
+      audioContext: null,
+      analyser: null,
+      dataArray: null,
+      volumeMeterWidth: 0,
+      showVolumeMeter: false,
+      menuAudioSource: require("@/assets/음성인식 설명.mp3"),
+      addAudioSource: require("@/assets/추가주문.mp3"),
+      optionAudioSource: require("@/assets/옵션.mp3"),
+      minVolume: 0.5,
+      microphone: null,
+      volumeCheckInterval: null,
+      silenceTimer: null,
+      silenceDuration: 2000,
     };
   },
   watch: {
@@ -103,85 +134,171 @@ export default {
         this.sendChat();
       }
     },
-  },
-  computed: {
-    ...mapState(["testdata", "ShopID", "orderType", "cart"]),
-    formattedTranscription() {
-      return this.transcription
-        ? this.transcription.replace(/\n/g, "<br>")
-        : "";
-    },
-    formattedResponse() {
-      return this.response ? this.response.replace(/\n/g, "<br>") : "";
+    step(newVal) {
+      if (newVal === 2) {
+        this.playAddAudio();
+      }
     },
   },
+  computed: mapState(["testdata", "ShopID", "orderType", "cart"]),
   mounted() {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      this.mediaRecorder = new MediaRecorder(stream);
-      console.log("MediaRecorder created:", this.mediaRecorder);
-
-      this.mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          this.recordedChunks.push(event.data);
-        }
-      };
-
-      this.mediaRecorder.onstop = () => {
-        let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
-        this.uploadAudio(blob);
-        this.audio_recording = false;
-        this.step = 1; // 프로그레스 인디케이터 표시
-      };
-    });
-
-    if (this.cart.length != 0) {
-      this.showCartModal = true;
-    }
+    this.initializeMediaRecorder();
+    if (this.cart.length != 0) this.showCartModal = true;
+    setTimeout(this.playMenuAudio, 300);
   },
   methods: {
     ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
-
-    async startRecording() {
-      if (this.mediaRecorder) {
-        this.audio_recording = true;
-        this.mediaRecorder.start();
-        setTimeout(() => {
-          this.stopRecording();
-        }, 5000);
+    stopAllAudios() {
+      [
+        this.$refs.menuAudio,
+        this.$refs.addAudio,
+        this.$refs.optionAudio,
+      ].forEach((audio) => {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
+    },
+    stopOptionAudio() {
+      if (this.$refs.optionAudio) {
+        this.$refs.optionAudio.pause();
+        this.$refs.optionAudio.currentTime = 0;
       }
     },
+    playMenuAudio() {
+      this.stopAllAudios();
+      this.$refs.menuAudio
+        .play()
+        .catch((error) => console.error("Audio play failed:", error));
+    },
+    playAddAudio() {
+      this.stopAllAudios();
+      this.$refs.addAudio
+        .play()
+        .catch((error) => console.error("Audio play failed:", error));
+    },
+    playOptionAudio() {
+      this.stopAllAudios();
+      this.$refs.optionAudio
+        .play()
+        .catch((error) => console.error("Option audio play failed:", error));
+    },
+    async startRecording() {
+      this.stopAllAudios();
+      if (this.mediaRecorder && !this.audio_recording) {
+        this.showVolumeMeter = true;
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        this.audioContext = new AudioContext();
+        this.analyser = this.audioContext.createAnalyser();
+        this.streamSource = this.audioContext.createMediaStreamSource(stream);
+        this.streamSource.connect(this.analyser);
+        this.analyser.fftSize = 256;
+        this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+        this.updateVolumeMeter();
+        this.volumeCheckInterval = setInterval(this.checkVolume, 100);
+        this.recordedChunks = []; // Ensure recordedChunks is reset
+        this.mediaRecorder.start(); // Start the media recorder
+        this.audio_recording = true;
+      }
+    },
+    initializeMediaRecorder() {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          this.mediaRecorder = new MediaRecorder(stream);
+          this.mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              this.recordedChunks.push(event.data);
+            }
+          };
+          this.mediaRecorder.onstop = () => {
+            console.log("Recording stopped.");
+            const blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+            this.uploadAudio(blob);
+            this.audio_recording = false;
+            this.step = 1;
+          };
+        })
+        .catch((error) => {
+          console.error("Error accessing microphone:", error);
+        });
+    },
+    checkVolume() {
+      this.analyser.getByteFrequencyData(this.dataArray);
+      const avgVolume =
+        this.dataArray.reduce((acc, cur) => acc + cur, 0) /
+        this.dataArray.length;
+      console.log("Average volume:", avgVolume); // 볼륨 확인용 로그
+
+      if (avgVolume < 45) {
+        if (!this.silenceTimer) {
+          console.log("Starting silence timer"); // 타이머 시작 로그
+          this.silenceTimer = setTimeout(() => {
+            console.log("Silence detected, stopping recording"); // 타이머 만료 로그
+            this.stopRecording();
+          }, this.silenceDuration);
+        }
+      } else {
+        if (this.silenceTimer) {
+          console.log("Resetting silence timer"); // 타이머 초기화 로그
+          clearTimeout(this.silenceTimer);
+          this.silenceTimer = null;
+        }
+      }
+    },
+
     stopRecording() {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
+        console.log("stop0");
         this.audio_recording = false;
-        setTimeout(() => {
-          this.submitAudio();
-        }, 1000);
+        this.showVolumeMeter = false;
+        clearInterval(this.volumeCheckInterval);
+        clearTimeout(this.silenceTimer);
+        this.silenceTimer = null;
+        this.uploadAudioAndSubmit();
       }
     },
-    async uploadAudio(blob) {
-      let formData = new FormData();
-      formData.append("audio", blob);
 
-      axios
-        .post("/api/upload", formData)
-        .then((response) => {
-          this.$store.commit("setFile", response.data.uploaded_file);
-        })
-        .catch((error) => {
-          console.error("Error uploading file:", error);
-        });
-      this.recordedChunks = [];
+    async uploadAudioAndSubmit() {
+      if (this.recordedChunks.length > 0) {
+        const blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+        try {
+          await this.uploadAudio(blob);
+          this.submitAudio();
+        } catch (error) {
+          console.error("Error uploading audio:", error);
+        }
+      } else {
+        console.warn("No recorded chunks to upload.");
+      }
     },
+
+    async uploadAudio(blob) {
+      const formData = new FormData();
+      formData.append("audio", blob);
+      try {
+        const response = await axios.post("/api/upload", formData);
+        this.$store.commit("setFile", response.data.uploaded_file);
+        console.log("upload");
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        throw error; // 에러를 호출자에게 다시 전파
+      }
+      this.recordedChunks = []; // 업로드 후 recordedChunks 초기화
+    },
+
     submitAudio() {
       if (this.audio_recording) {
         alert("녹음 중에는 파일을 올릴 수 없습니다.");
-      } else if (this.$store.state.file == null) {
+      } else if (!this.$store.state.file) {
         alert("녹음된 파일이 없습니다.");
       } else {
-        let formData = new FormData();
+        const formData = new FormData();
         formData.append("uploaded_file", this.$store.state.file);
-
         axios
           .post("/api/audio-upload", formData)
           .then((response) => {
@@ -205,17 +322,12 @@ export default {
         .post("/api/chat", { userInput: this.transcription })
         .then((result) => {
           this.response = result.data.message;
-          console.log("Response:", this.response);
           this.loading = false;
           this.step = 2;
-
-          // 응답을 바탕으로 아이템 필터링
           const responseItems = this.response.split("\n").map((line) => {
             const match = line.match(/\.\s*(.*?)\s*-/);
             return match ? match[1] : null;
           });
-
-          // testdata.js 데이터에서 응답에 포함된 항목만 추출
           this.filteredItems = this.testdata.filter((item) =>
             responseItems.includes(item.ProductName)
           );
@@ -227,16 +339,29 @@ export default {
           this.step = 2;
         });
     },
+    updateVolumeMeter() {
+      if (!this.showVolumeMeter) return;
+      requestAnimationFrame(this.updateVolumeMeter);
+      this.analyser.getByteFrequencyData(this.dataArray);
+      const average =
+        this.dataArray.reduce((a, b) => a + b, 0) / this.dataArray.length;
+      const scaleFactor = 1.5;
+      const maxVolumeWidth = 200;
+      this.volumeMeterWidth = Math.min(maxVolumeWidth, average * scaleFactor);
+    },
     openProductOptionModal(product) {
+      this.playOptionAudio();
       this.selectedProduct = product;
       this.showOptionModal = true;
       this.showCartModal = false;
     },
     closeProductOptionModal() {
+      this.stopOptionAudio();
       this.selectedProduct = null;
       this.showProductOptionModal = false;
     },
     payment($event) {
+      this.stopOptionAudio();
       if ($event !== undefined) {
         for (let i = 0; i < $event; i++) {
           this.addCart(this.selectedProduct);
@@ -247,17 +372,15 @@ export default {
       this.showCartModal = false;
       this.$router.push("/payment");
     },
-
     pickProduct($event) {
+      this.stopOptionAudio();
       this.showOptionModal = false;
       for (let i = 0; i < $event; i++) {
         this.addCart(this.selectedProduct);
         this.setTotalPrice(this.selectedProduct.Price);
       }
-
       this.showCartModal = true;
     },
-
     subProduct($event) {
       this.subCart($event);
       this.setTotalPrice(-$event.Price);
@@ -270,5 +393,25 @@ export default {
 </script>
 
 <style>
-/* 스타일 추가 가능 */
+.volume-meter-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.outer-meter {
+  background-color: #ccc;
+  height: 20px;
+  width: 100%;
+  max-width: 200px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.inner-meter {
+  height: 100%;
+  background: linear-gradient(to right, #4caf50, #8bc34a);
+  transition: width 0.05s ease-out;
+}
 </style>
