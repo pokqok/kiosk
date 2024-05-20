@@ -183,6 +183,7 @@ export default {
       this.$store.dispatch('fetchOptions');
       this.$store.dispatch('fetchProducts');
       this.$store.dispatch('fetchTagMenu');
+      this.restoreSelectedProduct();
 
     },
   methods: {
@@ -219,7 +220,10 @@ export default {
       this.showCartModal = false;
       this.$router.push("/payment");
     },
-
+    restoreSelectedProduct() {
+    // 예를 들어, localStorage 또는 Vuex 상태에서 이전 상태를 복구하는 로직
+    this.selectedProduct = this.$store.state.selectedProduct || {};
+    } ,
     /*
       pickProduct($event) {
         this.showOptionModal = false;
