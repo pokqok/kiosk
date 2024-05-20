@@ -28,13 +28,19 @@
         </button>
       </RouterLink>
       -->
+      <FontSizeControls />
     </v-main>
   </v-app>
 </template>
 
 <script>
+import FontSizeControls from "./components/FontSizeControls.vue";
+
 export default {
   name: "App",
+  components: {
+    FontSizeControls,
+  },
   data() {
     return {
       showButton: true,
@@ -45,39 +51,39 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif; /* 기본 폰트 유지 */
+  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50; /* 기본 텍스트 색상 유지 */
+  color: #2c3e50;
 }
 
 button {
   margin: 10px;
-  padding: 12px 20px; /* 버튼 패딩 조정 */
-  font-size: 16px; /* 버튼 폰트 크기 조정 */
-  font-weight: bold; /* 글자 두께 bold로 설정 */
-  color: #ffffff; /* 텍스트 색상 흰색으로 설정 */
-  background-color: #3498db; /* 밝은 파란색으로 버튼 색상 설정 */
-  border: none; /* 테두리 제거 */
-  border-radius: 5px; /* 버튼의 모서리 둥글게 */
-  cursor: pointer; /* 클릭 가능한 요소 표시 */
-  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5); /* 버튼에 그림자 효과 추가 */
-  transition: background-color 0.3s, box-shadow 0.3s; /* 색상과 그림자 변화에 애니메이션 효과 */
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #3498db;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5);
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 button:hover {
-  background-color: #2980b9; /* 호버 시 버튼 색상 진한 파란색으로 변경 */
-  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.7); /* 호버 시 그림자 효과 강조 */
+  background-color: #2980b9;
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.7);
 }
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none; /* Chrome, Safari에서 스피너 제거 */
+  -webkit-appearance: none;
   margin: 0;
 }
 
 input[type="number"] {
-  -moz-appearance: textfield; /* Firefox에서 스피너 제거 */
+  -moz-appearance: textfield;
 }
 </style>
