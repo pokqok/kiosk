@@ -12,10 +12,20 @@
           :src="paymentCompletedAudioSource"
           type="audio/mp3"
         ></audio>
+        <audio
+          ref="kakaoPayAudio"
+          :src="kakaoPayAudioSource"
+          type="audio/mp3"
+        ></audio>
+        <audio
+          ref="normalPayAudio"
+          :src="normalPayAudioSource"
+          type="audio/mp3"
+        ></audio>
         <v-btn
           @click="$router.go(-1 - 2 * cntCanclePay)"
-          style="background-color: #009688;"
-          >
+          style="background-color: #009688"
+        >
           <i class="bi bi-x-lg icon"></i>
           <p>취소</p>
         </v-btn>
@@ -27,20 +37,24 @@
   </div>
 
   <v-container>
-    <v-row style="margin-top: 12%;">
+    <v-row style="margin-top: 12%">
       <v-col cols="4">
         <v-btn @click="requestPay" block height="150%">
-          <span style="display: flex; flex-direction: column; align-items: center;">
+          <span
+            style="display: flex; flex-direction: column; align-items: center"
+          >
             <i class="bi bi-credit-card pay-icon"></i>
-            <h2 style="margin: 0;">카드 결제</h2>
+            <h2 style="margin: 0">카드 결제</h2>
           </span>
         </v-btn>
       </v-col>
       <v-col cols="4">
         <v-btn @click="requestPayKakao" block height="150%">
-          <span style="display: flex; flex-direction: column; align-items: center;">
+          <span
+            style="display: flex; flex-direction: column; align-items: center"
+          >
             <i class="bi bi-chat-fill pay-icon"></i>
-            <h2 style="margin: 0;">카카오 페이</h2>
+            <h2 style="margin: 0">카카오 페이</h2>
           </span>
         </v-btn>
       </v-col>
@@ -61,6 +75,8 @@ export default {
       cntCanclePay: 0,
       paymentAudioSource: require("@/assets/결제 방법 선택.mp3"),
       paymentCompletedAudioSource: require("@/assets/결제 완료.mp3"),
+      kakaoPayAudioSource: require("@/assets/카카오페이.mp3"),
+      normalPayAudioSource: require("@/assets/일반결제.mp3"),
     };
   },
 
@@ -80,13 +96,21 @@ export default {
     playPaymentCompletedAudio() {
       this.$refs.paymentCompletedAudio.play();
     },
-    stopPaymentAudio() {
+    playKakaoPayAudio() {
+      this.$refs.kakaoPayAudio.play();
+    },
+    playNormalPayAudio() {
+      this.$refs.normalPayAudio.play();
+    },
+    stopAllAudio() {
       this.$refs.paymentAudio.pause();
-    },
-    stopPaymentCompletedAudio() {
       this.$refs.paymentCompletedAudio.pause();
+      this.$refs.kakaoPayAudio.pause();
+      this.$refs.normalPayAudio.pause();
     },
+
     requestPay() {
+      this.playNormalPayAudio();
       const merchantUid = "merchant_" + new Date().getTime();
       this.IMP.request_pay(
         {
@@ -110,10 +134,12 @@ export default {
               })
               .then((verifyResponse) => {
                 if (verifyResponse.status === 200) {
+                  this.playPaymentCompletedAudio();
                   this.savePaymentData(merchantUid, this.totalPrice);
                   alert("결제가 완료되었습니다.");
-                  this.playPaymentCompletedAudio();
-                  this.$router.push("/mode-select");
+                  setTimeout(() => {
+                    this.$router.push("/mode-select");
+                  }, 5000);
                 } else {
                   alert("결제 검증 실패");
                 }
@@ -128,6 +154,7 @@ export default {
     },
 
     requestPayKakao() {
+      this.playKakaoPayAudio();
       const merchantUid = "merchant_" + new Date().getTime();
       this.IMP.request_pay(
         {
@@ -154,10 +181,12 @@ export default {
               },
             })
               .then(() => {
+                this.playPaymentCompletedAudio();
                 this.savePaymentData(merchantUid, this.totalPrice);
                 alert("결제가 완료되었습니다.");
-                this.playPaymentCompletedAudio();
-                this.$router.push("/mode-select");
+                setTimeout(() => {
+                  this.$router.push("/mode-select");
+                }, 5000);
               })
               .catch((error) => {
                 console.error("Error verifying payment:", error);
