@@ -1,48 +1,52 @@
 <template>
   <div>
-  <v-row class="futter cart-container align-center shadow">
-    <v-col cols="6" class="align-center" style="background-color: #ffffff">
-      <v-row
-        v-for="item in cart"
-        :key="item"
-        class="align-center"
-        style="margin-left: 10%;"
-      >
-        <p>{{ item.productName }} - {{ item.productPrice }}원</p>
-        <v-spacer></v-spacer>
-        <v-btn          
-          @click="$emit('subProduct', item)"
+    <v-row class="futter cart-container align-center shadow">
+      <v-col cols="6" class="align-center" style="background-color: #ffffff">
+        <v-row
+          v-for="(item, index) in cart"
+          :key="index"
+          class="align-center"
+          style="margin-left: 10%;"
         >
-          <v-icon>bi-x-lg</v-icon>
-        </v-btn>
-      </v-row>
-    </v-col>
-    <v-col cols="1" class="price-fixed shadow">
-      <p>{{ parseInt(totalPrice) }}원</p>
-    </v-col>
-    <v-btn
-      @click="$emit('payment', totalPrice)"
-      class="btn-fixed shadow"
-      width="30%"
-      height="10%"
-      style="margin-right: 5%;"
-    >
-      <v-icon left size="x-large" style="margin-right: 10%;">bi-coin</v-icon>
-      <p> 결제</p>
-    </v-btn>
-  </v-row>
-</div>
-
+          <p>{{ item.name }} - {{ item.productPrice }}원</p>
+          <v-spacer></v-spacer>
+          <v-btn @click="removeFromCart(index)">
+            <v-icon>bi-x-lg</v-icon>
+          </v-btn>
+        </v-row>
+      </v-col>
+      <v-col cols="1" class="price-fixed shadow">
+        <p>{{ parseInt(totalPrice) }}원</p>
+      </v-col>
+      <v-btn @click="handlePayment" class="btn-fixed shadow" width="30%" height="10%" style="margin-right: 5%;">
+        <v-icon left size="x-large" style="margin-right: 10%;">bi-coin</v-icon>
+        <p> 결제</p>
+      </v-btn>
+    </v-row>
+  </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "CartModal",
-
   computed: {
     ...mapState(["cart", "totalPrice"]),
+  },
+  methods: {
+    ...mapMutations(["subCart", "clearCart"]),
+    removeFromCart(index) {
+      this.subCart(index);
+    },
+    handlePayment() {
+      if (this.totalPrice > 0) {
+        this.$emit("payment", this.totalPrice);
+        this.clearCart();
+      } else {
+        alert("장바구니가 비어 있습니다.");
+      }
+    }
   },
 };
 </script>

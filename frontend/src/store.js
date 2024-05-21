@@ -1,5 +1,4 @@
 import { createStore } from "vuex";
-//테스트 데이터
 import testdata from "./assets/testdata";
 import { product } from "./data/PageProduct.js";
 import { tag } from "./data/PageTags.js";
@@ -8,7 +7,6 @@ import { category } from "./data/PageCategory.js";
 import { tagMenu } from "./data/PageTagMenu.js";
 import categoryModule from "./categoryModule";
 import tagModule from "./tagModule";
-//실제 사용 모듈
 import kioskModule from "./kioskModule";
 
 const store = createStore({
@@ -21,19 +19,19 @@ const store = createStore({
       jwt: null,
       productName: "",
 
-      //테스트 데이터들
       testdata: testdata,
       testProduct: product,
       testTag: tag,
       testOption: option,
       testCategory: category,
       testTagMenu: tagMenu,
-      //
+
       ShopID: -1,
-      orderType: -1, // init -1, if == 0 is 포장, if == 1 is 매장
+      orderType: -1,
       cart: [],
       totalPrice: 0,
-      orderCounter: 0, // add this line
+      orderCounter: 0,
+      optionsList: {},
     };
   },
 
@@ -52,7 +50,7 @@ const store = createStore({
     },
     setJwt(state, token) {
       state.jwt = token;
-      sessionStorage.setItem("jwt", token); // Vuex 밖에서는 sessionStorage에 저장
+      sessionStorage.setItem("jwt", token);
     },
     setProductName(state, name) {
       state.productName = name;
@@ -66,63 +64,53 @@ const store = createStore({
     setOrderType(state, type) {
       state.orderType = type;
     },
-    addCart(state, product) {
-      state.cart.push(product);
+    addCart(state, { product, options }) {
+      const productWithPrice = {
+        ...product,
+        productPrice: product.price + (options ? options.reduce((acc, option) => acc + option.price, 0) : 0)
+      };
+      const index = state.cart.length;
+      state.cart.push(productWithPrice);
+      state.optionsList[index] = options || [];
+      state.totalPrice += productWithPrice.productPrice;
     },
-    subCart(state, product) {
-      //this.selectedProduct.name, $event.price
-      const index = state.cart.indexOf(product);
-      if (index != -1) {
+    subCart(state, index) {
+      if (index !== -1 && index < state.cart.length) {
+        state.totalPrice -= state.cart[index].productPrice;
         state.cart.splice(index, 1);
+        delete state.optionsList[index];
+        const newOptionsList = {};
+        state.cart.forEach((item, i) => {
+          newOptionsList[i] = state.optionsList[i] || [];
+        });
+        state.optionsList = newOptionsList;
       }
     },
     incrementOrderCounter(state) {
       state.orderCounter++;
       console.log("Order Counter: ", state.orderCounter);
-      state.productName = "주문번호 : " + state.orderCounter; // Automatically update product name
+      state.productName = "주문번호 : " + state.orderCounter;
     },
     decrementOrderCounter(state) {
       state.orderCounter--;
     },
     clearCart(state) {
-      // 장바구니(cart)를 빈 배열로 초기화하여 비움
       state.cart = [];
-      // 총 가격을 0으로 초기화
       state.totalPrice = 0;
+      state.optionsList = {};
+    },
+    updateOptions(state, { index, options }) {
+      state.optionsList[index] = options;
     },
   },
   modules: {
-    categoryModule: categoryModule, // categoryModule을 Vuex 스토어에 등록
+    categoryModule: categoryModule,
     tagModule: tagModule,
     kioskModule: kioskModule,
-    // 다른 모듈도 필요하다면 여기에 추가합니다.
   },
-
   actions: {
     async initSocket() {
-      // const socket = new WebSocket()
-      // // socket.on('jwt', function (token) {
-      // //     context.commit('setJwt', token);
-      // // });
-      // context.commit('setSocket', socket);
-      // socket.onopen = (event) => {
-      //     console.log(event);
-      //     console.log('WS connection is stable! ~uWu~')
-      // }
-      // socket.onmessage = (message) => {
-      //     console.log('Got a message from the WS: ', message)
-      //     context.commit('addMessage', message);
-      //     window.scrollTo(0, document.body.scrollHeight);
-      // }
-      // socket.onclose = (event) => {
-      //     console.log(event);
-      //     console.log('No way, connection has been closed')
-      // }
-      // socket.onerror = (error) => {
-      //     console.error('Error: ', error)
-      // }
-      // console.log('Socket: ', socket);
-      // context.commit('setSocket', socket)
+      // Socket 초기화 코드
     },
   },
 });
