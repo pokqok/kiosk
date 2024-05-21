@@ -355,11 +355,8 @@ export default {
     },
 
     goToBack() {
-      if (this.orderType == 0) {
-        this.$router.push("/order-type/common");
-      } else {
-        this.$router.push("/order-type/helper");
-      }
+      this.$store.commit('clearCart');
+      this.$router.push("/order-type/common");
     },
   },
 };
