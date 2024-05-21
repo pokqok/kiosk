@@ -18,6 +18,7 @@
           to="/kiosk-manage"
           title="키오스크 관리"
         ></v-list-item>
+        <v-list-item link to="/order-receive" title="주문 접수"></v-list-item>
       </v-navigation-drawer>
     </v-main>
   </v-app>
@@ -28,7 +29,7 @@ import ProductManage from "./views/ProductManage.vue";
 import CategoryManage from "./views/CategoryManage.vue";
 import TagManage from "./views/TagManage.vue";
 import KioskManage from "./views/KioskManage.vue";
-//import CardTest from './views/CardTest.vue'
+import OrderReceive from "./views/OrderReceive.vue"; // 컴포넌트 임포트
 
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -40,19 +41,13 @@ const router = createRouter({
     { path: "/category-manage", component: CategoryManage },
     { path: "/tag-manage", component: TagManage },
     { path: "/kiosk-manage", component: KioskManage },
-    //컴포넌트 라우터 추가
+    { path: "/order-receive", component: OrderReceive }, // 새로운 라우트 추가
   ],
 });
 
 export default {
   name: "App",
 
-  /*
-  components: {
-    ProductManage,
-    CategoryManage,
-  },
-*/
   data: () => ({
     drawer: true,
   }),

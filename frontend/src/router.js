@@ -1,3 +1,5 @@
+// ./src/router.js
+
 import { createWebHistory, createRouter } from "vue-router";
 import AdminPage from "./components/AdminPage.vue";
 import LoginPage from "./components/LoginPage.vue";
@@ -14,8 +16,8 @@ import KioskManage from './components/KioskManage.vue';
 import UserManage from "./components/UserManage.vue";
 import RecommendView from "./components/RecommendView.vue";
 import IntegratedComponent from "./components/IntegratedComponent.vue";
-import HelperPage from "./components/HelperPage.vue"
-//import CardTest from '@/views/CardTest.vue';
+import HelperPage from "./components/HelperPage.vue";
+import OrderReceive from "./components/OrderReceive.vue"; // OrderReceive 컴포넌트 임포트
 
 const routes = [
   {
@@ -62,7 +64,10 @@ const routes = [
       {
         path: '/kiosk-manage', component: KioskManage
       },
-
+      {
+        path: 'order-receive',
+        component: OrderReceive // 새로운 라우트 추가
+      }
     ]
   },
   {
@@ -98,8 +103,7 @@ const routes = [
   {
     path: '/recommend',
     component: RecommendView,
-  }
-  ,
+  },
   {
     path: '/integrated',
     component: IntegratedComponent,
@@ -111,4 +115,4 @@ const router = createRouter({
   routes,
 });
 
-export default router; 
+export default router;

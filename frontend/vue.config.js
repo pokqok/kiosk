@@ -1,5 +1,6 @@
-const { defineConfig } = require("@vue/cli-service");
-module.exports = defineConfig({
+const webpack = require('webpack');
+
+module.exports = {
   transpileDependencies: true,
 
   devServer: {
@@ -27,9 +28,24 @@ module.exports = defineConfig({
     },
   },
 
+  configureWebpack: {
+    resolve: {
+      fallback: {
+        "stream": require.resolve("stream-browserify"),
+        "os": require.resolve("os-browserify/browser")
+      }
+    },
+    plugins: [
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer'],
+      }),
+    ],
+  },
+
   pluginOptions: {
     vuetify: {
       // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
     },
   },
-});
+};
