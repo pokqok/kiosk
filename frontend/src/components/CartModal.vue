@@ -10,14 +10,19 @@
           class="align-center"
           style="margin-left: 10%"
         >
-          <p>{{ item.name }} - {{ item.productPrice }}원</p>
+          <p>{{ item.name }} - {{ parseInt(item.price) }}원 </p>
+          <!--{{ formatOptionsString(item.option) }} -->
+          <v-chip v-for="(option, optionIndex) in item.option" :key="optionIndex" class="mr-2 mt-2" outlined>
+            {{ option.optionName }}
+          </v-chip>
           <v-spacer></v-spacer>
-          <v-btn @click="removeFromCart(index)">
+          <v-btn @click="removeFromCart(item, index)">
             <v-icon>bi-x-lg</v-icon>
           </v-btn>
         </v-row>
       </v-col>
       <v-col cols="1" class="price-fixed shadow">
+        <!-- store 및 shopPage에서의 전체 데이터 관리 형식이 바뀌어서 변형 필요-->
         <p>{{ parseInt(totalPrice) }}원</p>
       </v-col>
       <v-btn
@@ -50,13 +55,14 @@ export default {
   },
   methods: {
     ...mapMutations(["subCart", "clearCart"]),
-    removeFromCart(index) {
+    removeFromCart(item, index) {
       this.playClickSound();
       const audio = this.$refs.subOrder;
       audio.pause();
       audio.currentTime = 0;
       audio.play();
       this.subCart(index);
+      this.$emit("subProduct", item);
     },
     handlePayment() {
       this.playClickSound();
@@ -77,6 +83,14 @@ export default {
         console.error("Error playing click sound:", error);
       });
     },
+    formatOptionsString(optionsArray) { //options를 받아서 문자열로 변환
+      //console.log(optionsArray)
+      if (!optionsArray || optionsArray.length == 0) return '';
+      return "("+ optionsArray
+        .map(option => `${option.tagName}:${option.optionName}`)
+        .join(', ')
+        +")";
+    }
   },
 };
 </script>

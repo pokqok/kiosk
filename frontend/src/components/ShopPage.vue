@@ -339,6 +339,7 @@ export default {
       this.showOptionModal = false;
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
+      console.log("옵션:",$event.option);
       for (let i = 0; i < $event.num; i++) {
         this.addCart({
           product: {
@@ -349,9 +350,11 @@ export default {
         });
       }
       this.showCartModal = true;
+      console.log("장바구니 크기:",this.cart.length);
     },
 
     closeProductOptionModal() {
+      
       this.showOptionModal = false;
       if (this.cart.length != 0) {
         this.showCartModal = true;
@@ -361,7 +364,9 @@ export default {
     subProduct($event) {
       this.stopAllAudio();
       this.playSubOrderAudio();
+      console.log("장바구니 크기:",this.cart.length);
       this.subCart($event);
+      
       this.setTotalPrice(-$event.productPrice);
       if (this.cart.length == 0) {
         this.showCartModal = false;

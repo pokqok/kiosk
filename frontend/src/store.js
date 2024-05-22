@@ -67,16 +67,21 @@ const store = createStore({
     addCart(state, { product, options }) {
       const productWithPrice = {
         ...product,
-        productPrice: product.price + (options ? options.reduce((acc, option) => acc + option.price, 0) : 0)
+        productPrice: product.price + (options ? options.reduce((acc, option) => acc + option.price, 0) : 0),
+        option: options,
       };
       const index = state.cart.length;
       state.cart.push(productWithPrice);
+      //state.option = options;
       state.optionsList[index] = options || [];
-      state.totalPrice += productWithPrice.productPrice;
+      //state.totalPrice += productWithPrice.productPrice;
+      //코드에 쓰이지 않아서 없앰
+      state.totalPrice += productWithPrice.price;
     },
     subCart(state, index) {
       if (index !== -1 && index < state.cart.length) {
-        state.totalPrice -= state.cart[index].productPrice;
+        //state.totalPrice -= state.cart[index].productPrice;
+        state.totalPrice -= state.cart[index].price;
         state.cart.splice(index, 1);
         delete state.optionsList[index];
         const newOptionsList = {};
