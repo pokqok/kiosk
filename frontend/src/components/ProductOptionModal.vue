@@ -12,7 +12,7 @@
           <v-col cols="12" md="6">
             <div class="d-flex justify-center">
               <v-img
-                :src="getImageSrc(selectedProduct)"
+                :src="getImageUrl(selectedProduct.image)"
                 aspect-ratio="1.7"
                 contain
                 style="margin-top: 10%"
@@ -156,7 +156,7 @@ export default {
         alert("1개 이하로 주문 하실 수 없습니다");
       }
     };
-
+    
     const getOptionByID = (tag) => {
       return props.option.filter((option) => option.tag === tag.id);
     };
@@ -167,6 +167,15 @@ export default {
 
     const getImageSrc = () => {
       return "https://picsum.photos/100?random=1";
+    };
+
+    const getImageUrl = (imageFileName) =>{
+      // public/image/ 디렉토리에서 이미지를 가져옵니다.
+      console.log(`../../public/image/${imageFileName}`);
+      if(!imageFileName){
+        return "https://picsum.photos/100?random=1"; //비어있는 경우 랜덤 이미지.
+      }
+      return `/image/${imageFileName}`;
     };
 
     const handlePickProduct = () => {
@@ -220,6 +229,7 @@ export default {
       getOptionByID,
       setOptionPrice,
       getImageSrc,
+      getImageUrl,
       handlePickProduct,
       playClickSound,
       handlePickProductClick,
