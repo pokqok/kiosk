@@ -96,10 +96,11 @@ import CartModal from "./CartModal.vue";
 import axios from "axios";
 import menuData from "@/assets/testdata.js";
 
+let lastVolume = 0;
+
 export default {
   props: ["autoQuery"],
   name: "HelperPage",
-  emits: ["comeBack"],
   components: { ProductItem, ProductOptionModal, CartModal },
   data() {
     return {
@@ -120,11 +121,6 @@ export default {
       menuAudioSource: require("@/assets/음성인식 설명.mp3"),
       addAudioSource: require("@/assets/추가주문.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
-      minVolume: 0.5,
-      microphone: null,
-      volumeCheckInterval: null,
-      silenceTimer: null,
-      silenceDuration: 2000,
     };
   },
   watch: {
@@ -136,15 +132,34 @@ export default {
     },
     step(newVal) {
       if (newVal === 2) {
+        console.log("2번 확인");
         this.playAddAudio();
       }
     },
   },
-  computed: mapState(["testdata", "ShopID", "orderType", "cart"]),
+  computed: {
+    ...mapState(["testdata", "ShopID", "orderType", "cart"]),
+    formattedTranscription() {
+      return this.transcription.replace(/\n/g, "<br>");
+    },
+  },
   mounted() {
-    this.initializeMediaRecorder();
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+      this.mediaRecorder = new MediaRecorder(stream);
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) this.recordedChunks.push(event.data);
+      };
+      this.mediaRecorder.onstop = () => {
+        let blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+        this.uploadAudio(blob);
+        this.audio_recording = false;
+        this.step = 1;
+      };
+    });
     if (this.cart.length != 0) this.showCartModal = true;
-    setTimeout(this.playMenuAudio, 300);
+    setTimeout(() => {
+      this.playMenuAudio();
+    }, 300);
   },
   methods: {
     ...mapMutations(["addCart", "subCart", "setTotalPrice"]),
@@ -167,7 +182,6 @@ export default {
       }
     },
     playMenuAudio() {
-      this.stopAllAudios();
       this.$refs.menuAudio
         .play()
         .catch((error) => console.error("Audio play failed:", error));
@@ -198,101 +212,43 @@ export default {
         this.analyser.fftSize = 256;
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         this.updateVolumeMeter();
-        this.volumeCheckInterval = setInterval(this.checkVolume, 100);
+        this.audio_recording = true;
+        this.mediaRecorder.start();
+        setTimeout(() => {
+          this.stopRecording();
+        }, 5000);
       }
     },
-    initializeMediaRecorder() {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-          this.mediaRecorder = new MediaRecorder(stream);
-          this.mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) this.recordedChunks.push(event.data);
-          };
-          this.mediaRecorder.onstop = () => {
-            console.log("on stop");
-            const blob = new Blob(this.recordedChunks, { type: "audio/wav" });
-            this.uploadAudio(blob);
-            this.audio_recording = false;
-            this.step = 1;
-          };
-        })
-        .catch((error) => {
-          console.error("Error accessing microphone:", error);
-        });
-    },
-    checkVolume() {
-      this.analyser.getByteFrequencyData(this.dataArray);
-      const avgVolume =
-        this.dataArray.reduce((acc, cur) => acc + cur, 0) /
-        this.dataArray.length;
-      console.log("Average volume:", avgVolume); // 볼륨 확인용 로그
-
-      if (avgVolume < 100) {
-        if (!this.silenceTimer) {
-          console.log("Starting silence timer"); // 타이머 시작 로그
-          this.silenceTimer = setTimeout(() => {
-            console.log("Silence detected, stopping recording"); // 타이머 만료 로그
-            this.stopRecording();
-          }, this.silenceDuration);
-        }
-      } else {
-        if (this.silenceTimer) {
-          console.log("Resetting silence timer"); // 타이머 초기화 로그
-          clearTimeout(this.silenceTimer);
-          this.silenceTimer = null;
-        }
-      }
-    },
-
     stopRecording() {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
-        console.log("stop0");
         this.audio_recording = false;
         this.showVolumeMeter = false;
-        clearInterval(this.volumeCheckInterval);
-        clearTimeout(this.silenceTimer);
-        this.silenceTimer = null;
-        this.uploadAudioAndSubmit();
-      }
-    },
-
-    async uploadAudioAndSubmit() {
-      if (this.recordedChunks.length > 0) {
-        const blob = new Blob(this.recordedChunks, { type: "audio/wav" });
-        try {
-          await this.uploadAudio(blob);
+        setTimeout(() => {
           this.submitAudio();
-        } catch (error) {
-          console.error("Error uploading audio:", error);
-        }
-      } else {
-        console.warn("No recorded chunks to upload.");
+        }, 1000);
       }
     },
-
     async uploadAudio(blob) {
-      const formData = new FormData();
+      let formData = new FormData();
       formData.append("audio", blob);
-      try {
-        const response = await axios.post("/api/upload", formData);
-        this.$store.commit("setFile", response.data.uploaded_file);
-        console.log("upload");
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        throw error; // 에러를 호출자에게 다시 전파
-      }
-      this.recordedChunks = []; // 업로드 후 recordedChunks 초기화
+      axios
+        .post("/api/upload", formData)
+        .then((response) => {
+          this.$store.commit("setFile", response.data.uploaded_file);
+        })
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+        });
+      this.recordedChunks = [];
     },
-
     submitAudio() {
       if (this.audio_recording) {
         alert("녹음 중에는 파일을 올릴 수 없습니다.");
       } else if (!this.$store.state.file) {
         alert("녹음된 파일이 없습니다.");
       } else {
-        const formData = new FormData();
+        let formData = new FormData();
         formData.append("uploaded_file", this.$store.state.file);
         axios
           .post("/api/audio-upload", formData)
@@ -335,14 +291,19 @@ export default {
         });
     },
     updateVolumeMeter() {
-      if (!this.showVolumeMeter) return;
       requestAnimationFrame(this.updateVolumeMeter);
       this.analyser.getByteFrequencyData(this.dataArray);
-      const average =
-        this.dataArray.reduce((a, b) => a + b, 0) / this.dataArray.length;
-      const scaleFactor = 1.5;
-      const maxVolumeWidth = 200;
-      this.volumeMeterWidth = Math.min(maxVolumeWidth, average * scaleFactor);
+      let sum = this.dataArray.reduce((a, b) => a + b, 0);
+      let average = sum / this.dataArray.length;
+      let scaleFactor = 1.5;
+      let maxVolumeWidth = 200;
+      let newWidth = Math.min(maxVolumeWidth, average * scaleFactor);
+      if (newWidth < lastVolume) {
+        this.volumeMeterWidth = newWidth;
+      } else {
+        this.volumeMeterWidth = (lastVolume + newWidth) / 2;
+      }
+      lastVolume = newWidth;
     },
     openProductOptionModal(product) {
       this.playOptionAudio();
