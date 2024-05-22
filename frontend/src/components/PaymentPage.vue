@@ -184,6 +184,8 @@ export default {
                 this.playPaymentCompletedAudio();
                 this.savePaymentData(merchantUid, this.totalPrice);
                 alert("결제가 완료되었습니다.");
+                this.$store.commit('incrementOrderCounter');
+                this.$store.commit('clearCart');
                 setTimeout(() => {
                   this.$router.push("/mode-select");
                 }, 5000);

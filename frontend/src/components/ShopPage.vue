@@ -308,18 +308,6 @@ export default {
       this.$router.push("/payment");
     },
 
-    /*
-      pickProduct($event) {
-        this.showOptionModal = false;
-        console.log("개수: ",$event.num);
-        console.log("가격:",$event.price)
-        for (let i = 0; i < $event.num; i++) {
-          this.addCart($event.price);
-          this.setTotalPrice($event.price);
-        }
-        this.showCartModal = true;
-      },
-    */
     pickProduct($event) {
       this.stopAllAudio();
       this.playAddOrderAudio();
@@ -327,13 +315,14 @@ export default {
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
       for (let i = 0; i < $event.num; i++) {
-        this.addCart({
-          productName: this.selectedProduct.name,
-          productPrice: $event.price,
-          option: $event.option,
-        });
-        this.setTotalPrice($event.price);
-      }
+          this.addCart({
+            product: {
+              name: this.selectedProduct.name,
+              price: $event.price,
+            },
+            options: $event.option,
+          });
+        }
       this.showCartModal = true;
     },
 
@@ -355,11 +344,8 @@ export default {
     },
 
     goToBack() {
-      if (this.orderType == 0) {
-        this.$router.push("/order-type/common");
-      } else {
-        this.$router.push("/order-type/helper");
-      }
+      this.$store.commit("clearCart");
+      this.$router.push("/order-type/common");
     },
   },
 };

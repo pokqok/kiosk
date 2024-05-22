@@ -1,32 +1,19 @@
 <template>
-  <v-dialog
-    v-model="temp"
-    width="80%"
-    height="80%"
-    persistent
-    style="overflow-y: scroll;"
-    >
+  <v-dialog v-model="temp" width="80%" height="80%" persistent style="overflow-y: scroll;">
     <v-card>
       <v-container fluid>
         <v-row>
           <v-col cols="12" md="6">
             <div class="d-flex justify-center">
-              <v-img
-              :src="getImageSrc(selectedProduct)"
-              aspect-ratio="1.7"
-              contain
-              style="margin-top: 10%;"></v-img>
+              <v-img :src="getImageSrc(selectedProduct)" aspect-ratio="1.7" contain style="margin-top: 10%;"></v-img>
             </div>
           </v-col>
           <v-col md="6">
             <v-row class="d-flex justify-center mt-5">
-                <h2>{{ selectedProduct.name }}</h2>
+              <h2>{{ selectedProduct.name }}</h2>
             </v-row>
             <v-row>
-              <v-col
-              class="d-flex justify-center"
-              style="display: flex; flex-direction: column; align-items: center;"
-              cols="4">
+              <v-col class="d-flex justify-center" style="display: flex; flex-direction: column; align-items: center;" cols="4">
                 <v-btn icon @click="subNumProduct">
                   <v-icon>mdi-minus</v-icon>
                 </v-btn>
@@ -35,10 +22,7 @@
               <v-col class="d-flex justify-center mt-5" cols="4">
                 <span>{{ numProduct }}</span>
               </v-col>
-              <v-col
-              class="d-flex justify-center"
-              style="display: flex; flex-direction: column; align-items: center;"
-              cols="4">
+              <v-col class="d-flex justify-center" style="display: flex; flex-direction: column; align-items: center;" cols="4">
                 <v-btn icon @click="numProduct++">
                   <v-icon>mdi-plus</v-icon>
                 </v-btn>
@@ -52,15 +36,8 @@
             <v-divider class="my-4"></v-divider>
             <div v-for="(tags, i) in tag" :key="tags.id" class="my-3">
               <div class="text-h6">{{ tags.name }}</div>
-              <v-btn-toggle
-              v-model="selectedOption[i]"
-              color="primary"
-              mandatory
-              dense>
-                <v-btn
-                v-for="options in getOptionByID(tags)"
-                :key="options.id"
-                @click="setOptionPrice(tags.id, options.price)">
+              <v-btn-toggle v-model="selectedOption[i]" color="primary" mandatory dense>
+                <v-btn v-for="options in getOptionByID(tags)" :key="options.id" @click="setOptionPrice(tags.id, options.price)">
                   {{ options.name }}
                 </v-btn>
               </v-btn-toggle>
@@ -71,42 +48,13 @@
       <v-card-actions class="justify-end mb-12 mr-5">
         <v-row>
           <v-col cols="4">
-            <v-btn
-            block
-            height="175%"
-            color="green darken-1"
-            text
-            @click="$emit('pickProduct', {
-                num: numProduct,
-                price: parseInt(this.selectedProduct.price) + optionPrice,
-                option: optionPrice,
-              })">
+            <v-btn block height="175%" color="green darken-1" text @click="handlePickProduct">
               <v-icon left>mdi-cart</v-icon>
               <h3>장바구니</h3>
             </v-btn>
           </v-col>
           <v-col cols="4">
-            <v-btn
-            block
-            height="175%"
-            color="blue darken-1"
-            text
-            @click="$emit('payment', {
-                num: numProduct,
-                price: parseInt(this.selectedProduct.price) + optionPrice,
-                option: optionPrice,
-              })">
-              <v-icon left>mdi-cash</v-icon>
-              <h3>결제</h3>
-            </v-btn>
-          </v-col>
-          <v-col cols="4">
-            <v-btn
-            block
-            height="175%"
-            color="grey"
-            text
-            @click="$emit('closeProductOptionModal')">
+            <v-btn block height="175%" color="grey" text @click="$emit('closeProductOptionModal')">
               <v-icon left>mdi-close</v-icon>
               <h3>취소</h3>
             </v-btn>
@@ -117,64 +65,83 @@
   </v-dialog>
 </template>
 
-
 <script>
+import { ref, reactive, computed } from 'vue';
+
 export default {
   name: "ProductOptionModal",
-  data() {
-    return {
-      numProduct: 1,
-      price: parseInt(this.selectedProduct.price),
-      optionPrices: {},
-      temp: true,
-      selectedOption: []
-    };
-  },
   props: {
-    selectedProduct: Object,
-    tag: Object,
-    option: Object,
-  },
-  computed: {
-    optionPrice() {
-      let totalPrice = 0;
-      // optionPrices 객체의 각 값을 합산합니다.
-      for (const tagId in this.optionPrices) {
-        totalPrice += parseInt(this.optionPrices[tagId]);
-      }
-      return totalPrice;
+    selectedProduct: {
+      type: Object,
+      required: true,
     },
-    totalPrice() {
-      return (this.price + this.optionPrice) * this.numProduct;
+    tag: {
+      type: Array,
+      required: true,
+    },
+    option: {
+      type: Array,
+      required: true,
     },
   },
-  methods: {
-    subNumProduct() {
-      console.log("태그 테스트:", this.tag);
-      console.log("옵션 테스트:", this.option);
-      if (this.numProduct <= 1) {
-        alert("1개 이하로 주문 하실 수 없습니다");
+  setup(props, { emit }) {
+    const numProduct = ref(1);
+    const optionPrices = reactive({});
+    const temp = ref(true);
+    const selectedOption = reactive(Array(props.tag.length).fill(undefined));
+
+    const price = computed(() => parseInt(props.selectedProduct.price));
+    const optionPrice = computed(() => {
+      return Object.values(optionPrices).reduce((sum, price) => sum + parseInt(price), 0);
+    });
+    const totalPrice = computed(() => (price.value + optionPrice.value) * numProduct.value);
+
+    const subNumProduct = () => {
+      if (numProduct.value > 1) {
+        numProduct.value--;
       } else {
-        this.numProduct--;
+        alert("1개 이하로 주문 하실 수 없습니다");
       }
-    },
-    getOptionByID(tag) {
-      return this.option.filter((option) => option.tag === tag.id);
-    },
-    setOptionPrice(tagId, price) {
-      // 해당 태그에 대한 optionPrice를 업데이트합니다.
-      this.optionPrices[tagId] = price;
-      console.log("가격 근황", this.optionPrice);
-    },
-    getImageSrc(selectedProduct) {
-      // 이미지 경로가 비어있을 경우 빈 이미지를 반환하고,
-      // 비어있지 않을 경우 제품 이미지 경로를 반환합니다.
-      //return image ? image:"https://picsum.photos/100?random=1";
-      console.log("가져온 데이터 테스트: ",selectedProduct)
-      
-      console.log("가져온 이름들 ",selectedProduct.id)
+    };
+
+    const getOptionByID = (tag) => {
+      return props.option.filter((option) => option.tag === tag.id);
+    };
+
+    const setOptionPrice = (tagId, price) => {
+      optionPrices[tagId] = price;
+    };
+
+    const getImageSrc = () => {
       return "https://picsum.photos/100?random=1";
-    },
+    };
+
+    const handlePickProduct = () => {
+      if (selectedOption.includes(undefined)) {
+        alert("옵션을 전부 선택해 주세요");
+      } else {
+        emit('pickProduct', {
+          num: numProduct.value,
+          price: price.value + optionPrice.value,
+          options: selectedOption,
+        });
+      }
+    };
+
+    return {
+      numProduct,
+      optionPrices,
+      temp,
+      selectedOption,
+      price,
+      optionPrice,
+      totalPrice,
+      subNumProduct,
+      getOptionByID,
+      setOptionPrice,
+      getImageSrc,
+      handlePickProduct,
+    };
   },
 };
 </script>
