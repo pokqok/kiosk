@@ -3,12 +3,12 @@
     <v-main>
       <RouterView @comeBack="showButton = true"></RouterView>
       <RouterLink to="/login/admin">
-        <button v-if="showButton" @click="showButton = false">
+        <button v-if="showButton" @click="handleButtonClick">
           관리자 로그인
         </button>
       </RouterLink>
       <RouterLink to="/login/shop">
-        <button v-if="showButton" @click="showButton = false">
+        <button v-if="showButton" @click="handleButtonClick">
           상점 로그인
         </button>
       </RouterLink>
@@ -45,6 +45,16 @@ export default {
     return {
       showButton: true,
     };
+  },
+  methods: {
+    // eslint-disable-next-line
+    handleButtonClick(event) {
+      this.showButton = false;
+      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
+      clickSound.play().catch((error) => {
+        console.error("Error playing click sound:", error);
+      });
+    },
   },
 };
 </script>

@@ -1,12 +1,14 @@
 <template>
   <div>
+    <audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>
+    <audio ref="clickSound" :src="clickSoundSource" type="audio/mp3"></audio>
     <v-row class="futter cart-container align-center shadow">
       <v-col cols="6" class="align-center" style="background-color: #ffffff">
         <v-row
           v-for="(item, index) in cart"
           :key="index"
           class="align-center"
-          style="margin-left: 10%;"
+          style="margin-left: 10%"
         >
           <p>{{ item.name }} - {{ item.productPrice }}원</p>
           <v-spacer></v-spacer>
@@ -18,9 +20,15 @@
       <v-col cols="1" class="price-fixed shadow">
         <p>{{ parseInt(totalPrice) }}원</p>
       </v-col>
-      <v-btn @click="handlePayment" class="btn-fixed shadow" width="30%" height="10%" style="margin-right: 5%;">
-        <v-icon left size="x-large" style="margin-right: 10%;">bi-coin</v-icon>
-        <p> 결제</p>
+      <v-btn
+        @click="handlePayment"
+        class="btn-fixed shadow"
+        width="30%"
+        height="10%"
+        style="margin-right: 5%"
+      >
+        <v-icon left size="x-large" style="margin-right: 10%">bi-coin</v-icon>
+        <p>결제</p>
       </v-btn>
     </v-row>
   </div>
@@ -31,22 +39,44 @@ import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "CartModal",
+  data() {
+    return {
+      subOrderSource: require("@/assets/장바구니취소.mp3"),
+      clickSoundSource: require("@/assets/click-sound.mp3"),
+    };
+  },
   computed: {
     ...mapState(["cart", "totalPrice"]),
   },
   methods: {
     ...mapMutations(["subCart", "clearCart"]),
     removeFromCart(index) {
+      this.playClickSound();
+      const audio = this.$refs.subOrder;
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play();
       this.subCart(index);
     },
     handlePayment() {
+      this.playClickSound();
+      console.log("handlePayment");
       if (this.totalPrice > 0) {
         this.$emit("payment", this.totalPrice);
+        console.log("결제금액: ", this.totalPrice);
         this.clearCart();
       } else {
         alert("장바구니가 비어 있습니다.");
       }
-    }
+    },
+    playClickSound() {
+      const clickSound = this.$refs.clickSound;
+      clickSound.pause();
+      clickSound.currentTime = 0;
+      clickSound.play().catch((error) => {
+        console.error("Error playing click sound:", error);
+      });
+    },
   },
 };
 </script>

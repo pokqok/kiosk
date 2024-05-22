@@ -6,7 +6,7 @@
     <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
     <v-toolbar color="#229954" tabs style="position: fixed; z-index: 1000">
       <v-col cols="4">
-        <v-btn @click="goToBack" style="background-color: #009688">
+        <v-btn @click="handleBackButtonClick" style="background-color: #009688">
           <v-icon left>mdi-arrow-left</v-icon>
           <p>뒤로가기</p>
         </v-btn>
@@ -54,7 +54,7 @@
       <v-col cols="4" v-for="item in filteredProducts(i.id)" :key="item.id">
         <ProductItem
           :product="item"
-          @selectProduct="openProductOptionModal($event)"
+          @selectProduct="handleSelectProduct($event)"
         ></ProductItem>
       </v-col>
     </v-row>
@@ -232,10 +232,17 @@ export default {
       this.$refs.option.play();
     },
     stopAllAudio() {
-      this.$refs.orderMenu.pause();
-      this.$refs.addOrder.pause();
-      this.$refs.subOrder.pause();
-      this.$refs.option.pause();
+      this.resetAudio(this.$refs.orderMenu);
+      this.resetAudio(this.$refs.addOrder);
+      this.resetAudio(this.$refs.subOrder);
+      this.resetAudio(this.$refs.option);
+    },
+
+    resetAudio(audio) {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
     },
 
     ...mapMutations([
@@ -277,6 +284,11 @@ export default {
       this.showCartModal = false;
     },
 
+    handleSelectProduct(data) {
+      this.playClickSound();
+      this.openProductOptionModal(data);
+    },
+
     //카테고리별 품목 가져오기
     filteredProducts(categoryId) {
       // return this.products.filter(product => product.category == categoryId);
@@ -315,14 +327,14 @@ export default {
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
       for (let i = 0; i < $event.num; i++) {
-          this.addCart({
-            product: {
-              name: this.selectedProduct.name,
-              price: $event.price,
-            },
-            options: $event.option,
-          });
-        }
+        this.addCart({
+          product: {
+            name: this.selectedProduct.name,
+            price: $event.price,
+          },
+          options: $event.option,
+        });
+      }
       this.showCartModal = true;
     },
 
@@ -343,9 +355,21 @@ export default {
       }
     },
 
+    handleBackButtonClick() {
+      this.playClickSound();
+      this.goToBack();
+    },
+
     goToBack() {
       this.$store.commit("clearCart");
       this.$router.push("/order-type/common");
+    },
+
+    playClickSound() {
+      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
+      clickSound.play().catch((error) => {
+        console.error("Error playing click sound:", error);
+      });
     },
   },
 };
