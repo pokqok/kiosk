@@ -167,18 +167,18 @@ export default {
 
         console.log("옵션들:", this.options);
         const matchedOptionIds = [];
-        matchedTagIds.forEach((tag) => {
-          const options = this.testOption.filter((option) => option.tag == tag);
-          matchedOptionIds.push(...options.map((option) => option.id));
-        });
-        // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
-        const filteredOptions = this.testOption.filter((option) =>
-          matchedOptionIds.includes(option.id)
-        );
-        console.log("선택 상품의 태그들 현황: ", filteredTags);
-        console.log("선택 상품의 태그의 옵션들: ", filteredOptions);
-        //return { tags: matchedTags, options: filteredOptions };
-        return { tags: filteredTags, options: filteredOptions };
+          matchedTagIds.forEach(tag => {
+            const options = this.options.filter(option => option.tag == tag);
+            matchedOptionIds.push(...options.map(option => option.id));
+          });
+          // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
+          const filteredOptions = this.options.filter(option => matchedOptionIds.includes(option.id));
+          console.log("선택 상품의 태그들 현황: ",filteredTags);
+          console.log("선택 상품의 태그의 옵션들: ",filteredOptions);
+          //return { tags: matchedTags, options: filteredOptions };
+          return { tags: filteredTags, options: filteredOptions };
+
+         
       };
     },
   },
@@ -206,18 +206,17 @@ export default {
     this.playMenuAudio();
   },
   async created() {
-    // 데이터를 비동기적으로 로드
-    // this.$store.dispatch('fetchCategories');
-    // this.$store.dispatch('fetchTags')
-    // this.$store.dispatch('fetchOptions');
-    // this.$store.dispatch('fetchProducts');
-    // this.$store.dispatch('fetchTagMenu');
-  },
-
-  beforeUnmount() {
+      // 데이터를 비동기적으로 로드
+      this.$store.dispatch('fetchCategories');
+      this.$store.dispatch('fetchTags')
+      this.$store.dispatch('fetchOptions');
+      this.$store.dispatch('fetchProducts');
+      this.$store.dispatch('fetchTagMenu');
+      this.restoreSelectedProduct();
+    },
+    beforeUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
-  },
-
+    },
   methods: {
     playMenuAudio() {
       this.$refs.orderMenu.play();
@@ -319,7 +318,23 @@ export default {
       this.showCartModal = false;
       this.$router.push("/payment");
     },
-
+  
+    restoreSelectedProduct() {
+    // 예를 들어, localStorage 또는 Vuex 상태에서 이전 상태를 복구하는 로직
+    this.selectedProduct = this.$store.state.selectedProduct || {};
+    } ,
+    /*
+      pickProduct($event) {
+        this.showOptionModal = false;
+        console.log("개수: ",$event.num);
+        console.log("가격:",$event.price)
+        for (let i = 0; i < $event.num; i++) {
+          this.addCart($event.price);
+          this.setTotalPrice($event.price);
+        }
+        this.showCartModal = true;
+      },
+    */
     pickProduct($event) {
       this.stopAllAudio();
       this.playAddOrderAudio();
