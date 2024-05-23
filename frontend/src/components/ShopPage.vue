@@ -190,29 +190,27 @@ export default {
   },
 
   mounted() {
-    window.addEventListener("scroll", this.handleScroll);
+    if(this.$store.state.ShopID == -1) {
+      alert("login error")
+      this.$router.push('/login/shop')
+      return;
+    }
 
+    window.addEventListener("scroll", this.handleScroll);
     if (this.cart.length != 0) {
       this.showCartModal = true;
     }
-
-    // shopID 받아 올 수 있을 때 사용
-    // if(this.ShopID == -1) {
-    //     alert('login error')
-    // } else if(this.orderType == -1) {
-    //     alert('orderType error')
-    // }
-
     this.playMenuAudio();
   },
-  async created() {
-    // 데이터를 비동기적으로 로드
-    // this.$store.dispatch('fetchCategories');
-    // this.$store.dispatch('fetchTags')
-    // this.$store.dispatch('fetchOptions');
-    // this.$store.dispatch('fetchProducts');
-    // this.$store.dispatch('fetchTagMenu');
-  },
+
+  // async created() {
+  //   // 데이터를 비동기적으로 로드
+  //   // this.$store.dispatch('fetchCategories');
+  //   // this.$store.dispatch('fetchTags')
+  //   // this.$store.dispatch('fetchOptions');
+  //   // this.$store.dispatch('fetchProducts');
+  //   // this.$store.dispatch('fetchTagMenu');
+  // },
 
   beforeUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
