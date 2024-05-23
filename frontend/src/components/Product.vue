@@ -9,7 +9,7 @@
     <div v-else class="product" @click="$emit('selectProduct', product)">
 
       <div class="product-img-container">
-        <img class="product-img" :src="getImageSrc(product)" alt="" />
+        <img class="product-img" :src="getImageUrl(product.image)" alt="" />
 
       </div>
       <div class="product-info">
@@ -49,6 +49,15 @@ export default {
       
       console.log("가져온 이름들 ",item.id)
       return "https://picsum.photos/100?random=1";
+    },
+    
+    getImageUrl(imageFileName) {
+      // public/image/ 디렉토리에서 이미지를 가져옵니다.
+      console.log(`../../public/image/${imageFileName}`);
+      if(!imageFileName){
+        return "https://picsum.photos/100?random=1"; //비어있는 경우 랜덤 이미지.
+      }
+      return `/image/${imageFileName}`;
     },
   },
 
