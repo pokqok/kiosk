@@ -403,27 +403,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.volume-meter-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.outer-meter {
-  background-color: #ccc;
-  height: 20px;
-  width: 100%;
-  max-width: 200px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-
-.inner-meter {
-  height: 100%;
-  background: linear-gradient(to right, #4caf50, #8bc34a);
-  transition: width 0.05s ease-out;
-}
-</style>

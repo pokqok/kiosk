@@ -272,27 +272,3 @@ export default {
   },
 };
 </script>
-
-<style>
-body {
-  margin: 0;
-}
-
-div {
-  box-sizing: border-box;
-}
-
-.futter {
-  background: white;
-  border-radius: 8px;
-  width: 100%;
-  height: 15%;
-  position: fixed;
-  bottom: 0;
-  z-index: 9999;
-}
-
-.icon {
-  font-size: xx-large;
-}
-</style>

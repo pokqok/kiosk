@@ -329,21 +329,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.head-container {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: #229954;
-  padding: 10px 0;
-  z-index: 100;
-}
-
-.title {
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  margin: 0;
-}
-</style>

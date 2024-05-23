@@ -104,9 +104,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.login-page {
-  margin-top: 60px;
-}
-</style>

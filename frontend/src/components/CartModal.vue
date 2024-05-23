@@ -94,27 +94,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.cart-container {
-  background-color: #f8f9fa;
-  height: 25%;
-  overflow-y: auto;
-}
-
-.btn-fixed {
-  position: fixed;
-  right: 2vw;
-}
-
-.price-fixed {
-  position: fixed;
-  right: 40vw;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.shadow {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-</style>

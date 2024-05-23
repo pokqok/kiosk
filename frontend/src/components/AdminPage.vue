@@ -62,6 +62,3 @@ export default {
   },
 };
 </script>
-
-<!-- 스타일 (필요에 따라 추가) -->
-<style></style>
