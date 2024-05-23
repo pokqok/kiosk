@@ -1,5 +1,3 @@
-// ./src/router.js
-
 import { createWebHistory, createRouter } from "vue-router";
 import AdminPage from "./components/AdminPage.vue";
 import LoginPage from "./components/LoginPage.vue";
@@ -80,6 +78,7 @@ const routes = [
   },
   {
     path: '/payment',
+    name: 'PaymentPage',
     component: PaymentPage,
   },
   {

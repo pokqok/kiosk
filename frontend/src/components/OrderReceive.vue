@@ -2,7 +2,7 @@
   <div>
     <v-container>
       <v-row>
-        <v-col v-for="order in orders" :key="order.id">
+        <v-col v-for="order in orders" :key="order.id" cols="4">
           <v-card>
             <v-card-title>
               주문번호: {{ order.id }}
@@ -21,6 +21,7 @@
           </v-card>
         </v-col>
       </v-row>
+      <v-btn @click="logOrders">주문 데이터 콘솔 출력</v-btn>
     </v-container>
   </div>
 </template>
@@ -34,7 +35,10 @@ export default {
     ...mapState(['orders'])
   },
   methods: {
-    ...mapActions(['completeOrder'])
+    ...mapActions(['completeOrder']),
+    logOrders() {
+      console.log(this.orders);
+    }
   }
 }
 </script>

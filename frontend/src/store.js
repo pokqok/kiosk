@@ -18,23 +18,21 @@ const store = createStore({
       socket: null,
       jwt: null,
       productName: "",
-
       testdata: testdata,
       testProduct: product,
       testTag: tag,
       testOption: option,
       testCategory: category,
       testTagMenu: tagMenu,
-
       ShopID: -1,
       orderType: -1,
       cart: [],
       totalPrice: 0,
       orderCounter: 0,
       optionsList: {},
+      orders: [] // New state for storing orders
     };
   },
-
   mutations: {
     setFile(state, file) {
       state.file = file;
@@ -65,9 +63,12 @@ const store = createStore({
       state.orderType = type;
     },
     addCart(state, { product, options }) {
+      const productPrice = parseFloat(product.price) || 0;
+      const optionsPrice = options ? options.reduce((acc, option) => acc + (parseFloat(option.price) || 0), 0) : 0;
       const productWithPrice = {
         ...product,
-        productPrice: product.price + (options ? options.reduce((acc, option) => acc + option.price, 0) : 0)
+        productPrice: productPrice + optionsPrice,
+        option: options,
       };
       const index = state.cart.length;
       state.cart.push(productWithPrice);
@@ -88,7 +89,6 @@ const store = createStore({
     },
     incrementOrderCounter(state) {
       state.orderCounter++;
-      console.log("Order Counter: ", state.orderCounter);
       state.productName = "주문번호 : " + state.orderCounter;
     },
     decrementOrderCounter(state) {
@@ -102,6 +102,9 @@ const store = createStore({
     updateOptions(state, { index, options }) {
       state.optionsList[index] = options;
     },
+    ADD_ORDER(state, order) {
+      state.orders.push(order);
+    }
   },
   modules: {
     categoryModule: categoryModule,
@@ -109,10 +112,13 @@ const store = createStore({
     kioskModule: kioskModule,
   },
   actions: {
-    async initSocket() {
-      // Socket 초기화 코드
-    },
+    saveOrder({ commit }, order) {
+      commit('ADD_ORDER', order);
+    }
   },
+  getters: {
+    orders: state => state.orders
+  }
 });
 
 export default store;

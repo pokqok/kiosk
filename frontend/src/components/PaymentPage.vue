@@ -62,9 +62,10 @@
   </v-container>
 </template>
 
+// PaymentPage.vue
 <script>
 import axios from "axios";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "PaymentPage",
@@ -81,7 +82,7 @@ export default {
   },
 
   computed: {
-    ...mapState(["productName", "totalPrice"]),
+    ...mapState(["productName", "totalPrice", "cart"]),
   },
 
   mounted() {
@@ -90,6 +91,8 @@ export default {
   },
 
   methods: {
+    ...mapActions(['saveOrder']),
+    
     playPaymentAudio() {
       this.$refs.paymentAudio.play();
     },
@@ -117,7 +120,7 @@ export default {
           pg: "html5_inicis.INIpayTest",
           merchant_uid: merchantUid,
           name: this.productName,
-          //goodsname: this.productName,
+          goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -137,6 +140,17 @@ export default {
                   this.playPaymentCompletedAudio();
                   this.savePaymentData(merchantUid, this.totalPrice);
                   alert("결제가 완료되었습니다.");
+
+                  // 주문 데이터를 Vuex 스토어에 추가
+                  this.saveOrder({
+                    id: merchantUid,
+                    details: {
+                      productName: this.productName,
+                      option: this.cart.map(item => item.option),
+                      orderType: this.orderType // orderType은 별도로 설정되어야 함
+                    }
+                  });
+
                   setTimeout(() => {
                     this.$router.push("/mode-select");
                   }, 5000);
@@ -162,6 +176,7 @@ export default {
           pay_method: "kakaopay",
           merchant_uid: merchantUid,
           name: this.productName,
+          goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -184,6 +199,17 @@ export default {
                 this.playPaymentCompletedAudio();
                 this.savePaymentData(merchantUid, this.totalPrice);
                 alert("결제가 완료되었습니다.");
+
+                // 주문 데이터를 Vuex 스토어에 추가
+                this.saveOrder({
+                  id: merchantUid,
+                  details: {
+                    productName: this.productName,
+                    option: this.cart.map(item => item.option),
+                    orderType: this.orderType // orderType은 별도로 설정되어야 함
+                  }
+                });
+
                 this.$store.commit('incrementOrderCounter');
                 this.$store.commit('clearCart');
                 setTimeout(() => {
@@ -221,6 +247,7 @@ export default {
   },
 };
 </script>
+
 
 <style>
 .head-container {

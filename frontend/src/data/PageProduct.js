@@ -69,6 +69,17 @@ let product = [
       alias: '',
       isOn: true,
     },
+
+    {
+      id: 8,
+      name: '테스트',
+      price: 100,
+      category: 1,
+      detail: '',
+      image: 'minttea.jpg',
+      alias: '',
+      isOn: true,
+    },
   ]
 /*
             id: item.ProductNO,
