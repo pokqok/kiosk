@@ -295,6 +295,7 @@ export default {
       // );
     },
 
+
     payment($event) {
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
@@ -333,6 +334,7 @@ export default {
         this.showCartModal = true;
       },
     */
+
     pickProduct($event) {
       this.stopAllAudio();
       this.playAddOrderAudio();

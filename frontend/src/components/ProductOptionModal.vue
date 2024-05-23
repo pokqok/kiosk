@@ -13,6 +13,7 @@
             <div class="d-flex justify-center">
               <v-img
                 :src="getImageUrl(selectedProduct.image)"
+
                 aspect-ratio="1.7"
                 contain
                 style="margin-top: 10%"
@@ -135,6 +136,7 @@ export default {
   setup(props, { emit }) {
     const numProduct = ref(1);
     const optionPrices = reactive({});
+    const selectedOptionIds = reactive([]);
     const temp = ref(true);
     const selectedOption = reactive(Array(props.tag.length).fill(undefined));
     //const selectedOption =reactive({});
@@ -162,6 +164,7 @@ export default {
       return props.option.filter((option) => option.tag === tag.id);
     };
 
+
     // const setOptionPrice = (tagId, price) => {
     //   optionPrices[tagId] = price;
     // };
@@ -174,6 +177,7 @@ export default {
         optionName: option.name,
         optionPrice: option.price
       };
+
     };
 
     const getImageSrc = () => {
