@@ -12,8 +12,7 @@
           <v-col cols="12" md="6">
             <div class="d-flex justify-center">
               <v-img
-                :src="getImageUrl(selectedProduct.image)"
-
+                :src="getImageSrc(selectedProduct)"
                 aspect-ratio="1.7"
                 contain
                 style="margin-top: 10%"
@@ -34,7 +33,7 @@
                 "
                 cols="4"
               >
-                <v-btn icon @click="handleSubNumProductClick">
+                <v-btn icon @click="subNumProduct">
                   <v-icon>mdi-minus</v-icon>
                 </v-btn>
                 <p>제거</p>
@@ -51,7 +50,7 @@
                 "
                 cols="4"
               >
-                <v-btn icon @click="handleAddNumProductClick">
+                <v-btn icon @click="numProduct++">
                   <v-icon>mdi-plus</v-icon>
                 </v-btn>
                 <p>추가</p>
@@ -73,7 +72,7 @@
                 <v-btn
                   v-for="options in getOptionByID(tags)"
                   :key="options.id"
-                  @click="setOptionPrice(tags, options)"
+                  @click="setOptionPrice(tags.id, options.id, options.price)"
                 >
                   {{ options.name }}
                 </v-btn>
@@ -90,7 +89,7 @@
               height="175%"
               color="green darken-1"
               text
-              @click="handlePickProductClick"
+              @click="handlePickProduct"
             >
               <v-icon left>mdi-cart</v-icon>
               <h3>장바구니</h3>
@@ -102,7 +101,7 @@
               height="175%"
               color="grey"
               text
-              @click="handleCloseButtonClick"
+              @click="$emit('closeProductOptionModal')"
             >
               <v-icon left>mdi-close</v-icon>
               <h3>취소</h3>
@@ -139,8 +138,7 @@ export default {
     const selectedOptionIds = reactive([]);
     const temp = ref(true);
     const selectedOption = reactive(Array(props.tag.length).fill(undefined));
-    //const selectedOption =reactive({});
-    const totalOption = reactive({});
+
     const price = computed(() => parseInt(props.selectedProduct.price));
     const optionPrice = computed(() => {
       return Object.values(optionPrices).reduce(
@@ -159,94 +157,40 @@ export default {
         alert("1개 이하로 주문 하실 수 없습니다");
       }
     };
-    
+
     const getOptionByID = (tag) => {
       return props.option.filter((option) => option.tag === tag.id);
     };
 
-
-    // const setOptionPrice = (tagId, price) => {
-    //   optionPrices[tagId] = price;
-    // };
-
-    const setOptionPrice = (tag, option) => {
-      optionPrices[tag.id] = option.price;
-      totalOption[tag.id] = {
-        tagName: tag.name,
-        optionId: option.id,
-        optionName: option.name,
-        optionPrice: option.price
-      };
-
+    const setOptionPrice = (tagId, optionId, price) => {
+      optionPrices[optionId] = price; // 태그 아이디가 아닌 옵션의 아이디를 사용합니다.
+      console.log("Selected option ID:", optionId);
+      selectedOptionIds[tagId] = optionId;
     };
 
     const getImageSrc = () => {
       return "https://picsum.photos/100?random=1";
     };
 
-    const getImageUrl = (imageFileName) =>{
-      // public/image/ 디렉토리에서 이미지를 가져옵니다.
-      console.log(`../../public/image/${imageFileName}`);
-      if(!imageFileName){
-        return "https://picsum.photos/100?random=1"; //비어있는 경우 랜덤 이미지.
-      }
-      return `/image/${imageFileName}`;
-    };
-
-    // const handlePickProduct = () => {
-    //   if (selectedOption.includes(undefined)) {
-    //     alert("옵션을 전부 선택해 주세요");
-    //   } else {
-    //     console.log("상품:",numProduct);
-    //     console.log("옵션정보:",selectedOption);
-    //     emit("pickProduct", {
-    //       num: numProduct.value,
-    //       price: price.value + optionPrice.value,
-    //       options: selectedOption,
-    //       //optionPrice: selectedOption, //이 부분에서 수정이 필요하다
-    //     });
-    //   }
-    // };
-
     const handlePickProduct = () => {
       if (selectedOption.includes(undefined)) {
         alert("옵션을 전부 선택해 주세요");
       } else {
-        console.log("안의 내용은?",Object.values(totalOption));
+        const options = selectedOption.map((selectedIndex, i) => {
+          if (selectedIndex !== undefined) {
+            const tagId = props.tag[i].id;
+            const optionId = selectedOptionIds[tagId]; // 해당 태그의 선택된 옵션 아이디를 가져옵니다.
+            return optionId;
+          }
+          return null;
+        });
+
         emit("pickProduct", {
           num: numProduct.value,
           price: price.value + optionPrice.value,
-          option: Object.values(totalOption), // 객체의 값만 배열 형태로 전달
-          optionPrice: optionPrice.value
+          options: options,
         });
       }
-    };
-
-    const playClickSound = () => {
-      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
-      clickSound.play().catch((error) => {
-        console.error("Error playing click sound:", error);
-      });
-    };
-
-    const handlePickProductClick = () => {
-      playClickSound();
-      handlePickProduct();
-    };
-
-    const handleCloseButtonClick = () => {
-      playClickSound();
-      emit("closeProductOptionModal");
-    };
-
-    const handleSubNumProductClick = () => {
-      playClickSound();
-      subNumProduct();
-    };
-
-    const handleAddNumProductClick = () => {
-      playClickSound();
-      numProduct.value++;
     };
 
     return {
@@ -261,13 +205,7 @@ export default {
       getOptionByID,
       setOptionPrice,
       getImageSrc,
-      getImageUrl,
       handlePickProduct,
-      playClickSound,
-      handlePickProductClick,
-      handleCloseButtonClick,
-      handleSubNumProductClick,
-      handleAddNumProductClick,
     };
   },
 };

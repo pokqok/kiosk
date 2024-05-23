@@ -22,11 +22,6 @@
           :src="normalPayAudioSource"
           type="audio/mp3"
         ></audio>
-        <audio
-          ref="clickSound"
-          :src="clickSoundSource"
-          type="audio/mp3"
-        ></audio>
         <v-btn
           @click="$router.go(-1 - 2 * cntCanclePay)"
           style="background-color: #009688"
@@ -82,7 +77,6 @@ export default {
       paymentCompletedAudioSource: require("@/assets/결제 완료.mp3"),
       kakaoPayAudioSource: require("@/assets/카카오페이.mp3"),
       normalPayAudioSource: require("@/assets/일반결제.mp3"),
-      clickSoundSource: require("@/assets/click-sound.mp3"),
     };
   },
 
@@ -92,7 +86,7 @@ export default {
 
   mounted() {
     this.IMP.init("imp03664607");
-    this.playClickSoundThenPaymentAudio();
+    this.playPaymentAudio();
   },
 
   methods: {
@@ -113,20 +107,6 @@ export default {
       this.$refs.paymentCompletedAudio.pause();
       this.$refs.kakaoPayAudio.pause();
       this.$refs.normalPayAudio.pause();
-    },
-    playClickSoundThenPaymentAudio() {
-      const clickSound = this.$refs.clickSound;
-      clickSound
-        .play()
-        .then(() => {
-          clickSound.onended = () => {
-            this.playPaymentAudio();
-          };
-        })
-        .catch((error) => {
-          console.error("Error playing click sound:", error);
-          this.playPaymentAudio(); // In case click sound fails, still play payment audio
-        });
     },
 
     requestPay() {
@@ -204,8 +184,8 @@ export default {
                 this.playPaymentCompletedAudio();
                 this.savePaymentData(merchantUid, this.totalPrice);
                 alert("결제가 완료되었습니다.");
-                this.$store.commit("incrementOrderCounter");
-                this.$store.commit("clearCart");
+                this.$store.commit('incrementOrderCounter');
+                this.$store.commit('clearCart');
                 setTimeout(() => {
                   this.$router.push("/mode-select");
                 }, 5000);

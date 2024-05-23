@@ -3,12 +3,12 @@
     <v-main>
       <RouterView @comeBack="showButton = true"></RouterView>
       <RouterLink to="/login/admin">
-        <button v-if="showButton" @click="handleButtonClick">
+        <button v-if="showButton" @click="showButton = false">
           관리자 로그인
         </button>
       </RouterLink>
       <RouterLink to="/login/shop">
-        <button v-if="showButton" @click="handleButtonClick">
+        <button v-if="showButton" @click="showButton = false">
           상점 로그인
         </button>
       </RouterLink>
@@ -28,72 +28,56 @@
         </button>
       </RouterLink>
       -->
-      <FontSizeControls />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import FontSizeControls from "./components/FontSizeControls.vue";
-
 export default {
   name: "App",
-  components: {
-    FontSizeControls,
-  },
   data() {
     return {
       showButton: true,
     };
-  },
-  methods: {
-    // eslint-disable-next-line
-    handleButtonClick(event) {
-      this.showButton = false;
-      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
-      clickSound.play().catch((error) => {
-        console.error("Error playing click sound:", error);
-      });
-    },
   },
 };
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Avenir, Helvetica, Arial, sans-serif; /* 기본 폰트 유지 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #2c3e50; /* 기본 텍스트 색상 유지 */
 }
 
 button {
   margin: 10px;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #ffffff;
-  background-color: #3498db;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5);
-  transition: background-color 0.3s, box-shadow 0.3s;
+  padding: 12px 20px; /* 버튼 패딩 조정 */
+  font-size: 16px; /* 버튼 폰트 크기 조정 */
+  font-weight: bold; /* 글자 두께 bold로 설정 */
+  color: #ffffff; /* 텍스트 색상 흰색으로 설정 */
+  background-color: #3498db; /* 밝은 파란색으로 버튼 색상 설정 */
+  border: none; /* 테두리 제거 */
+  border-radius: 5px; /* 버튼의 모서리 둥글게 */
+  cursor: pointer; /* 클릭 가능한 요소 표시 */
+  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5); /* 버튼에 그림자 효과 추가 */
+  transition: background-color 0.3s, box-shadow 0.3s; /* 색상과 그림자 변화에 애니메이션 효과 */
 }
 
 button:hover {
-  background-color: #2980b9;
-  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.7);
+  background-color: #2980b9; /* 호버 시 버튼 색상 진한 파란색으로 변경 */
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.7); /* 호버 시 그림자 효과 강조 */
 }
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
+  -webkit-appearance: none; /* Chrome, Safari에서 스피너 제거 */
   margin: 0;
 }
 
 input[type="number"] {
-  -moz-appearance: textfield;
+  -moz-appearance: textfield; /* Firefox에서 스피너 제거 */
 }
 </style>
