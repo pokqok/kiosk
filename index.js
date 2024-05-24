@@ -478,6 +478,10 @@ app.use("/kiosk", kioskRouter);
 //이미지 업로드
 const uploadImage = require('./dto/imageUpload.js');
 app.use('/image', uploadImage);
+
+const productRouter = require('./dto/product.js');
+app.use('/product', productRouter);
+//-
 //---------------------------------------------------
 
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
