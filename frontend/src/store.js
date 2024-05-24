@@ -133,6 +133,14 @@ const store = createStore({
       state.optionsList[index] = options;
     },
     addCartToOrders(state) {
+      if (!Array.isArray(state.cart) || state.cart.length === 0) {
+        console.error('Cart is empty or not an array:', state.cart);
+        return;
+      }
+      if (!Array.isArray(state.orders)) {
+        console.error('Orders state is not an array:', state.orders);
+        state.orders = [];
+      }
       const newOrder = {
         id: state.orderCounter + 1,
         details: {
