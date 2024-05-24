@@ -1,33 +1,35 @@
 <template>
-  <div class="head-container row">
-    <div class="col-4">
-      <button @click="$router.go(-1)" type="button" class="btn btn-light">
-        <i class="bi bi-x-lg icon"></i>
-        <p>취소</p>
-      </button>
-    </div>
-    <h2 class="title mb-4 col-4">실타래 {{ ShopID }}</h2>
+  <div class="head-container">
+    <v-row>
+      <v-col cols="4">
+        <v-btn color="#3498db" @click="$router.go(-1)">
+          <v-icon>mdi-close</v-icon>
+          <p>취소</p>
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <h2 class="mb-4">실타래 {{ ShopID }}</h2>
+      </v-col>
+    </v-row>
   </div>
-  <div style="margin-top: 15%">
+
+  <div style="margin-top: 10%;"></div>
+
+  <v-container>
     <audio ref="menuAudio" :src="menuAudioSource" type="audio/mp3"></audio>
     <audio ref="addAudio" :src="addAudioSource" type="audio/mp3"></audio>
     <audio ref="optionAudio" :src="optionAudioSource" type="audio/mp3"></audio>
     <div v-if="step == 0">
-      <button
+      <v-btn
         @click="startRecording"
-        size="x-large"
-        icon="$vuetify"
-        style="
-          font-size: 24px;
-          padding: 10px;
-          width: 50%;
-          height: 50vh;
-          background-color: green;
-        "
+        width="50%"
+        height="50vh"
+        color="rgb(30, 144, 255)"
       >
-        <i class="bi bi-mic-fill x-lg"></i>
-      </button>
+        <v-icon size="xxx-large" color="white">mdi-microphone</v-icon>
+      </v-btn>
       <h3 style="margin-top: 3%">버튼을 눌러서 음성인식을 실행해주세요</h3>
+
       <div v-if="showVolumeMeter" class="volume-meter-container">
         <div class="outer-meter">
           <div
@@ -37,6 +39,7 @@
         </div>
       </div>
     </div>
+    
     <div v-if="step == 1">
       <v-progress-circular
         indeterminate
@@ -45,9 +48,10 @@
       ></v-progress-circular>
       <p>인식결과: <span v-html="formattedTranscription"></span></p>
     </div>
+    
     <div v-if="step == 2">
       <div v-if="loading">추천 중...</div>
-      <div v-else class="row">
+      <v-row v-else>
         <v-btn
           @click="startRecording"
           color="accent"
@@ -64,14 +68,15 @@
             ></div>
           </div>
         </div>
-        <ProductItem
-          v-for="item in filteredItems"
-          :product="item"
-          class="col-3"
-          @selectProduct="openProductOptionModal($event)"
-          :key="item.ProductNO"
-        ></ProductItem>
-      </div>
+        <v-col cols="3">
+          <ProductItem
+            v-for="item in filteredItems"
+            :product="item"
+            :key="item.ProductNO"
+            @selectProduct="openProductOptionModal($event)"
+          ></ProductItem>
+        </v-col>
+      </v-row>
     </div>
     <ProductOptionModal
       @closeProductOptionModal="closeProductOptionModal"
@@ -85,7 +90,7 @@
       @payment="payment"
       v-if="showCartModal"
     />
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -403,27 +408,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.volume-meter-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.outer-meter {
-  background-color: #ccc;
-  height: 20px;
-  width: 100%;
-  max-width: 200px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-
-.inner-meter {
-  height: 100%;
-  background: linear-gradient(to right, #4caf50, #8bc34a);
-  transition: width 0.05s ease-out;
-}
-</style>

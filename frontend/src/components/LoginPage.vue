@@ -1,17 +1,16 @@
 <template>
-  <div class="login-page">
-    <div style="display: flex; justify-content: center; align-items: center">
-      <div style="width: 15%; height: 15%">
+  <v-container class="login-page">
+      <div style="width: 20%;">
         <v-img v-if="$route.params.mode == 'shop'" src="../assets/logo.png" />
-        <v-img v-if="$route.params.mode == 'admin'" src="../assets/admin.png" />
+        <v-img class="ma-5" v-if="$route.params.mode == 'admin'" src="../assets/admin.png" />
       </div>
-    </div>
+    
 
     <v-form
     ref="form"
     v-model="valid"
     lazy-validation
-    style="margin-left: 25%; margin-right: 25%;"
+    style="width: 50%;"
     >
       <v-text-field
         v-model="email"
@@ -37,7 +36,7 @@
     </v-form>
 
     <button @click="goToRootPage">메인 페이지로 돌아가기</button>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -104,9 +103,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.login-page {
-  margin-top: 60px;
-}
-</style>

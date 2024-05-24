@@ -86,6 +86,12 @@ export default {
   },
 
   mounted() {
+    if(this.$store.state.ShopID == -1) {
+      alert("login error")
+      this.$router.push('/login/shop')
+      return;
+    }
+
     this.IMP.init("imp03664607");
     this.playPaymentAudio();
   },
@@ -258,3 +264,4 @@ export default {
   font-size: 150px;
 }
 </style>
+

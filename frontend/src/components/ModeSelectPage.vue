@@ -44,6 +44,11 @@ export default {
   },
 
   mounted() {
+    if(this.$store.state.ShopID == -1) {
+      alert("login error")
+      this.$router.push('/login/shop')
+      return;
+    }
     this.playAudio();
   },
 
@@ -59,15 +64,5 @@ export default {
       this.$refs.modeSelect.pause();
     },
   },
-
-  // 로그인 정보 받아올 수 있을 때 사용
-  // mounted() {
-  //     if(this.$store.state.ShopID == -1) {
-  //         alert("login error")
-  //         this.$router.push('/login/shop')
-  //     }
-  // }
 };
 </script>
-
-<style></style>

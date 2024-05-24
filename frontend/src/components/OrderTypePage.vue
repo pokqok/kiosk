@@ -1,5 +1,5 @@
 <template>
-  <div class="head-container row">
+  <div class="head-container">
     <h2 class="title">실타래 {{ $store.state.ShopID }}</h2>
   </div>
 
@@ -30,6 +30,11 @@
 export default {
   name: "OrderTypePage",
   mounted() {
+    if(this.$store.state.ShopID == -1) {
+      alert("login error")
+      this.$router.push('/login/shop')
+      return;
+    }
     this.playAudio();
   },
   data() {
@@ -67,5 +72,3 @@ export default {
   },
 };
 </script>
-
-<style></style>
