@@ -1,11 +1,5 @@
 <template>
-  <v-dialog
-    v-model="temp"
-    width="80%"
-    height="80%"
-    persistent
-    style="overflow-y: scroll"
-  >
+  <v-dialog v-model="temp" width="80%" persistent>
     <v-card>
       <v-container fluid>
         <v-row>
@@ -13,7 +7,6 @@
             <div class="d-flex justify-center">
               <v-img
                 :src="getImageUrl(selectedProduct.image)"
-
                 aspect-ratio="1.7"
                 contain
                 style="margin-top: 10%"
@@ -27,11 +20,7 @@
             <v-row>
               <v-col
                 class="d-flex justify-center"
-                style="
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                "
+                style="display: flex; flex-direction: column; align-items: center;"
                 cols="4"
               >
                 <v-btn icon @click="handleSubNumProductClick">
@@ -44,11 +33,7 @@
               </v-col>
               <v-col
                 class="d-flex justify-center"
-                style="
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                "
+                style="display: flex; flex-direction: column; align-items: center;"
                 cols="4"
               >
                 <v-btn icon @click="handleAddNumProductClick">
@@ -75,7 +60,7 @@
                   :key="options.id"
                   @click="setOptionPrice(tags, options)"
                 >
-                  {{ options.name }}
+                  {{ options.name }} ({{ options.price }}원)
                 </v-btn>
               </v-btn-toggle>
             </div>
@@ -136,10 +121,8 @@ export default {
   setup(props, { emit }) {
     const numProduct = ref(1);
     const optionPrices = reactive({});
-    //const selectedOptionIds = reactive([]);
     const temp = ref(true);
     const selectedOption = reactive(Array(props.tag.length).fill(undefined));
-    //const selectedOption =reactive({});
     const totalOption = reactive({});
     const price = computed(() => parseInt(props.selectedProduct.price));
     const optionPrice = computed(() => {
@@ -164,11 +147,6 @@ export default {
       return props.option.filter((option) => option.tag === tag.id);
     };
 
-
-    // const setOptionPrice = (tagId, price) => {
-    //   optionPrices[tagId] = price;
-    // };
-
     const setOptionPrice = (tag, option) => {
       optionPrices[tag.id] = option.price;
       totalOption[tag.id] = {
@@ -177,46 +155,23 @@ export default {
         optionName: option.name,
         optionPrice: option.price
       };
-
     };
 
-    const getImageSrc = () => {
-      return "https://picsum.photos/100?random=1";
-    };
-
-    const getImageUrl = (imageFileName) =>{
-      // public/image/ 디렉토리에서 이미지를 가져옵니다.
-      console.log(`../../public/image/${imageFileName}`);
-      if(!imageFileName){
-        return "https://picsum.photos/100?random=1"; //비어있는 경우 랜덤 이미지.
+    const getImageUrl = (imageFileName) => {
+      if (!imageFileName) {
+        return "https://picsum.photos/100?random=1";
       }
       return `/image/${imageFileName}`;
     };
-
-    // const handlePickProduct = () => {
-    //   if (selectedOption.includes(undefined)) {
-    //     alert("옵션을 전부 선택해 주세요");
-    //   } else {
-    //     console.log("상품:",numProduct);
-    //     console.log("옵션정보:",selectedOption);
-    //     emit("pickProduct", {
-    //       num: numProduct.value,
-    //       price: price.value + optionPrice.value,
-    //       options: selectedOption,
-    //       //optionPrice: selectedOption, //이 부분에서 수정이 필요하다
-    //     });
-    //   }
-    // };
 
     const handlePickProduct = () => {
       if (selectedOption.includes(undefined)) {
         alert("옵션을 전부 선택해 주세요");
       } else {
-        console.log("안의 내용은?",Object.values(totalOption));
         emit("pickProduct", {
           num: numProduct.value,
           price: price.value + optionPrice.value,
-          option: Object.values(totalOption), // 객체의 값만 배열 형태로 전달
+          option: Object.values(totalOption),
           optionPrice: optionPrice.value
         });
       }
@@ -260,7 +215,6 @@ export default {
       subNumProduct,
       getOptionByID,
       setOptionPrice,
-      getImageSrc,
       getImageUrl,
       handlePickProduct,
       playClickSound,
