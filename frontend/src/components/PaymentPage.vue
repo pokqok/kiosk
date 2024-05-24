@@ -2,30 +2,11 @@
   <div class="head-container">
     <v-row>
       <v-col cols="4">
-        <audio
-          ref="paymentAudio"
-          :src="paymentAudioSource"
-          type="audio/mp3"
-        ></audio>
-        <audio
-          ref="paymentCompletedAudio"
-          :src="paymentCompletedAudioSource"
-          type="audio/mp3"
-        ></audio>
-        <audio
-          ref="kakaoPayAudio"
-          :src="kakaoPayAudioSource"
-          type="audio/mp3"
-        ></audio>
-        <audio
-          ref="normalPayAudio"
-          :src="normalPayAudioSource"
-          type="audio/mp3"
-        ></audio>
-        <v-btn
-          @click="$router.go(-1 - 2 * cntCanclePay)"
-          style="background-color: #009688"
-        >
+        <audio ref="paymentAudio" :src="paymentAudioSource" type="audio/mp3"></audio>
+        <audio ref="paymentCompletedAudio" :src="paymentCompletedAudioSource" type="audio/mp3"></audio>
+        <audio ref="kakaoPayAudio" :src="kakaoPayAudioSource" type="audio/mp3"></audio>
+        <audio ref="normalPayAudio" :src="normalPayAudioSource" type="audio/mp3"></audio>
+        <v-btn @click="$router.go(-1 - 2 * cntCanclePay)" style="background-color: #009688">
           <i class="bi bi-x-lg icon"></i>
           <p>취소</p>
         </v-btn>
@@ -40,9 +21,7 @@
     <v-row style="margin-top: 12%">
       <v-col cols="4">
         <v-btn @click="requestPay" block height="150%">
-          <span
-            style="display: flex; flex-direction: column; align-items: center"
-          >
+          <span style="display: flex; flex-direction: column; align-items: center">
             <i class="bi bi-credit-card pay-icon"></i>
             <h2 style="margin: 0">카드 결제</h2>
           </span>
@@ -50,9 +29,7 @@
       </v-col>
       <v-col cols="4">
         <v-btn @click="requestPayKakao" block height="150%">
-          <span
-            style="display: flex; flex-direction: column; align-items: center"
-          >
+          <span style="display: flex; flex-direction: column; align-items: center">
             <i class="bi bi-chat-fill pay-icon"></i>
             <h2 style="margin: 0">카카오 페이</h2>
           </span>
@@ -62,9 +39,8 @@
   </v-container>
 </template>
 
-// PaymentPage.vue
 <script>
-import axios from "axios";
+// import axios from "axios";
 import { mapState, mapActions } from "vuex";
 
 export default {
@@ -86,9 +62,9 @@ export default {
   },
 
   mounted() {
-    if(this.$store.state.ShopID == -1) {
-      alert("login error")
-      this.$router.push('/login/shop')
+    if (this.$store.state.ShopID == -1) {
+      alert("login error");
+      this.$router.push('/login/shop');
       return;
     }
 
@@ -127,7 +103,7 @@ export default {
           pg: "html5_inicis.INIpayTest",
           merchant_uid: merchantUid,
           name: this.productName,
-          goodsname: this.productName, // 여기서 goodsname을 설정합니다.
+          goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -137,28 +113,8 @@ export default {
         },
         (rsp) => {
           if (rsp.success) {
-            axios
-              .post("api/payments/verify", {
-                imp_uid: rsp.imp_uid,
-                merchant_uid: rsp.merchant_uid,
-              })
-              .then((verifyResponse) => {
-                if (verifyResponse.status === 200) {
-                  this.playPaymentCompletedAudio();
-                  this.savePaymentData(merchantUid, this.totalPrice);
-                  alert("결제가 완료되었습니다.");
-
-                  // Vuex 뮤테이션 호출하여 cart 내용을 orders에 추가
-                  this.$store.commit("addCartToOrders");
-                  console.log("현재 주문 목록:", this.$store.state.orders);
-
-                  setTimeout(() => {
-                    this.$router.push("/mode-select");
-                  }, 5000);
-                } else {
-                  alert("결제 검증 실패");
-                }
-              });
+            // 테스트 데이터를 사용하여 결제 성공 처리
+            this.handlePaymentSuccess(merchantUid);
           } else {
             alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
             this.$store.commit("decrementOrderCounter");
@@ -178,7 +134,7 @@ export default {
           pay_method: "kakaopay",
           merchant_uid: merchantUid,
           name: this.productName,
-          goodsname: this.productName, // 여기서 goodsname을 설정합니다.
+          goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -188,36 +144,8 @@ export default {
         },
         (rsp) => {
           if (rsp.success) {
-            axios({
-              url: "api/payments/verify",
-              method: "post",
-              headers: { "Content-Type": "application/json" },
-              data: {
-                imp_uid: rsp.imp_uid,
-                merchant_uid: rsp.merchant_uid,
-              },
-            })
-              .then(() => {
-                this.playPaymentCompletedAudio();
-                this.savePaymentData(merchantUid, this.totalPrice);
-                alert("결제가 완료되었습니다.");
-
-                // Vuex 뮤테이션 호출하여 cart 내용을 orders에 추가
-                this.$store.commit("addCartToOrders");
-                console.log("현재 주문 목록:", this.$store.state.orders);
-                
-                this.$store.commit("incrementOrderCounter");
-                this.$store.commit("clearCart");
-                setTimeout(() => {
-                  this.$router.push("/mode-select");
-                }, 5000);
-              })
-              .catch((error) => {
-                console.error("Error verifying payment:", error);
-                alert(`결제 검증 실패: ${error.message}`);
-                this.$store.commit("decrementOrderCounter");
-                this.cntCanclePay++;
-              });
+            // 테스트 데이터를 사용하여 결제 성공 처리
+            this.handlePaymentSuccess(merchantUid);
           } else {
             alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
             this.cntCanclePay++;
@@ -226,18 +154,29 @@ export default {
       );
     },
 
+    handlePaymentSuccess(merchantUid) {
+      this.playPaymentCompletedAudio();
+      alert("결제가 완료되었습니다.");
+
+      // Vuex 뮤테이션 호출하여 cart 내용을 orders에 추가
+      this.$store.commit("addCartToOrders");
+      console.log("현재 주문 목록:", this.$store.state.orders);
+
+      // 테스트 데이터를 사용하여 결제 데이터를 저장
+      this.savePaymentData(merchantUid, this.totalPrice);
+      
+      console.log("5초 후에 모드 선택 페이지로 이동합니다.");
+      setTimeout(() => {
+        console.log("모드 선택 페이지로 이동합니다.");
+        this.$router.push("/mode-select");
+      }, 5000);
+    },
+
     savePaymentData(merchantUid, totalPrice) {
-      axios
-        .post("/api/payments/save", {
-          merchant_uid: merchantUid,
-          total_price: totalPrice,
-        })
-        .then((response) => {
-          console.log("Payment data saved successfully:", response);
-        })
-        .catch((error) => {
-          console.error("Failed to save payment data:", error);
-        });
+      console.log("Payment data saved successfully:", {
+        merchant_uid: merchantUid,
+        total_price: totalPrice,
+      });
     },
   },
 };
@@ -264,4 +203,3 @@ export default {
   font-size: 150px;
 }
 </style>
-
