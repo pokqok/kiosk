@@ -97,8 +97,8 @@ export default {
   },
 
   methods: {
-    ...mapActions(['saveOrder']),
-    
+    ...mapActions([]),
+
     playPaymentAudio() {
       this.$refs.paymentAudio.play();
     },
@@ -121,12 +121,13 @@ export default {
     requestPay() {
       this.playNormalPayAudio();
       const merchantUid = "merchant_" + new Date().getTime();
+      console.log(this.productName);
       this.IMP.request_pay(
         {
           pg: "html5_inicis.INIpayTest",
           merchant_uid: merchantUid,
           name: this.productName,
-          goodsname: this.productName,
+          goodsname: this.productName, // 여기서 goodsname을 설정합니다.
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -147,15 +148,9 @@ export default {
                   this.savePaymentData(merchantUid, this.totalPrice);
                   alert("결제가 완료되었습니다.");
 
-                  // 주문 데이터를 Vuex 스토어에 추가
-                  this.saveOrder({
-                    id: merchantUid,
-                    details: {
-                      productName: this.productName,
-                      option: this.cart.map(item => item.option),
-                      orderType: this.orderType // orderType은 별도로 설정되어야 함
-                    }
-                  });
+                  // Vuex 뮤테이션 호출하여 cart 내용을 orders에 추가
+                  this.$store.commit("addCartToOrders");
+                  console.log("현재 주문 목록:", this.$store.state.orders);
 
                   setTimeout(() => {
                     this.$router.push("/mode-select");
@@ -176,13 +171,14 @@ export default {
     requestPayKakao() {
       this.playKakaoPayAudio();
       const merchantUid = "merchant_" + new Date().getTime();
+      console.log(this.productName);
       this.IMP.request_pay(
         {
           pg: "html5_inicis.INIpayTest",
           pay_method: "kakaopay",
           merchant_uid: merchantUid,
           name: this.productName,
-          goodsname: this.productName,
+          goodsname: this.productName, // 여기서 goodsname을 설정합니다.
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -206,18 +202,12 @@ export default {
                 this.savePaymentData(merchantUid, this.totalPrice);
                 alert("결제가 완료되었습니다.");
 
-                // 주문 데이터를 Vuex 스토어에 추가
-                this.saveOrder({
-                  id: merchantUid,
-                  details: {
-                    productName: this.productName,
-                    option: this.cart.map(item => item.option),
-                    orderType: this.orderType // orderType은 별도로 설정되어야 함
-                  }
-                });
-
-                this.$store.commit('incrementOrderCounter');
-                this.$store.commit('clearCart');
+                // Vuex 뮤테이션 호출하여 cart 내용을 orders에 추가
+                this.$store.commit("addCartToOrders");
+                console.log("현재 주문 목록:", this.$store.state.orders);
+                
+                this.$store.commit("incrementOrderCounter");
+                this.$store.commit("clearCart");
                 setTimeout(() => {
                   this.$router.push("/mode-select");
                 }, 5000);
@@ -230,7 +220,6 @@ export default {
               });
           } else {
             alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
-            this.$store.commit("decrementOrderCounter");
             this.cntCanclePay++;
           }
         }
@@ -253,3 +242,26 @@ export default {
   },
 };
 </script>
+
+<style>
+.head-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #229954;
+  padding: 10px 0;
+  z-index: 100;
+}
+
+.title {
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  margin: 0;
+}
+
+.pay-icon {
+  font-size: 150px;
+}
+</style>
+
