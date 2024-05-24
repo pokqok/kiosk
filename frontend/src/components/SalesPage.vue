@@ -27,7 +27,6 @@
                         </li>
                       </ul>
                     </div>
-                    <div><strong>포장/매장 여부:</strong> {{ item.orderType === 0 ? '포장' : '매장' }}</div>
                     <div><strong>총 가격:</strong> {{ item.total }}원</div>
                   </v-card-text>
                 </v-card>
@@ -189,6 +188,13 @@
   
   .product-name {
     font-weight: bold;
+    display: block; /* Add this line to make product names display in block */
+  }
+  
+  .v-card-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
   </style>
   
