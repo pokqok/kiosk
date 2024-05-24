@@ -4,17 +4,15 @@
     <audio ref="addOrder" :src="addOrderSource" type="audio/mp3"></audio>
     <audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>
     <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
-    <v-toolbar color="#229954" tabs style="position: fixed; z-index: 1000">
+    <v-toolbar class="head-container pb-0" tabs>
       <v-col cols="4">
-        <v-btn @click="goToBack" style="background-color: #009688">
+        <v-btn color="white" @click="goToBack">
           <v-icon left>mdi-arrow-left</v-icon>
           <p>뒤로가기</p>
         </v-btn>
       </v-col>
       <v-col cols="4">
-        <v-toolbar-title class="text-center">
-          <h2>실타래 {{ ShopID }}</h2>
-        </v-toolbar-title>
+        <h2>실타래 {{ ShopID }}</h2>
       </v-col>
       <template v-slot:extension>
         <v-tabs v-model="tab" grow>
@@ -33,7 +31,7 @@
             :key="i"
             :href="'#CategoryTitle' + i.name"
           >
-            Category {{ i.name }}
+            <h4>Category {{ i.name }}</h4>
           </v-tab>
         </v-tabs>
       </template>
@@ -46,7 +44,7 @@
 
   <!-- testdata 사용 시 -->
   <v-container v-for="i in testCategory" :key="i">
-    <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i.name">
+    <h4 style="scroll-margin: 140px;" :id="'CategoryTitle' + i.name">
       #{{ i.name }}
     </h4>
     <v-row>
@@ -190,11 +188,11 @@ export default {
   },
 
   mounted() {
-    if(this.$store.state.ShopID == -1) {
-      alert("login error")
-      this.$router.push('/login/shop')
-      return;
-    }
+    // if(this.$store.state.ShopID == -1) {
+    //   alert("login error")
+    //   this.$router.push('/login/shop')
+    //   return;
+    // }
 
     window.addEventListener("scroll", this.handleScroll);
     if (this.cart.length != 0) {

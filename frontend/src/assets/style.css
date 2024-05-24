@@ -26,6 +26,7 @@ button {
   cursor: pointer; /* 클릭 가능한 요소 표시 */
   box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5); /* 버튼에 그림자 효과 추가 */
   transition: background-color 0.3s, box-shadow 0.3s; /* 색상과 그림자 변화에 애니메이션 효과 */
+  box-sizing: border-box;
 }
 
 button:hover {
@@ -47,28 +48,33 @@ input[type="number"] {
   position: fixed;
   top: 0;
   width: 100%;
-  background-color: #229954;
-  padding: 10px 0;
+  background-color: rgb(70, 130, 180); /* #229954; */
+  color: white;
+  padding: 10px;
   z-index: 100;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.head-container h2 {
+  color: white;
+  text-align: center;
+  margin: 0;
+  font-size: 24px;
+  font-family: 'Arial', sans-serif;
+}
+
+.futter {
+  position: fixed;
+  bottom: 0;
+  border-radius: 8px;
+  width: 100%;
+  height: 15%;  
 }
 
 .cart-container {
   background-color: #f8f9fa;
   height: 25%;
   overflow-y: auto;
-}
-
-.btn-fixed {
-  position: fixed;
-  right: 2vw;
-}
-
-.price-fixed {
-  position: fixed;
-  right: 40vw;
-  padding: 10px;
-  border-radius: 5px;
 }
 
 .shadow {
@@ -98,14 +104,12 @@ input[type="number"] {
 }
 
 .login-page {
-  margin-top: 60px;
-}
-
-.title {
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 80%;
 }
 
 .pay-icon {
@@ -156,25 +160,4 @@ input[type="number"] {
 .product-price {
   color: #666;
   margin: 5px 0 0;
-}
-
-.futter {
-  background: white;
-  border-radius: 8px;
-  width: 100%;
-  height: 15%;
-  position: fixed;
-  bottom: 0;
-  z-index: 9999;
-}
-
-.icon {
-  font-size: xx-large;
-}
-
-.title {
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  margin: 0;
 }

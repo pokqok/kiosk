@@ -7,11 +7,11 @@
         <v-row
           v-for="(item, index) in cart"
           :key="index"
-          class="align-center"
+          class="align-center ml-5"
           style="margin-left: 10%"
         >
           <p>{{ item.name }} - {{ parseInt(item.productPrice) }}원 </p>
-          <v-chip v-for="(option, optionIndex) in item.option" :key="optionIndex" class="mr-2 mt-2" outlined>
+          <v-chip v-for="(option, optionIndex) in item.option" :key="optionIndex" class="ml-4" outlined>
             {{ option.optionName }}
           </v-chip>
           <v-spacer></v-spacer>
@@ -20,19 +20,20 @@
           </v-btn>
         </v-row>
       </v-col>
-      <v-col cols="1" class="price-fixed shadow">
+      <v-col cols="1" class="shadow" style="margin-left: 5%;">
         <p>{{ parseInt(totalPrice) }}원</p>
       </v-col>
-      <v-btn
-        @click="handlePayment"
-        class="btn-fixed shadow"
-        width="30%"
-        height="10%"
-        style="margin-right: 5%"
-      >
-        <v-icon left size="x-large" style="margin-right: 10%">bi-coin</v-icon>
-        <p>결제</p>
-      </v-btn>
+      <v-col>
+        <v-btn
+          @click="handlePayment"
+          class="shadow"
+          width="80%"
+          height="8vw"
+        >
+          <v-icon left size="xx-large" style="margin-right: 10%">bi-coin</v-icon>
+          <h2>결제</h2>
+        </v-btn>
+      </v-col>
     </v-row>
   </div>
 </template>
