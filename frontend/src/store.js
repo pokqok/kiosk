@@ -181,8 +181,8 @@ const store = createStore({
       localStorage.setItem(key, JSON.stringify(state.orders)); // Save orders to localStorage with date and time
       state.orders = [];
       state.orderCounter = 0;
-      localStorage.removeItem('orders');
-      localStorage.removeItem('orderCounter');
+      localStorage.setItem('orders', JSON.stringify(state.orders)); // Save updated orders to localStorage
+      localStorage.setItem('orderCounter', state.orderCounter); // Save updated orderCounter to localStorage
     },
     resetSingleOrder(state, orderId) {
       state.orders = state.orders.filter(order => order.id !== orderId);
