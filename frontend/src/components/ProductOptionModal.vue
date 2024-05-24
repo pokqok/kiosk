@@ -17,6 +17,9 @@
             <v-row class="d-flex justify-center mt-5">
               <h2>{{ selectedProduct.name }}</h2>
             </v-row>
+            <v-row class="d-flex justify-center mt-2">
+              <p>{{ selectedProduct.detail }}</p>
+            </v-row>
             <v-row>
               <v-col
                 class="d-flex justify-center"
