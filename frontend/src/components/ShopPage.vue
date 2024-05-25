@@ -33,7 +33,7 @@
             :key="i"
             :href="'#CategoryTitle' + i.name"
           >
-            Category {{ i.name }}
+            #{{ i.name }}
           </v-tab>
         </v-tabs>
       </template>
@@ -70,6 +70,7 @@
     v-if="showOptionModal"
     :tag="filteredTagsByProductId().tags"
     :option="filteredTagsByProductId().options"
+    :category="getCategoryNameById(selectedProduct.category)"
   />
 
   <CartModal @subProduct="subProduct" @payment="payment" v-if="showCartModal" />
@@ -390,6 +391,11 @@ export default {
       clickSound.play().catch((error) => {
         console.error("Error playing click sound:", error);
       });
+    },
+
+    getCategoryNameById(id) {
+      const category = this.categories.find(cat => cat.id === id);
+      return category ? category.name : null;
     },
   },
 };

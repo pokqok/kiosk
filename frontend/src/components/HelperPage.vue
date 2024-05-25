@@ -80,6 +80,7 @@
       :selectedProduct="selectedProduct"
       :tag=filteredTagsByProductId().tags
       :option=filteredTagsByProductId().options
+      :category="getCategoryNameById(selectedProduct.category)"
       v-if="showOptionModal"
     />
     <CartModal
@@ -445,10 +446,18 @@ export default {
          // let totalArray = matchArray ? result.split(",").map(Number) : [];
 
           // testdata.js 데이터에서 응답에 포함된 항목만 추출
+          console.log("전체 결과:",result.data.message);
           console.log("this is what you Got: ",responseItems[1]);
-           this.filteredItems = this.products.filter((item) =>
-             responseItems[1].includes(item.id)
-           );
+          //  this.filteredItems = this.products.filter((item) =>
+          //    responseItems[1].includes(item.id)
+          //  );
+          const responseArray = responseItems[1].split(',').map(item => parseInt(item.trim(), 10));
+          console.log("배열 변환 결과 ",responseArray);
+
+          this.filteredItems = this.products.filter((item) =>
+            responseArray.includes((item.id)) // item.id를 문자열로 변환하여 비교
+          );
+          console.log("필터링 결과는: ",this.filteredItems);
         
         })
         .catch((error) => {
@@ -510,14 +519,20 @@ export default {
     pickProduct($event) {
       this.stopOptionAudio();
       this.showOptionModal = false;
-      console.log("개수: ",$event.num);
-        console.log("가격:",$event.price);
+      console.log("개수: ", $event.num);
+      console.log("가격:", $event.price);
+      console.log("옵션:",$event.option);
       for (let i = 0; i < $event.num; i++) {
-          this.addCart({productName:this.selectedProduct.name, productPrice: $event.price, option:$event.option});
-          this.setTotalPrice($event.price);
-        }
-
+        this.addCart({
+          product: {
+            name: this.selectedProduct.name,
+            price: $event.price,
+          },
+          options: $event.option,
+        });
+      }
       this.showCartModal = true;
+      console.log("장바구니 크기:",this.cart.length);
     },
     subProduct($event) {
       this.subCart($event);

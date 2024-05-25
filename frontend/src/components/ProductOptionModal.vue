@@ -11,6 +11,13 @@
         <v-row>
           <v-col cols="12" md="6">
             <div class="d-flex justify-center">
+              <v-chip 
+                class="ma-2 x-large"
+                color="light-green"
+                text-color="white"
+              >
+                #{{ category }}
+              </v-chip>
               <v-img
                 :src="getImageUrl(selectedProduct.image)"
 
@@ -132,11 +139,15 @@ export default {
       type: Array,
       required: true,
     },
+    category: {
+      type: String,
+      required: true
+    },
   },
   setup(props, { emit }) {
     const numProduct = ref(1);
     const optionPrices = reactive({});
-    const selectedOptionIds = reactive([]);
+    //const selectedOptionIds = reactive([]);
     const temp = ref(true);
     const selectedOption = reactive(Array(props.tag.length).fill(undefined));
     //const selectedOption =reactive({});
@@ -180,6 +191,11 @@ export default {
 
     };
 
+    const getCategoryNameById = (id) => {
+      const category = this.categories.find(cat => cat.id === id);
+      return category ? category.name : null;
+    };
+    
     const getImageSrc = () => {
       return "https://picsum.photos/100?random=1";
     };
@@ -268,6 +284,7 @@ export default {
       handleCloseButtonClick,
       handleSubNumProductClick,
       handleAddNumProductClick,
+      getCategoryNameById,
     };
   },
 };

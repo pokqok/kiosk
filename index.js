@@ -161,15 +161,15 @@ app.post('/chat', async (req, res) => {
       const category = item.category;
       const isOn = category.isOn === undefined ? true : category.isOn;
       
-      // console.log("Product ID:", item.productId);
-      // console.log("Product Name:", item.productName);
-      // console.log("Category ID:", category.id);
-      // console.log("Category Name:", category.name);
-      // console.log("Category Alias:", category.alias);
-      // console.log("Is Category On:", isOn);
-      // console.log("Tags:", item.tags);
-      // console.log("Options:", item.options);
-      // console.log("-----------------------");
+      console.log("Product ID:", item.productId);
+      console.log("Product Name:", item.productName);
+      console.log("Category ID:", category.id);
+      console.log("Category Name:", category.name);
+      console.log("Category Alias:", category.alias);
+      console.log("Is Category On:", isOn);
+      console.log("Tags:", item.tags);
+      console.log("Options:", item.options);
+      console.log("-----------------------");
     });
 
     //console.log('test:', JSON.stringify(items));
@@ -200,22 +200,23 @@ app.post('/chat', async (req, res) => {
 
     const parts = [
       {text: `질문에 맞는 메뉴의 아이디를 찾아 productId: [] 형식으로 반환하라,
+      \n 아래 질문들과 답변은 형식을 위한 예시이다. 반드시 테이블에 있는 모든 메뉴를 탐색하라.
       \n 질문에 맞는 단어가 없다면 발음이나 철자가 비슷한지를 찾아라.
       \n 만약 어떤 메뉴와도 상응하는 데이터를 찾지 못하겠다면 모든 메뉴 productId를 반환해라`},
       {text: `input: ${JSON.stringify(items)}` },
       {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
       {text: "input: 따뜻한 거 추천해줘"},
-      {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
-      {text: "input: 달달한거 추천해줘"},
-      {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:[4,5], productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
-      {text: "input: 시원한거 추천해줘"},
-      {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:2,  productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
-      {text: "input: 차 추천해줘"},
-      {text: "output: 타겟팅: {categoryId:3, tagId:null, optionId:null,  productId:null, recommened: null\n}\n검색결과: 보리차, 민트티\nproductId: [6,7]"},
-      {text: "input: 에이드 추천해줘"},
-      {text: "output: 타겟팅: {categoryId:2, tagId:null, optionId:null,  productId:null, recommened: null\n}\n검색결과: 레몬에이드, 복숭아에이드\nproductId: [4,5]"},
-      {text: "input: 아메리카노 추천해줘"},
-      {text: "output: 타겟팅: {categoryId:null, tagId:null, optionId:null,  productId: 1, recommened: null}\n검색결과: 아메리카노\nproductId: [1]"},
+      // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
+      // {text: "input: 달달한거 추천해줘"},
+      // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:[4,5], productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
+      // {text: "input: 시원한거 추천해줘"},
+      // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:2,  productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
+      // {text: "input: 차 추천해줘"},
+      // {text: "output: 타겟팅: {categoryId:3, tagId:null, optionId:null,  productId:null, recommened: null\n}\n검색결과: 보리차, 민트티\nproductId: [6,7]"},
+      // {text: "input: 에이드 추천해줘"},
+      // {text: "output: 타겟팅: {categoryId:2, tagId:null, optionId:null,  productId:null, recommened: null\n}\n검색결과: 레몬에이드, 복숭아에이드\nproductId: [4,5]"},
+      // {text: "input: 아메리카노 추천해줘"},
+      // {text: "output: 타겟팅: {categoryId:null, tagId:null, optionId:null,  productId: 1, recommened: null}\n검색결과: 아메리카노\nproductId: [1]"},
       //{text: "input: const Monthly_recommendedItems = [  {   name: '아메리카노',   id: 1,  },  {    name: '카페라떼',    id: 2,   },   {    name: '민트티',    id: 7,   }];"},
       {text: `input: 추천메뉴 테이블: ${JSON.stringify(Monthly_recommendedItems)}`},
       {text: "output: 타겟팅: {categoryId:null, tagId:null, optionId:null,  productId:null, recommened: [1,2,7]}\n검색결과: 아메리카노, 카페라떼, 민트티\nproductId: [1,2,7]"},
