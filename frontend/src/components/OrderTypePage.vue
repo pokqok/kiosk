@@ -30,11 +30,11 @@
 export default {
   name: "OrderTypePage",
   mounted() {
-    if(this.$store.state.ShopID == -1) {
-      alert("login error")
-      this.$router.push('/login/shop')
-      return;
-    }
+    // if(this.$store.state.ShopID == -1) {
+    //   alert("login error")
+    //   this.$router.push('/login/shop')
+    //   return;
+    // }
     this.playAudio();
   },
   data() {
