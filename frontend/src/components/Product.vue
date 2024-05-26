@@ -9,8 +9,7 @@
     <div v-else class="product" @click="$emit('selectProduct', product)">
 
       <div class="product-img-container">
-        <img class="product-img" :src="getImageSrc(product)" alt="" />
-
+        <img class="product-img" :src="getImageSrc(product.image)"  @error="handleImageError"/>
       </div>
       <div class="product-info">
         <p class="product-name">{{ product.name }}</p>
@@ -44,12 +43,18 @@ export default {
     getImageSrc(item) {
       // 이미지 경로가 비어있을 경우 빈 이미지를 반환하고,
       // 비어있지 않을 경우 제품 이미지 경로를 반환합니다.
-      //return image ? image:"https://picsum.photos/100?random=1";
       console.log("가져온 데이터 테스트: ",item)
-      
-      console.log("가져온 이름들 ",item.id)
-      return "https://picsum.photos/100?random=1";
+
+      if (!item || typeof item !== 'string' || item.trim() === '') {
+        return "https://picsum.photos/100?random=1";
+      }
+
+      return `/image/${item}`;
     },
+
+    handleImageError(event) {
+      event.target.src = "https://picsum.photos/100?random=1";
+    }
   },
 
 };
