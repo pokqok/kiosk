@@ -2,7 +2,7 @@ let product = [
     {
       id: 1,
       name: '아메리카노',
-      price: 1500,
+      price: 100,
       category: 1,
       detail: '에스프레소에 물을 탔습니다.',
       image: 'americano.jpg',
@@ -12,7 +12,7 @@ let product = [
     {
       id: 2,
       name: '카페라떼',
-      price: 3000,
+      price: 100,
       category: 1,
       detail: '에스프레소에 우유를 탔습니다.',
       image: 'latte.png',
@@ -22,7 +22,7 @@ let product = [
     {
       id: 3,
       name: '말차',
-      price: 4000,
+      price: 100,
       category: 1,
       detail: '녹차를 우유에 탔습니다',
       image: 'maltcha.png',
@@ -64,6 +64,17 @@ let product = [
       name: '민트티',
       price: 2000,
       category: 3,
+      detail: '',
+      image: 'minttea.jpg',
+      alias: '',
+      isOn: true,
+    },
+
+    {
+      id: 8,
+      name: '테스트',
+      price: 100,
+      category: 1,
       detail: '',
       image: 'minttea.jpg',
       alias: '',
