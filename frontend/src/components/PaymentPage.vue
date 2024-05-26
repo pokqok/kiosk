@@ -3,35 +3,11 @@
     <div class="head-container">
       <v-row>
         <v-col cols="4">
-          <audio
-            ref="paymentAudio"
-            :src="paymentAudioSource"
-            type="audio/mp3"
-          ></audio>
-          <audio
-            ref="paymentCompletedAudio"
-            :src="paymentCompletedAudioSource"
-            type="audio/mp3"
-          ></audio>
-          <audio
-            ref="kakaoPayAudio"
-            :src="kakaoPayAudioSource"
-            type="audio/mp3"
-          ></audio>
-          <audio
-            ref="normalPayAudio"
-            :src="normalPayAudioSource"
-            type="audio/mp3"
-          ></audio>
-          <audio
-            ref="clickSound"
-            :src="clickSoundSource"
-            type="audio/mp3"
-          ></audio>
-          <v-btn
-            @click="$router.go(-1 - 2 * cntCanclePay)"
-            style="background-color: #009688"
-          >
+          <audio ref="paymentAudio" :src="paymentAudioSource" type="audio/mp3"></audio>
+          <audio ref="paymentCompletedAudio" :src="paymentCompletedAudioSource" type="audio/mp3"></audio>
+          <audio ref="kakaoPayAudio" :src="kakaoPayAudioSource" type="audio/mp3"></audio>
+          <audio ref="normalPayAudio" :src="normalPayAudioSource" type="audio/mp3"></audio>
+          <v-btn @click="$router.go(-1 - 2 * cntCanclePay)" style="background-color: #009688">
             <i class="bi bi-x-lg icon"></i>
             <p>취소</p>
           </v-btn>
@@ -46,9 +22,7 @@
       <v-row style="margin-top: 12%">
         <v-col cols="4">
           <v-btn @click="requestPay" block height="150%">
-            <span
-              style="display: flex; flex-direction: column; align-items: center"
-            >
+            <span style="display: flex; flex-direction: column; align-items: center">
               <i class="bi bi-credit-card pay-icon"></i>
               <h2 style="margin: 0">카드 결제</h2>
             </span>
@@ -56,9 +30,7 @@
         </v-col>
         <v-col cols="4">
           <v-btn @click="requestPayKakao" block height="150%">
-            <span
-              style="display: flex; flex-direction: column; align-items: center"
-            >
+            <span style="display: flex; flex-direction: column; align-items: center">
               <i class="bi bi-chat-fill pay-icon"></i>
               <h2 style="margin: 0">카카오 페이</h2>
             </span>
@@ -70,9 +42,7 @@
     <v-dialog v-model="showModal" max-width="500">
       <v-card class="square-modal">
         <v-card-title class="headline large-text">결제 완료</v-card-title>
-        <v-card-text class="order-number-text"
-          >주문번호: {{ orderNumber }}</v-card-text
-        >
+        <v-card-text class="order-number-text">주문번호: {{ orderNumber }}</v-card-text>
       </v-card>
     </v-dialog>
   </div>
@@ -93,7 +63,6 @@ export default {
       paymentCompletedAudioSource: require("@/assets/결제 완료.mp3"),
       kakaoPayAudioSource: require("@/assets/카카오페이.mp3"),
       normalPayAudioSource: require("@/assets/일반결제.mp3"),
-      clickSoundSource: require("@/assets/click-sound.mp3"), // 추가된 클릭 사운드
       showModal: false, // 모달 표시 여부
       orderNumber: null, // 주문번호
     };
@@ -106,7 +75,7 @@ export default {
   mounted() {
     if (this.$store.state.ShopID == -1) {
       alert("login error");
-      this.$router.push("/login/shop");
+      this.$router.push('/login/shop');
       return;
     }
 
@@ -120,43 +89,22 @@ export default {
     ]),
 
     playPaymentAudio() {
-      this.resetAndPlay(this.$refs.paymentAudio);
+      this.$refs.paymentAudio.play();
     },
     playPaymentCompletedAudio() {
-      this.resetAndPlay(this.$refs.paymentCompletedAudio);
+      this.$refs.paymentCompletedAudio.play();
     },
     playKakaoPayAudio() {
-      this.resetAndPlay(this.$refs.kakaoPayAudio);
+      this.$refs.kakaoPayAudio.play();
     },
     playNormalPayAudio() {
-      this.resetAndPlay(this.$refs.normalPayAudio);
-    },
-    playClickSound() {
-      this.resetAndPlay(this.$refs.clickSound);
+      this.$refs.normalPayAudio.play();
     },
     stopAllAudio() {
-      const audios = [
-        this.$refs.paymentAudio,
-        this.$refs.paymentCompletedAudio,
-        this.$refs.kakaoPayAudio,
-        this.$refs.normalPayAudio,
-        this.$refs.clickSound,
-      ];
-      audios.forEach((audio) => {
-        if (audio) {
-          audio.pause();
-          audio.currentTime = 0;
-        }
-      });
-    },
-    resetAndPlay(audio) {
-      this.stopAllAudio();
-      if (audio) {
-        audio.currentTime = 0; // 초기화
-        audio.play().catch((error) => {
-          console.error("Error playing audio:", error);
-        });
-      }
+      this.$refs.paymentAudio.pause();
+      this.$refs.paymentCompletedAudio.pause();
+      this.$refs.kakaoPayAudio.pause();
+      this.$refs.normalPayAudio.pause();
     },
 
     requestPay() {
@@ -279,7 +227,7 @@ export default {
 
       // 카트 비우기
       this.$store.commit("clearCart");
-      console.log("Cart after clearCart:", this.$store.state.cart); // clearCart 후 cart 출력
+      console.log('Cart after clearCart:', this.$store.state.cart); // clearCart 후 cart 출력
 
       // 5초 후 모드 선택 페이지로 이동
       setTimeout(() => {
@@ -339,8 +287,7 @@ export default {
   text-align: center;
 }
 
-.v-card-title,
-.v-card-text {
+.v-card-title, .v-card-text {
   display: flex;
   justify-content: center;
   align-items: center;
