@@ -200,12 +200,12 @@ app.post('/chat', async (req, res) => {
 
     const parts = [
       {text: `질문에 맞는 메뉴의 아이디를 찾아 productId: [] 형식으로 반환하라,
-      \n 아래 질문들과 답변은 형식을 위한 예시이다. 반드시 테이블에 있는 모든 메뉴를 탐색하라.
+      \n 해당 이름이 들어간 메뉴나, 카테고리에 속하는 메뉴를 추천하라. 만약 옵션명과 관련된 내용이라면 해당 옵션을 가진 메뉴를 추천하라.
       \n 질문에 맞는 단어가 없다면 발음이나 철자가 비슷한지를 찾아라.
       \n 만약 어떤 메뉴와도 상응하는 데이터를 찾지 못하겠다면 모든 메뉴 productId를 반환해라`},
       {text: `input: ${JSON.stringify(items)}` },
       {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
-      {text: "input: 따뜻한 거 추천해줘"},
+      // {text: "input: 따뜻한 거 추천해줘"},
       // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
       // {text: "input: 달달한거 추천해줘"},
       // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:[4,5], productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},

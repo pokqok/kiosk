@@ -69,7 +69,7 @@
 
 <script>
 import axios from "axios";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "PaymentPage",
@@ -96,6 +96,10 @@ export default {
   },
 
   methods: {
+    ...mapMutations([
+      "clearCart",
+    ]),
+
     playPaymentAudio() {
       this.$refs.paymentAudio.play();
     },
@@ -130,7 +134,10 @@ export default {
     },
 
     requestPay() {
+      console.log("결제 시작 진입 성공 (여기서 totalPrice는:",this.totalPrice)
+      console.log("결제 시작 진입 성공 (결제하는 상품 이름은 :",this.productName)
       this.playNormalPayAudio();
+      const price = this.totalPrice;
       const merchantUid = "merchant_" + new Date().getTime();
       this.IMP.request_pay(
         {
@@ -164,8 +171,10 @@ export default {
                   alert("결제 검증 실패");
                 }
               });
+              this.clearCart();
           } else {
             alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
+            console.log("총 결제 내역은:",price);
             this.$store.commit("decrementOrderCounter");
             this.cntCanclePay++;
           }
@@ -216,6 +225,7 @@ export default {
                 this.$store.commit("decrementOrderCounter");
                 this.cntCanclePay++;
               });
+              this.clearCart();
           } else {
             alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
             this.$store.commit("decrementOrderCounter");

@@ -68,9 +68,10 @@ export default {
       this.playClickSound();
       console.log("handlePayment");
       if (this.totalPrice > 0) {
-        this.$emit("payment", this.totalPrice);
-        console.log("결제금액: ", this.totalPrice);
-        this.clearCart();
+        this.$emit("payment", {num: this.cart.length, price: this.totalPrice, option: this.cart.option});
+        //그래서 형식이 어떻게 된 건지는 잘 몰라서 일단 대충 넣어둠
+        console.log("카트에서 결제함-결제금액: ", this.totalPrice);
+        //this.clearCart(); 해당 clean Cart는 shopPage로 이동했다.
       } else {
         alert("장바구니가 비어 있습니다.");
       }

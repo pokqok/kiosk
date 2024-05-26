@@ -77,11 +77,14 @@ const store = createStore({
       //state.totalPrice += productWithPrice.productPrice;
       //코드에 쓰이지 않아서 없앰
       state.totalPrice += productWithPrice.price;
+      //console.log("현재 추가된 금액은 바로 이것:", state.totalPrice);
     },
     subCart(state, index) {
       if (index !== -1 && index < state.cart.length) {
         //state.totalPrice -= state.cart[index].productPrice;
-        state.totalPrice -= state.cart[index].price;
+        //console.log("제거 전에 있던 금액은 바로 이것:", state.totalPrice);
+        //console.log("카트안에 있는 가격은 과연: ",state.cart[index].price)
+        state.totalPrice -= parseInt(state.cart[index].price);
         state.cart.splice(index, 1);
         delete state.optionsList[index];
         const newOptionsList = {};
@@ -89,6 +92,7 @@ const store = createStore({
           newOptionsList[i] = state.optionsList[i] || [];
         });
         state.optionsList = newOptionsList;
+        //console.log("현재 제거 후 금액은 바로 이것:", state.totalPrice);
       }
     },
     incrementOrderCounter(state) {
