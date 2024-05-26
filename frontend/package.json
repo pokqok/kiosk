@@ -17,7 +17,6 @@
     "bootstrap-icons": "^1.11.3",
     "buffer": "^6.0.3",
     "core-js": "^3.8.3",
-    "dayjs": "^1.11.11",
     "dotenv": "^16.4.5",
     "file-saver": "^2.0.5",
     "json2csv": "^6.0.0-alpha.2",
