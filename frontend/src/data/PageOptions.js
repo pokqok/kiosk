@@ -4,7 +4,7 @@ let option = [
     {
       id: 1,
       name: '뜨겁게',
-      price: 100,
+      price: 0,
       tag: 1,
       image: '',
       alias: '',
