@@ -18,6 +18,16 @@
       </v-col>
       <template v-slot:extension>
         <v-tabs v-model="tab" grow>
+          <!-- db 연결 시 -->
+          <!-- <v-tab
+            v-for="i in categories"
+            :key="i"
+            :href="'#CategoryTitle' + i.name"
+          >
+            Category {{ i.name }}
+          </v-tab> -->
+
+          <!-- testdata 사용 시 -->
           <v-tab
             v-for="i in categories"
             :key="i"
@@ -40,6 +50,7 @@
       #{{ i.name }}
     </h4>
     <v-row>
+      <!-- test, 나중에 testdata대신 카테고리에 있는 메뉴목록 -->
       <v-col cols="4" v-for="item in filteredProducts(i.id)" :key="item.id">
         <ProductItem
           :product="item"
@@ -50,6 +61,7 @@
     <v-divider class="my-5"></v-divider>
   </v-container>
 
+  <!-- 이부분에 테스트 데이터는 아래 두개 filtered 메서드 부분에서 변경해줘야함 -->
   <ProductOptionModal
     @closeProductOptionModal="closeProductOptionModal"
     @payment="payment"
@@ -87,6 +99,8 @@ export default {
   },
 
   computed: {
+    //...mapState(["testdata", "ShopID", "orderType", "cart"]),
+    //테스트 데이터 추가 버전
     ...mapState([
       "testProduct",
       "testTag",
@@ -97,6 +111,22 @@ export default {
       "orderType",
       "cart",
     ]),
+
+    tags() {
+      return this.$store.state.kioskModule.tags;
+    },
+    categories() {
+      return this.$store.state.kioskModule.categories;
+    },
+    options() {
+      return this.$store.state.kioskModule.options;
+    },
+    products() {
+      return this.$store.state.kioskModule.products;
+    },
+    tagMenu() {
+      return this.$store.state.kioskModule.tagMenu;
+    },
 
     filteredTagsByProductId() {
       // db 사용 시
@@ -223,6 +253,16 @@ export default {
     ]), //결제 시 이름 넣기 추가
 
     handleScroll() {
+      //db연결 시
+      // for (let i = 0; i < this.categories.length; i++) {
+      //   const category = this.categories[i];
+      //   const element = document.getElementById('CategoryTitle' + categories.name);
+      //   if (window.scrollY >= element.offsetTop - 140) {
+      //     this.tab = i;
+      //   }
+      // }
+
+      // testdata 사용 시
       for (let i = 0; i < this.testCategory.length; i++) {
         const category = this.testCategory[i];
         const element = document.getElementById(
@@ -238,6 +278,7 @@ export default {
       this.stopAllAudio();
       this.playOptionAudio();
       this.selectedProduct = data;
+      console.log("선택 상품: ", this.selectedProduct);
       this.showOptionModal = true;
       this.showCartModal = false;
     },
@@ -349,8 +390,15 @@ export default {
       this.$router.push("/order-type/common");
     },
 
+    playClickSound() {
+      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
+      clickSound.play().catch((error) => {
+        console.error("Error playing click sound:", error);
+      });
+    },
+
     getCategoryNameById(id) {
-      const category = this.categories.find((cat) => cat.id === id);
+      const category = this.categories.find(cat => cat.id === id);
       return category ? category.name : null;
     },
   },
