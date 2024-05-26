@@ -1,73 +1,74 @@
 <template>
-  <div>
-    <div class="futter cart-container row align-items-center shadow">
-      <div
-        class="col-6 gy-2 rounded align-items-center p-3"
-        style="background-color: #ffffff"
-      >
-        <div
-          class="row mb-1"
-          v-for="item in cart"
-          :key="item"
-          style="align-items: center"
+  <div v-if="cart.length > 0">
+    <v-row class="futter cart-container align-center shadow">
+      <v-col cols="6" class="align-center" style="background-color: #ffffff">
+        <v-row
+          v-for="(item, index) in cart"
+          :key="index"
+          class="align-center ml-5"
+          style="margin-left: 10%"
         >
-          <p class="col-10 m-0">{{ item.ProductName }} - {{ item.Price }}원</p>
-          <button
-            type="button"
-            class="btn btn-outline-danger col-2"
-            @click="$emit('subProduct', item)"
+          <p>{{ item.name }} - {{ parseInt(item.productPrice) }}원</p>
+          <v-chip
+            v-for="(option, optionIndex) in item.option"
+            :key="optionIndex"
+            class="ml-4"
+            outlined
           >
-            <i class="bi bi-x-lg"></i>
-          </button>
-        </div>
-      </div>
-      <div class="col-1 price-fixed shadow">
-        <p class="m-0">{{ totalPrice }}원</p>
-      </div>
-      <button
-        @click="$emit('payment')"
-        type="button"
-        class="btn btn-outline-primary btn-fixed col-4 shadow"
-      >
-        <i class="bi bi-coin icon"></i>
-        <p>결제</p>
-      </button>
-    </div>
+            {{ option.optionName }}
+          </v-chip>
+          <v-spacer></v-spacer>
+          <v-btn @click="removeFromCart(index)">
+            <v-icon>bi-x-lg</v-icon>
+          </v-btn>
+        </v-row>
+      </v-col>
+      <v-col cols="1" class="shadow cart-fix-price">
+        <p>{{ parseInt(totalPrice) }}원</p>
+      </v-col>
+      <v-col>
+        <v-btn @click="handlePayment" class="shadow cart-fix-btn" height="20%">
+          <v-icon left size="xx-large" style="margin-right: 10%"
+            >bi-coin</v-icon
+          >
+          <h2>결제</h2>
+        </v-btn>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "CartModal",
-
+  data() {
+    return {};
+  },
   computed: {
     ...mapState(["cart", "totalPrice"]),
   },
+  methods: {
+    ...mapMutations(["subCart", "clearCart"]),
+    removeFromCart(index) {
+      this.subCart(index);
+    },
+    handlePayment() {
+      if (this.totalPrice > 0) {
+        this.$emit("payment", this.totalPrice);
+        this.$router.push({ name: "PaymentPage" });
+      } else {
+        alert("장바구니가 비어 있습니다.");
+      }
+    },
+  },
+  watch: {
+    cart(newCart) {
+      if (newCart.length === 0) {
+        this.$emit("hideCartModal");
+      }
+    },
+  },
 };
 </script>
-
-<style>
-.cart-container {
-  background-color: #f8f9fa;
-  height: 25%;
-  overflow-y: auto;
-}
-
-.btn-fixed {
-  position: fixed;
-  right: 2vw;
-}
-
-.price-fixed {
-  position: fixed;
-  right: 40vw;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.shadow {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-</style>

@@ -1,0 +1,178 @@
+body {
+  margin: 0;
+}
+
+div {
+  box-sizing: border-box;
+}
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif; /* 기본 폰트 유지 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50; /* 기본 텍스트 색상 유지 */
+}
+
+button {
+  margin: 10px;
+  padding: 12px 20px; /* 버튼 패딩 조정 */
+  font-size: 16px; /* 버튼 폰트 크기 조정 */
+  font-weight: bold; /* 글자 두께 bold로 설정 */
+  color: #ffffff; /* 텍스트 색상 흰색으로 설정 */
+  background-color: #3498db; /* 밝은 파란색으로 버튼 색상 설정 */
+  border: none; /* 테두리 제거 */
+  border-radius: 5px; /* 버튼의 모서리 둥글게 */
+  cursor: pointer; /* 클릭 가능한 요소 표시 */
+  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.5); /* 버튼에 그림자 효과 추가 */
+  transition: background-color 0.3s, box-shadow 0.3s; /* 색상과 그림자 변화에 애니메이션 효과 */
+  box-sizing: border-box;
+}
+
+button:hover {
+  background-color: #2980b9; /* 호버 시 버튼 색상 진한 파란색으로 변경 */
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.7); /* 호버 시 그림자 효과 강조 */
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none; /* Chrome, Safari에서 스피너 제거 */
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox에서 스피너 제거 */
+}
+
+.head-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: rgb(70, 130, 180); /* #229954; */
+  color: white;
+  padding: 10px;
+  z-index: 100;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.head-container h2 {
+  color: white;
+  text-align: center;
+  margin: 0;
+  font-size: 24px;
+  font-family: 'Arial', sans-serif;
+}
+
+.futter {
+  position: fixed;
+  bottom: 0;
+  border-radius: 8px;
+  width: 100%;
+  height: 15%;  
+}
+
+.cart-container {
+  background-color: #f8f9fa;
+  height: 25%;
+  overflow-y: auto;
+}
+
+.shadow {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.volume-meter-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.outer-meter {
+  background-color: #ccc;
+  height: 20px;
+  width: 100%;
+  max-width: 200px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.inner-meter {
+  height: 100%;
+  background: linear-gradient(to right, #4caf50, #8bc34a);
+  transition: width 0.05s ease-out;
+}
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 80%;
+}
+
+.pay-icon {
+  font-size: 150px;
+}
+
+.product {
+  background-color: white;
+  border: 1px solid #e1e1e1;
+  margin: 4%;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.product:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.product-img-container {
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.product-img {
+  max-width: 80%;
+  max-height: 80%;
+}
+
+.product-info {
+  padding: 10px;
+}
+
+.product-name {
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-price {
+  color: #666;
+  margin: 5px 0 0;
+}
+
+.cart-fix-price {
+  position: fixed;
+  right: 40vw;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.cart-fix-btn {
+  position: fixed;
+  bottom: 0;
+  right: 2vw;
+  width: 30%;
+  margin-right: 5%;
+}

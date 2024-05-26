@@ -1,12 +1,12 @@
-
-import axios from 'axios';
+import axios from "axios";
+import { tagMenu } from "./data/PageTagMenu";
 //import {createStore} from 'vuex';
 
-const categoryModule = {
+const productModule = {
   state() {
     return {
       //products: product, //사실 안쓸듯?
-      categorys: [],
+      tagMenu: [],
     };
   },
 
@@ -218,4 +218,4 @@ const categoryModule = {
   },
 };
 
-export default categoryModule;
+export default productModule;

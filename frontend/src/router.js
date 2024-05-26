@@ -14,7 +14,9 @@ import KioskManage from './components/KioskManage.vue';
 import UserManage from "./components/UserManage.vue";
 import RecommendView from "./components/RecommendView.vue";
 import IntegratedComponent from "./components/IntegratedComponent.vue";
-//import CardTest from '@/views/CardTest.vue';
+import HelperPage from "./components/HelperPage.vue";
+import OrderReceive from "./components/OrderReceive.vue"; // OrderReceive 컴포넌트 임포트
+import SalesPage from "./components/SalesPage.vue"; // SalesPage 컴포넌트 임포트
 
 const routes = [
   {
@@ -50,18 +52,13 @@ const routes = [
         component: UserManage
       },
       {
-        path: '/product-manage', component: ProductManage
+        path: 'order-receive',
+        component: OrderReceive // 새로운 라우트 추가
       },
       {
-        path: '/category-manage', component: CategoryManage
-      },
-      {
-        path: '/tag-manage', component: TagManage
-      },
-      {
-        path: '/kiosk-manage', component: KioskManage
-      },
-
+        path: 'sales-page',
+        component: SalesPage // 매출 내역 페이지 라우트 추가
+      }
     ]
   },
   {
@@ -69,7 +66,12 @@ const routes = [
     component: ShopPage,
   },
   {
+    path: '/helper/:id',
+    component: HelperPage,
+  },
+  {
     path: '/payment',
+    name: 'PaymentPage',
     component: PaymentPage,
   },
   {
@@ -87,14 +89,13 @@ const routes = [
     component: ModeSelectPage,
   },
   {
-    path: '/order-type',
+    path: '/order-type/:mode',
     component: OrderTypePage,
   },
   {
     path: '/recommend',
     component: RecommendView,
-  }
-  ,
+  },
   {
     path: '/integrated',
     component: IntegratedComponent,
@@ -106,4 +107,4 @@ const router = createRouter({
   routes,
 });
 
-export default router; 
+export default router;

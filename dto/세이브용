@@ -1,159 +1,92 @@
-//카테고리 설정 쿼리 파일
-//const bodyParser = require('body-parser');
-const mariadb = require('mariadb');
-const express = require('express');
-const router = express.Router();
-const config = require('../DBconfig.json');
+<template>
+  <div class="product" @click="$emit('selectProduct', product)">
+    <div class="product-img-container">
+      <img class="product-img" :src="getImageSrc(item)" alt="" />
+    </div>
+    <div class="product-info">
+      <p class="product-name">{{ item.name }}</p>
+      <p class="product-price">{{ item.price }} 원</p>
+    </div>
+  </div>
+</template>
 
-const pool = mariadb.createPool({
-  host: config.db.host,
-  user: config.db.user,
-  password: config.db.password,
-  database: config.db.database,
-});
+<script>
+export default {
+  name: "ProductItem",
 
-/*
-  vue의 v-form에서 데이터 형식을 받아 적용하고
-  apply를 누르면 최종적으로 적용되도록 하기 위해 
-  transaction을 이용하게 해 DML명령은 이를 통하게 하고
-  실제 적용/취소 시 commit 또는 rollback하도록 함
- */
+  props: {
+    product: Object,
+    //item: Object,
+  },
+  data() {
+    return{
+      item: this.product,
+    }
+  },
+  mounted() {
+    // 컴포넌트가 마운트된 후에 데이터가 완전히 로드된 것을 확인합니다.
+    console.log("컴포넌트가 마운트되었습니다.");
+    console.log("로드된 데이터 확인: ", this.product);
+  },
+  methods: {
+    getImageSrc(item) {
+      // 이미지 경로가 비어있을 경우 빈 이미지를 반환하고,
+      // 비어있지 않을 경우 제품 이미지 경로를 반환합니다.
+      //return image ? image:"https://picsum.photos/100?random=1";
+      console.log("가져온 데이터 테스트: ",item)
+      
+      console.log("가져온 이름들 ",item.id)
+      return "https://picsum.photos/100?random=1";
+    },
+  },
 
-/*
-  현재 유저별, 가게별 데이터 가져오기 삭제, 추가를 고려하지 않음
-  이부분을 지금 추가해야 한다.
-*/
+};
+</script>
 
-//let conn; // 전역으로 선언하여 트랜잭션을 공유하는데 문제생겨서 지움
-//let savepointName = 'savepoint';
-//DB 가져오기
-router.get('/getAllCategories', async (req, res) => {
-  try {
-    // MariaDB에 연결하여 쿼리 실행
-    const conn = await pool.getConnection();
-    const result = await conn.query('SELECT * FROM category');
-    conn.release(); // 연결 해제
-    console.log('가져오기 성공');
+<style>
+.product {
+  background-color: white;
+  border: 1px solid #e1e1e1;
+  margin: 4%;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  cursor: pointer;
+}
 
-    res.status(200).json(result); // 결과를 JSON 형태로 응답
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    res.status(500).send('Error fetching categories');
-  }
-});
+.product:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 
+.product-img-container {
+  width: 100%;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
 
-// 태그 추가
-router.post('/add', async (req, res) => {
-  let conn;
-  try {
-    const { categoryId, categoryName } = req.body;
-    conn = await pool.getConnection();
-    
-    //await conn.beginTransaction();
-    await conn.query('START TRANSACTION'); //위에 뭔짓해도 안되서 그냥 직접 넣음
-    await conn.query(`INSERT INTO category (CategoryNO, CategoryName, CategoryAlias) VALUES (${categoryId},'${categoryName}', NULL)`);
+.product-img {
+  max-width: 80%;
+  max-height: 80%;
+}
 
-    console.log('적용 성공');
-    res.status(200).send('카테고리 추가 성공');
-  } catch (error) {
-    console.error('카테고리 추가 에러:', error);
-    if (conn) await conn.rollback();
-    // await conn.query('ROLLBACK');
-    res.status(500).send('카테고리 추가 실패');
-  }  finally {
-    if (conn) await conn.release();
-    //conn.release();
-  }
-});
+.product-info {
+  padding: 10px;
+}
 
-// 태그 삭제
-router.post('/delete', async (req, res) => {
-  let conn;
-  try {
-    const { categoryId } = req.body;
+.product-name {
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-    conn = await pool.getConnection();
-    //await conn.beginTransaction();
-
-    await conn.query('START TRANSACTION');
-    await conn.query(`DELETE FROM category WHERE id = ${categoryId}`);
-    //commit은 apply시
-  
-
-    res.status(200).send('카테고리 제거 성공');
-  } catch (error) {
-    console.error('카테고리 제거 에러:', error);
-    if (conn) await conn.rollback();
-    // await conn.query('ROLLBACK');
-    res.status(500).send('카테고리 제거 실패');
-  } finally {
-    if (conn) await conn.release();
-    //conn.release();
-  }
-});
-
-// 태그 수정
-router.post('/update', async (req, res) => {
-    /*
-      만약 카테고리 순서 적용, 순서 변경 기능 적용 시,
-      id를 땡겨오는 기능이 필요할수도
-    */
-      let conn;
-      try {
-        const { categoryId, categoryName} = req.body;
-    
-        conn = await pool.getConnection();
-
-        //await conn.beginTransaction();
-        await conn.query('START TRANSACTION');
-        await conn.query(`UPDATE category SET CategoryName = '${categoryName}' WHERE CategoryNO = ${categoryId}`);
-        //await conn.commit();
-
-        res.status(200).send('카테고리 수정 성공');
-      } catch (error) {
-        console.error('카테고리 수정 에러: ', error);
-        if (conn) await conn.rollback();
-        // await conn.query('ROLLBACK');
-        res.status(500).send('카테고리 수정 실패');
-      } finally {
-        if (conn) await conn.release();
-        //conn.release();
-      }
-});
-
-//DML사용 시, 최종적으로 페이지의 "적용"을 눌러야 적용되게 함
-router.post('/apply', async (req, res) => {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    //await conn.commit();
-    await conn.query('COMMIT');
-    res.status(200).send('Changes applied successfully');
-  } catch (error) {
-    console.error('Error applying changes:', error);
-    res.status(500).send('Error applying changes');
-  } finally {
-    conn.release();
-    conn = undefined;
-    //if (conn) conn.release();
-  }
-});
-
-// 변경 사항 취소
-router.post('/cancel', async (req, res) => {
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    //await conn.rollback();
-    await conn.query('ROLLBACK');
-    res.status(200).send('Changes canceled successfully');
-  } catch (error) {
-    console.error('Error canceling changes:', error);
-    res.status(500).send('Error canceling changes');
-  } finally {
-    conn.release();
-  }
-});
-
-module.exports = router;
+.product-price {
+  color: #666;
+  margin: 5px 0 0;
+}
+</style>

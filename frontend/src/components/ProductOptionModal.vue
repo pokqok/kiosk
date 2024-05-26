@@ -1,217 +1,256 @@
 <template>
-  <div class="black-bg">
-    <div class="white-bg">
-      <div class="option-container">
-        <div class="row">
-          <img :src="selectedProduct.ProductImage" class="col-4" alt="" />
-          <button
-            class="btn btn-outline-dark vol-btn col-2"
-            type="button"
-            style="margin-left: 10%"
-            @click="numProduct++"
-          >
-            <i class="bi bi-arrow-up"></i>
-          </button>
-          <p class="col-2" style="margin-top: 5%">{{ numProduct }}</p>
-          <button
-            class="btn btn-outline-dark vol-btn col-2"
-            type="button"
-            @click="subNumProduct"
-          >
-            <i class="bi bi-arrow-down"></i>
-          </button>
-          <hr />
-          <p>{{ price * numProduct }}원</p>
-          <hr />
-        </div>
-
-        <!-- 옵션 테스트 -->
-        <!-- 체크박스 그룹 -->
-        <div
-          class="container"
-          v-for="(checkboxOption, i) in checkBoxOptions"
-          :key="i"
-        >
-          <div class="row">
-            <div class="col">
-              <h4>{{ optionTitle[i] }}</h4>
+  <v-dialog v-model="temp" width="80%" persistent>
+    <v-card>
+      <v-container fluid>
+        <v-row>
+          <v-col cols="12" md="6">
+            <div class="d-flex justify-center">
+              <v-chip 
+                class="ma-2 x-large"
+                color="light-green"
+                text-color="white"
+              >
+                #{{ category }}
+              </v-chip>
+              <v-img
+                :src="getImageUrl(selectedProduct.image)"
+                aspect-ratio="1.7"
+                contain
+                style="margin-top: 10%"
+              ></v-img>
             </div>
-          </div>
-          <div class="row">
-            <div
-              class="btn-group btn-group-lg"
-              role="group"
-              aria-label="Basic checkbox toggle button group"
-            >
-              <div class="col" v-for="(option, j) in checkboxOption" :key="j">
-                <input
-                  type="checkbox"
-                  class="btn-check"
-                  :id="'btncheck' + i + '-' + j"
-                  autocomplete="off"
-                />
-                <label
-                  class="btn btn-outline-dark col-12"
-                  :for="'btncheck' + i + '-' + j"
-                  >{{ option }}</label
+          </v-col>
+          <v-col md="6">
+            <v-row class="d-flex justify-center mt-5">
+              <h2>{{ selectedProduct.name }}</h2>
+            </v-row>
+            <v-row class="d-flex justify-center mt-2">
+              <p>{{ selectedProduct.detail }}</p>
+            </v-row>
+            <v-row>
+              <v-col
+                class="d-flex justify-center"
+                style="display: flex; flex-direction: column; align-items: center;"
+                cols="4"
+              >
+                <v-btn icon @click="handleSubNumProductClick">
+                  <v-icon>mdi-minus</v-icon>
+                </v-btn>
+                <p>제거</p>
+              </v-col>
+              <v-col class="d-flex justify-center mt-5" cols="4">
+                <span>{{ numProduct }}</span>
+              </v-col>
+              <v-col
+                class="d-flex justify-center"
+                style="display: flex; flex-direction: column; align-items: center;"
+                cols="4"
+              >
+                <v-btn icon @click="handleAddNumProductClick">
+                  <v-icon>mdi-plus</v-icon>
+                </v-btn>
+                <p>추가</p>
+              </v-col>
+            </v-row>
+            <v-divider class="my-4"></v-divider>
+            <div class="text-center">
+              <h3>{{ totalPrice }}원</h3>
+            </div>
+            <v-divider class="my-4"></v-divider>
+            <div v-for="(tags, i) in tag" :key="tags.id" class="my-3">
+              <div class="text-h6">{{ tags.name }}</div>
+              <v-btn-toggle
+                v-model="selectedOption[i]"
+                color="primary"
+                mandatory
+                dense
+              >
+                <v-btn
+                  v-for="options in getOptionByID(tags)"
+                  :key="options.id"
+                  @click="setOptionPrice(tags, options)"
                 >
-                <hr />
-              </div>
+                  {{ options.name }} ({{ options.price }}원)
+                </v-btn>
+              </v-btn-toggle>
             </div>
-          </div>
-        </div>
-
-        <!-- 라디오버튼 그룹 -->
-        <div
-          class="container"
-          v-for="(radioOption, i) in radioOptions"
-          :key="i"
-        >
-          <div class="row">
-            <div class="col">
-              <h4>{{ optionTitle[i + checkBoxOptions.length] }}</h4>
-            </div>
-          </div>
-          <div class="row">
-            <div
-              class="btn-group btn-group-lg"
-              role="group"
-              aria-label="Basic radio toggle button group"
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-card-actions class="justify-end mb-12 mr-5">
+        <v-row>
+          <v-col cols="4">
+            <v-btn
+              block
+              height="175%"
+              color="green darken-1"
+              text
+              @click="handlePickProductClick"
             >
-              <div class="col" v-for="(option, j) in radioOption" :key="j">
-                <input
-                  type="radio"
-                  class="btn-check"
-                  :name="'btnradio' + i"
-                  :id="'btnradio' + i + '-' + j"
-                  autocomplete="off"
-                />
-                <label
-                  class="btn btn-outline-dark col-12"
-                  :for="'btnradio' + i + '-' + j"
-                  >{{ option }}</label
-                >
-                <hr />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="white-bg futter row">
-    <button
-      @click="$emit('pickProduct', numProduct)"
-      type="button"
-      class="btn col"
-    >
-      <i class="bi bi-cart icon"></i>
-      <p>장바구니</p>
-    </button>
-    <button @click="$emit('payment', numProduct)" type="button" class="btn col">
-      <i class="bi bi-coin icon"></i>
-      <p>결제</p>
-    </button>
-    <button
-      @click="$emit('closeProductOptionModal')"
-      type="button"
-      class="btn col"
-    >
-      <i class="bi bi-x-lg icon"></i>
-      <p>취소</p>
-    </button>
-  </div>
+              <v-icon left>mdi-cart</v-icon>
+              <h3>장바구니</h3>
+            </v-btn>
+          </v-col>
+          <v-col cols="4">
+            <v-btn
+              block
+              height="175%"
+              color="grey"
+              text
+              @click="handleCloseButtonClick"
+            >
+              <v-icon left>mdi-close</v-icon>
+              <h3>취소</h3>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
+import { ref, reactive, computed } from "vue";
+
 export default {
   name: "ProductOptionModal",
-  data() {
-    return {
-      numProduct: 1,
-      price: this.selectedProduct.Price,
-
-      //test Data
-      optionTitle: ["안녕", "하세", "요", "이것", "은", "테스트", "최애"],
-      checkBoxOptions: [
-        [1, 2, 3],
-        ["a", "b", "c", "d"],
-        ["x", "y", "z"],
-      ],
-      radioOptions: [
-        ["q", "w", "e", "r"],
-        ["ㄱ", "ㄴ", "ㄷ"],
-        ["Yes", "No"],
-        ["족발", "피자", "보쌈", "치킨"],
-      ],
-    };
-  },
   props: {
-    selectedProduct: Object,
-  },
-
-  methods: {
-    subNumProduct() {
-      if (this.numProduct <= 1) {
-        alert("1개 이하로 주문 하실 수 없습니다");
-      } else {
-        this.numProduct--;
-      }
+    selectedProduct: {
+      type: Object,
+      required: true,
     },
+    tag: {
+      type: Array,
+      required: true,
+    },
+    option: {
+      type: Array,
+      required: true,
+    },
+    category: {
+      type: String,
+      required: true
+    },
+  },
+  setup(props, { emit }) {
+    const numProduct = ref(1);
+    const optionPrices = reactive({});
+
+    //const selectedOptionIds = reactive([]);
+    const temp = ref(true);
+    const selectedOption = reactive(Array(props.tag.length).fill(undefined));
+    const totalOption = reactive({});
+    const price = computed(() => parseInt(props.selectedProduct.price));
+    const optionPrice = computed(() => {
+      return Object.values(optionPrices).reduce(
+        (sum, price) => sum + parseInt(price),
+        0
+      );
+    });
+    const totalPrice = computed(
+      () => (price.value + optionPrice.value) * numProduct.value
+    );
+
+    const subNumProduct = () => {
+      if (numProduct.value > 1) {
+        numProduct.value--;
+      } else {
+        alert("1개 이하로 주문 하실 수 없습니다");
+      }
+    };
+    
+    const getOptionByID = (tag) => {
+      return props.option.filter((option) => option.tag === tag.id);
+    };
+
+    const setOptionPrice = (tag, option) => {
+      optionPrices[tag.id] = option.price;
+      totalOption[tag.id] = {
+        tagName: tag.name,
+        optionId: option.id,
+        optionName: option.name,
+        optionPrice: option.price
+      };
+
+    };
+
+    const getCategoryNameById = (id) => {
+      const category = this.categories.find(cat => cat.id === id);
+      return category ? category.name : null;
+    };
+    
+    const getImageSrc = () => {
+      return "https://picsum.photos/100?random=1";
+
+    };
+
+    const getImageUrl = (imageFileName) => {
+      if (!imageFileName) {
+        return "https://picsum.photos/100?random=1";
+      }
+      return `/image/${imageFileName}`;
+    };
+
+    const handlePickProduct = () => {
+      if (selectedOption.includes(undefined)) {
+        alert("옵션을 전부 선택해 주세요");
+      } else {
+        emit("pickProduct", {
+          num: numProduct.value,
+          price: price.value + optionPrice.value,
+          option: Object.values(totalOption),
+          optionPrice: optionPrice.value
+        });
+      }
+    };
+
+    const playClickSound = () => {
+      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
+      clickSound.play().catch((error) => {
+        console.error("Error playing click sound:", error);
+      });
+    };
+
+    const handlePickProductClick = () => {
+      playClickSound();
+      handlePickProduct();
+    };
+
+    const handleCloseButtonClick = () => {
+      playClickSound();
+      emit("closeProductOptionModal");
+    };
+
+    const handleSubNumProductClick = () => {
+      playClickSound();
+      subNumProduct();
+    };
+
+    const handleAddNumProductClick = () => {
+      playClickSound();
+      numProduct.value++;
+    };
+
+    return {
+      numProduct,
+      optionPrices,
+      temp,
+      selectedOption,
+      price,
+      optionPrice,
+      totalPrice,
+      subNumProduct,
+      getOptionByID,
+      setOptionPrice,
+      getImageUrl,
+      handlePickProduct,
+      playClickSound,
+      handlePickProductClick,
+      handleCloseButtonClick,
+      handleSubNumProductClick,
+      handleAddNumProductClick,
+      getCategoryNameById,
+    };
   },
 };
 </script>
-
-<style>
-body {
-  margin: 0;
-}
-
-div {
-  box-sizing: border-box;
-}
-
-.black-bg {
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  position: fixed;
-  padding: 20px;
-
-  top: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.white-bg {
-  width: 50%;
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  max-height: 90%;
-  overflow-y: auto;
-  overflow-x: visible;
-}
-
-.futter {
-  width: 100%;
-  height: 15%;
-  position: fixed;
-  bottom: 0;
-  z-index: 1001;
-}
-
-.icon {
-  font-size: xx-large;
-}
-
-.option-container {
-  margin: 5%;
-}
-
-.vol-btn {
-  margin-bottom: 20%;
-}
-</style>
