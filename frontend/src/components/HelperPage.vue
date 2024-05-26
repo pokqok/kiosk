@@ -83,6 +83,10 @@
       @payment="payment"
       @pickProduct="pickProduct"
       :selectedProduct="selectedProduct"
+      :tag=filteredTagsByProductId().tags
+      :option=filteredTagsByProductId().options
+      :category="getCategoryNameById(selectedProduct.category)"
+
       v-if="showOptionModal"
     />
     <CartModal
@@ -341,13 +345,42 @@ export default {
           this.response = result.data.message;
           this.loading = false;
           this.step = 2;
-          const responseItems = this.response.split("\n").map((line) => {
-            const match = line.match(/\.\s*(.*?)\s*-/);
-            return match ? match[1] : null;
-          });
-          this.filteredItems = this.testdata.filter((item) =>
-            responseItems.includes(item.ProductName)
+
+          // // 응답을 바탕으로 아이템 필터링
+          // const responseItems = this.response.split("\n").map((line) => {
+          //   const match = line.match(/\[(.*?)\]/);
+          //   console.log("추가적 처리중입니다");
+          //   return match ? match[1] : null;
+          // });
+
+          const responseItems = this.response.match(/\[(\d+(?:,\s*\d+)*)\]/m);
+
+          // if (responseItems) {
+          //     const matchString = responseItems[1];
+          //     const productIds = matchString.split(',').map(id => parseInt(id.trim()));
+          //     console.log("최종 배열 값: ", productIds);
+          // } else {
+          //     console.log("배열 찾기 실패");
+          // }
+
+          //const matchItem = this.response.match(/productId:\s*\[([^\]]+)\]/);
+          // let match = str.match(/\[(.*?)\]/);
+         // let totalArray = matchArray ? result.split(",").map(Number) : [];
+
+          // testdata.js 데이터에서 응답에 포함된 항목만 추출
+          console.log("전체 결과:",result.data.message);
+          console.log("this is what you Got: ",responseItems[1]);
+          //  this.filteredItems = this.products.filter((item) =>
+          //    responseItems[1].includes(item.id)
+          //  );
+          const responseArray = responseItems[1].split(',').map(item => parseInt(item.trim(), 10));
+          console.log("배열 변환 결과 ",responseArray);
+
+          this.filteredItems = this.products.filter((item) =>
+            responseArray.includes((item.id)) // item.id를 문자열로 변환하여 비교
           );
+          console.log("필터링 결과는: ",this.filteredItems);
+        
         })
         .catch((error) => {
           console.error("Error sending chat:", error);
@@ -392,11 +425,23 @@ export default {
     pickProduct($event) {
       this.stopOptionAudio();
       this.showOptionModal = false;
-      for (let i = 0; i < $event; i++) {
-        this.addCart(this.selectedProduct);
+
+      console.log("개수: ", $event.num);
+      console.log("가격:", $event.price);
+      console.log("옵션:",$event.option);
+      for (let i = 0; i < $event.num; i++) {
+        this.addCart({
+          product: {
+            name: this.selectedProduct.name,
+            price: $event.price,
+          },
+          options: $event.option,
+        });
         this.setTotalPrice(this.selectedProduct.Price);
+
       }
       this.showCartModal = true;
+      console.log("장바구니 크기:",this.cart.length);
     },
     subProduct($event) {
       this.subCart($event);
