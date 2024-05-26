@@ -135,6 +135,7 @@ export default {
   setup(props, { emit }) {
     const numProduct = ref(1);
     const optionPrices = reactive({});
+
     //const selectedOptionIds = reactive([]);
     const temp = ref(true);
     const selectedOption = reactive(Array(props.tag.length).fill(undefined));
@@ -170,6 +171,7 @@ export default {
         optionName: option.name,
         optionPrice: option.price
       };
+
     };
 
     const getCategoryNameById = (id) => {
@@ -179,13 +181,12 @@ export default {
     
     const getImageSrc = () => {
       return "https://picsum.photos/100?random=1";
+
     };
 
-    const getImageUrl = (imageFileName) =>{
-      // public/image/ 디렉토리에서 이미지를 가져옵니다.
-      console.log(`../../public/image/${imageFileName}`);
-      if(!imageFileName){
-        return "https://picsum.photos/100?random=1"; //비어있는 경우 랜덤 이미지.
+    const getImageUrl = (imageFileName) => {
+      if (!imageFileName) {
+        return "https://picsum.photos/100?random=1";
       }
       return `/image/${imageFileName}`;
     };

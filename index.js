@@ -50,6 +50,8 @@ app.post('/chat', async (req, res) => {
     console.log("Chat request received:", userInput);
     //const menuItems = getMenuItems();
 
+    //const menuItems = getMenuItems();
+
     const items = await getMenuItems(); // getMenuItems()의 실행이 완료될 때까지 대기
     items.forEach(item => {
       const category = item.category;
@@ -66,9 +68,6 @@ app.post('/chat', async (req, res) => {
       console.log("-----------------------");
     });
 
-    //console.log('test:', JSON.stringify(items));
-    console.log(JSON.stringify(Monthly_recommendedItems));
-    
     const generationConfig = {
       temperature: 1,
       topK: 0,
@@ -359,6 +358,7 @@ app.use("/tag", tagRouter);
 const kioskRouter = require("./dto/shopData.js");
 app.use("/kiosk", kioskRouter);
 
+
 //이미지 업로드
 const uploadImage = require('./dto/imageUpload.js');
 app.use('/image', uploadImage);
@@ -367,6 +367,7 @@ const productRouter = require('./dto/product.js');
 app.use('/product', productRouter);
 //-
 //---------------------------------------------------
+
 
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
   server.listen(PORT, () => {

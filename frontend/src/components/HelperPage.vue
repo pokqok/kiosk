@@ -86,6 +86,7 @@
       :tag=filteredTagsByProductId().tags
       :option=filteredTagsByProductId().options
       :category="getCategoryNameById(selectedProduct.category)"
+
       v-if="showOptionModal"
     />
     <CartModal
@@ -345,8 +346,6 @@ export default {
           this.loading = false;
           this.step = 2;
 
-     
-
           // // 응답을 바탕으로 아이템 필터링
           // const responseItems = this.response.split("\n").map((line) => {
           //   const match = line.match(/\[(.*?)\]/);
@@ -426,6 +425,7 @@ export default {
     pickProduct($event) {
       this.stopOptionAudio();
       this.showOptionModal = false;
+
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
       console.log("옵션:",$event.option);
@@ -437,6 +437,8 @@ export default {
           },
           options: $event.option,
         });
+        this.setTotalPrice(this.selectedProduct.Price);
+
       }
       this.showCartModal = true;
       console.log("장바구니 크기:",this.cart.length);
