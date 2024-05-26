@@ -32,7 +32,7 @@
             :key="i"
             :href="'#CategoryTitle' + i.name"
           >
-            <h4>Category {{ i.name }}</h4>
+            #{{ i.name }}
           </v-tab>
         </v-tabs>
       </template>
@@ -69,6 +69,7 @@
     v-if="showOptionModal"
     :tag="filteredTagsByProductId().tags"
     :option="filteredTagsByProductId().options"
+    :category="getCategoryNameById(selectedProduct.category)"
   />
 
   <CartModal @subProduct="subProduct" @payment="payment" v-if="showCartModal" />
@@ -339,6 +340,18 @@ export default {
     goToBack() {
       this.$store.commit("clearCart");
       this.$router.push("/order-type/common");
+    },
+
+    playClickSound() {
+      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
+      clickSound.play().catch((error) => {
+        console.error("Error playing click sound:", error);
+      });
+    },
+
+    getCategoryNameById(id) {
+      const category = this.categories.find(cat => cat.id === id);
+      return category ? category.name : null;
     },
   },
 };
