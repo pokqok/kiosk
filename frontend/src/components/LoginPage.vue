@@ -1,15 +1,18 @@
 <template>
-  <v-container class="login-page">
-    <div style="width: 20%">
-      <v-img v-if="$route.params.mode == 'shop'" src="../assets/logo.png" />
-      <v-img
-        class="ma-5"
-        v-if="$route.params.mode == 'admin'"
-        src="../assets/admin.png"
-      />
+  <div class="login-page">
+    <div style="display: flex; justify-content: center; align-items: center">
+      <div style="width: 15%; height: 15%">
+        <v-img v-if="$route.params.mode == 'shop'" src="../assets/logo.png" />
+        <v-img v-if="$route.params.mode == 'admin'" src="../assets/admin.png" />
+      </div>
     </div>
 
-    <v-form ref="form" v-model="valid" lazy-validation style="width: 50%">
+    <v-form
+      ref="form"
+      v-model="valid"
+      lazy-validation
+      style="margin-left: 25%; margin-right: 25%"
+    >
       <v-text-field
         v-model="email"
         :rules="IDRules"
@@ -30,13 +33,11 @@
     </v-form>
 
     <button @click="handleGoToRootPageClick">메인 페이지로 돌아가기</button>
-  </v-container>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
-import clickSoundFile from "@/assets/click-sound.mp3";
-
 export default {
   name: "LoginPage",
   data() {
@@ -59,6 +60,7 @@ export default {
           if (response.data.success) {
             console.log("LOGIN SUCCESS");
             alert("로그인 완료되었습니다.");
+            // 관리자 페이지로 이동
             this.$router.push("/admin/" + response.data.userID); // 이동할 페이지 위치
           } else {
             alert("로그인 실패: " + response.data.message);
@@ -91,13 +93,6 @@ export default {
       this.$emit("comeBack");
     },
 
-    playClickSound() {
-      const clickSound = new Audio(clickSoundFile);
-      clickSound.play().catch((error) => {
-        console.error("Error playing click sound:", error);
-      });
-    },
-
     handleLoginClick() {
       this.playClickSound();
       this.login();
@@ -107,6 +102,19 @@ export default {
       this.playClickSound();
       this.goToRootPage();
     },
+
+    playClickSound() {
+      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
+      clickSound.play().catch((error) => {
+        console.error("Error playing click sound:", error);
+      });
+    },
   },
 };
 </script>
+
+<style>
+.login-page {
+  margin-top: 60px;
+}
+</style>
