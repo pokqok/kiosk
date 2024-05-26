@@ -127,7 +127,8 @@ app.post('/chat', async (req, res) => {
 });
 
 // 태그 목록 조회
-app.get("/tags", async (req, res) => {
+/*
+app.get('/tags', async (req, res) => {
   try {
     console.log("태그 목록 조회 요청이 들어왔습니다.");
     // Oracle DB 연결
@@ -146,6 +147,7 @@ app.get("/tags", async (req, res) => {
     res.status(500).send("태그 목록 조회 중 오류가 발생했습니다.");
   }
 });
+*/
 
 // http 요청 들어오면 frontend/dist/index.html 제공
 // app.get("*", (req, res) => {
@@ -154,6 +156,7 @@ app.get("/tags", async (req, res) => {
 app.get("/", (req, res) => {
   res.sendFile("test.html", { root: __dirname });
 });
+
 
 const jwtSecret = "mysecret key";
 
@@ -345,6 +348,11 @@ app.post("/login/shop", (req, res) => {
     res.status(401).json({ success: false, message: "Invalid credentials" });
   }
 });
+
+
+
+
+
 
 //db 연결
 const categoryRouter = require("./dto/categorys.js");

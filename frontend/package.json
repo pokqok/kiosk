@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "jest"
   },
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
@@ -29,7 +30,7 @@
     "stream-browserify": "^3.0.0",
     "vue": "^3.2.13",
     "vue-router": "^4.3.0",
-    "vuetify": "^3.5.15",
+    "vuetify": "^3.6.0-alpha.2",
     "vuex": "^4.0.2",
     "webfontloader": "^1.0.0"
   },
