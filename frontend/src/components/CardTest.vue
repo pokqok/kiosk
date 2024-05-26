@@ -261,7 +261,7 @@
   </script>
 
   <!--제목줄 스타일-->
-<style scoped>
+  <style scoped>
 .subheader {
   font-size: 40px;
   display: flex;
