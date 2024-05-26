@@ -179,10 +179,10 @@ export default {
       return category ? category.name : null;
     };
     
-    const getImageSrc = () => {
-      return "https://picsum.photos/100?random=1";
+    // const getImageSrc = () => {
+    //   return "https://picsum.photos/100?random=1";
 
-    };
+    // };
 
     const getImageUrl = (imageFileName) => {
       if (!imageFileName) {
