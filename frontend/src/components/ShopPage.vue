@@ -4,6 +4,7 @@
     <audio ref="addOrder" :src="addOrderSource" type="audio/mp3"></audio>
     <audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>
     <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
+    <audio ref="clickSound" :src="clickSoundSource" type="audio/mp3"></audio>
     <v-toolbar class="head-container pb-0" tabs>
       <v-col cols="4">
         <v-btn color="white" @click="goToBack">
@@ -44,7 +45,7 @@
 
   <!-- testdata 사용 시 -->
   <v-container v-for="i in testCategory" :key="i">
-    <h4 style="scroll-margin: 140px;" :id="'CategoryTitle' + i.name">
+    <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i.name">
       #{{ i.name }}
     </h4>
     <v-row>
@@ -52,7 +53,7 @@
       <v-col cols="4" v-for="item in filteredProducts(i.id)" :key="item.id">
         <ProductItem
           :product="item"
-          @selectProduct="openProductOptionModal($event)"
+          @selectProduct="handleProductClick($event)"
         ></ProductItem>
       </v-col>
     </v-row>
@@ -85,7 +86,7 @@ export default {
   data() {
     return {
       tab: null,
-      activeCategory: null, // 현재 활성화된 카테고리
+      activeCategory: null,
       showOptionModal: false,
       showCartModal: false,
       selectedProduct: null,
@@ -93,6 +94,7 @@ export default {
       addOrderSource: require("@/assets/장바구니추가.mp3"),
       subOrderSource: require("@/assets/장바구니취소.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
+      clickSoundSource: require("@/assets/click-sound.mp3"), // 추가된 클릭 사운드
     };
   },
 
@@ -152,17 +154,17 @@ export default {
 
       //testdata 사용 시
       return () => {
-        if (!this.selectedProduct) return { tags: [], options: [] }; // 선택된 상품이 없으면 빈 배열 반환
+        if (!this.selectedProduct) return { tags: [], options: [] };
 
-        const productId = this.selectedProduct.id; // 선택된 상품의 ID 가져오기
+        const productId = this.selectedProduct.id;
         const matchedTags = this.testTagMenu.filter(
           (tag) => tag.productId === productId
-        ); // productId와 일치하는 tagMenu 찾기
+        );
 
-        const matchedTagIds = matchedTags.map((tag) => tag.tagId); // 일치하는 tag의 tagId 추출
+        const matchedTagIds = matchedTags.map((tag) => tag.tagId);
         const filteredTags = this.testTag.filter((tag) =>
           matchedTagIds.includes(tag.id)
-        ); // tagId와 일치하는 tag 필터링
+        );
 
         console.log("옵션들:", this.options);
         const matchedOptionIds = [];
@@ -170,13 +172,12 @@ export default {
           const options = this.testOption.filter((option) => option.tag == tag);
           matchedOptionIds.push(...options.map((option) => option.id));
         });
-        // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
+
         const filteredOptions = this.testOption.filter((option) =>
           matchedOptionIds.includes(option.id)
         );
         console.log("선택 상품의 태그들 현황: ", filteredTags);
         console.log("선택 상품의 태그의 옵션들: ", filteredOptions);
-        //return { tags: matchedTags, options: filteredOptions };
         return { tags: filteredTags, options: filteredOptions };
       };
     },
@@ -189,12 +190,6 @@ export default {
   },
 
   mounted() {
-    // if(this.$store.state.ShopID == -1) {
-    //   alert("login error")
-    //   this.$router.push('/login/shop')
-    //   return;
-    // }
-
     window.addEventListener("scroll", this.handleScroll);
     if (this.cart.length != 0) {
       this.showCartModal = true;
@@ -217,22 +212,43 @@ export default {
 
   methods: {
     playMenuAudio() {
-      this.$refs.orderMenu.play();
+      this.resetAndPlay(this.$refs.orderMenu);
     },
     playAddOrderAudio() {
-      this.$refs.addOrder.play();
+      this.resetAndPlay(this.$refs.addOrder);
     },
     playSubOrderAudio() {
-      this.$refs.subOrder.play();
+      this.resetAndPlay(this.$refs.subOrder);
     },
     playOptionAudio() {
-      this.$refs.option.play();
+      this.resetAndPlay(this.$refs.option);
+    },
+    playClickSound() {
+      this.resetAndPlay(this.$refs.clickSound);
     },
     stopAllAudio() {
-      this.$refs.orderMenu.pause();
-      this.$refs.addOrder.pause();
-      this.$refs.subOrder.pause();
-      this.$refs.option.pause();
+      const audios = [
+        this.$refs.orderMenu,
+        this.$refs.addOrder,
+        this.$refs.subOrder,
+        this.$refs.option,
+        this.$refs.clickSound,
+      ];
+      audios.forEach((audio) => {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
+    },
+    resetAndPlay(audio) {
+      this.stopAllAudio();
+      if (audio) {
+        audio.currentTime = 0; // 초기화
+        audio.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
+      }
     },
 
     ...mapMutations([
@@ -242,7 +258,7 @@ export default {
       "setTotalPrice",
       "setProductName",
       "orderType",
-    ]), //결제 시 이름 넣기 추가
+    ]),
 
     handleScroll() {
       //db연결 시
@@ -275,10 +291,12 @@ export default {
       this.showCartModal = false;
     },
 
-    //카테고리별 품목 가져오기
+    handleProductClick(data) {
+      this.playClickSound();
+      this.openProductOptionModal(data);
+    },
+
     filteredProducts(categoryId) {
-      // return this.products.filter(product => product.category == categoryId);
-      //테스트용
       return this.testProduct.filter(
         (product) => product.category == categoryId
       );
@@ -334,7 +352,7 @@ export default {
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
       for (let i = 0; i < $event.num; i++) {
-        console.log("옵션:", $event.option); // 옵션 정보 출력
+        console.log("옵션:", $event.option);
         this.addCart({
           product: {
             name: this.selectedProduct.name,
@@ -383,3 +401,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+h2,
+h4 {
+  color: #70320d;
+  text-align: center;
+}
+
+v-toolbar-title {
+  font-family: MapleStory;
+}
+</style>

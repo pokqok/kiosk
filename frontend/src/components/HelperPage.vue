@@ -13,7 +13,7 @@
     </v-row>
   </div>
 
-  <div style="margin-top: 10%;"></div>
+  <div style="margin-top: 10%"></div>
 
   <v-container>
     <audio ref="menuAudio" :src="menuAudioSource" type="audio/mp3"></audio>
@@ -39,7 +39,7 @@
         </div>
       </div>
     </div>
-    
+
     <div v-if="step == 1">
       <v-progress-circular
         indeterminate
@@ -48,7 +48,7 @@
       ></v-progress-circular>
       <p>인식결과: <span v-html="formattedTranscription"></span></p>
     </div>
-    
+
     <div v-if="step == 2">
       <div v-if="loading">추천 중...</div>
       <v-row v-else>
@@ -305,6 +305,7 @@ export default {
         const response = await axios.post("/api/upload", formData);
         this.$store.commit("setFile", response.data.uploaded_file);
         console.log("upload");
+        console.log("check");
       } catch (error) {
         console.error("Error uploading file:", error);
         throw error; // 에러를 호출자에게 다시 전파
