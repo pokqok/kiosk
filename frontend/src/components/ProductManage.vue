@@ -6,13 +6,14 @@
     </v-subheader>
     <v-divider></v-divider>
 
-    <v-text-field
-      v-model="search"
-      label="Search"
-      solo-inverted
-      hide-details
-      @input="searchItems"
-    ></v-text-field>
+  <v-text-field
+    v-model="search"
+    label="Search"
+    solo-inverted
+    hide-details
+    @input="searchItems"
+  ></v-text-field>
+
 
     <v-sheet class="left-aligned-container" max-width="600">
       <v-slide-group multiple show-arrows v-model="selectedCategorys">
@@ -21,17 +22,12 @@
           :key="n"
           v-slot="{ isSelected, toggle }"
         >
-          <v-btn
-            :color="isSelected ? 'primary' : undefined"
-            class="ma-2"
-            rounded
-            @click="toggle"
-          >
-            {{ n.name }}
-          </v-btn>
-        </v-slide-group-item>
-      </v-slide-group>
-    </v-sheet>
+          {{ n.name }}
+        </v-btn>
+      </v-slide-group-item>
+    </v-slide-group>
+  </v-sheet>
+
 
     <v-table>
       <thead>
@@ -223,10 +219,8 @@
 //import { CategoryData } from "@/data/PageCategory.js";
 import FileUploadModal from "@/components/FileUploadModal.vue";
 import { mapState,} from "vuex";
+
 export default {
-  components: {
-    FileUploadModal
-  },
   data() {
     return {
       search: "",
@@ -269,9 +263,10 @@ export default {
       this.$store.dispatch('fetchCategories');
       this.$store.dispatch('fetchTags');
   },
+
   methods: {
     searchItems() {
-      // 검색기능 구현 예정
+      //검색기능 구현 예정
     },
     showUploadModal(productId) {
       this.selectedProductId = productId;
@@ -366,9 +361,19 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /*버튼의 스타일도 여기에 넣어서 따로 분리할 예정 */
 }
 .left-aligned-container {
-  max-width: none;
-  width: 100%;
+  /* 카테고리 선택 창 스타일*/
+  max-width: none; /* 최대 너비 제한 해제 */
+  width: 100%; /* 페이지 너비에 맞게 설정 */
+  /*아니 이거 크기 어떻게 늘리는데 */
 }
+/*
+.v-slide-group {
+}*/
+
+/* 더 추가해야 할 것
+  드롭다운 박스에서 정렬 순서 지정하는 기능?
+*/
 </style>

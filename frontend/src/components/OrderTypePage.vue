@@ -1,5 +1,5 @@
 <template>
-  <div class="head-container row">
+  <div class="head-container">
     <h2 class="title">실타래 {{ $store.state.ShopID }}</h2>
   </div>
 
@@ -8,25 +8,27 @@
   <v-container>
     <div>
       <audio ref="orderType" :src="orderTypeSource" type="audio/mp3"></audio>
-      <v-btn @click="handleButtonClick('shop')" block class="pa-12">
+      <v-btn @click="handleGoToShop('shop')" block class="pa-12">
         <i class="bi bi-shop" style="font-size: 2rem; margin-right: 10px"></i>
         매장
       </v-btn>
     </div>
     <div>
-      <v-btn @click="handleButtonClick('Packaging')" block class="mt-10 pa-12">
+      <v-btn @click="handleGoToShop('Packaging')" block class="mt-10 pa-12">
         <i class="bi bi-bag" style="font-size: 2rem; margin-right: 10px"></i>
         포장
       </v-btn>
     </div>
   </v-container>
 
-  <v-btn @click="handleBackButtonClick">
+  <v-btn @click="handleGoToBack">
     <i class="bi bi-arrow-90deg-left"></i>
   </v-btn>
 </template>
 
 <script>
+import clickSoundFile from "@/assets/click-sound.mp3";
+
 export default {
   name: "OrderTypePage",
   mounted() {
@@ -44,63 +46,40 @@ export default {
       this.$refs.orderType.play();
     },
     stopAllAudio() {
-      this.resetAudio(this.$refs.orderType);
+      this.$refs.orderType.pause();
     },
-    resetAudio(audio) {
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
+    playClickSound() {
+      const clickSound = new Audio(clickSoundFile);
+      clickSound.play().catch((error) => {
+        console.error("Error playing click sound:", error);
+      });
     },
     goToShop(type) {
-      this.stopAllAudio();
-      if (type === "shop") {
+      if (type == "shop") {
+        this.stopAllAudio();
         this.$store.commit("setOrderType", 0);
-      } else if (type === "Packaging") {
+      } else if (type == "Packaging") {
+        this.stopAllAudio();
         this.$store.commit("setOrderType", 1);
       }
 
-      if (this.$route.params.mode === "common") {
+      if (this.$route.params.mode == "common") {
         this.$router.push("/shop/" + this.$store.state.ShopID);
-      } else if (this.$route.params.mode === "helper") {
+      } else if (this.$route.params.mode == "helper") {
         this.$router.push("/helper/" + this.$store.state.ShopID);
       }
     },
     goToBack() {
       this.$router.push("/mode-select");
     },
-    handleButtonClick(type) {
+    handleGoToShop(type) {
       this.playClickSound();
       this.goToShop(type);
     },
-    handleBackButtonClick() {
+    handleGoToBack() {
       this.playClickSound();
       this.goToBack();
-    },
-    playClickSound() {
-      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
-      clickSound.play().catch((error) => {
-        console.error("Error playing click sound:", error);
-      });
     },
   },
 };
 </script>
-
-<style>
-.head-container {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: #229954;
-  padding: 10px 0;
-  z-index: 100;
-}
-
-.title {
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  margin: 0;
-}
-</style>
