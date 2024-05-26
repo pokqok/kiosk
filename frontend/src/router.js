@@ -1,5 +1,3 @@
-// ./src/router.js
-
 import { createWebHistory, createRouter } from "vue-router";
 import AdminPage from "./components/AdminPage.vue";
 import LoginPage from "./components/LoginPage.vue";
@@ -18,6 +16,7 @@ import RecommendView from "./components/RecommendView.vue";
 import IntegratedComponent from "./components/IntegratedComponent.vue";
 import HelperPage from "./components/HelperPage.vue";
 import OrderReceive from "./components/OrderReceive.vue"; // OrderReceive 컴포넌트 임포트
+import SalesPage from "./components/SalesPage.vue"; // SalesPage 컴포넌트 임포트
 
 const routes = [
   {
@@ -53,20 +52,12 @@ const routes = [
         component: UserManage
       },
       {
-        path: '/product-manage', component: ProductManage
-      },
-      {
-        path: '/category-manage', component: CategoryManage
-      },
-      {
-        path: '/tag-manage', component: TagManage
-      },
-      {
-        path: '/kiosk-manage', component: KioskManage
-      },
-      {
         path: 'order-receive',
         component: OrderReceive // 새로운 라우트 추가
+      },
+      {
+        path: 'sales-page',
+        component: SalesPage // 매출 내역 페이지 라우트 추가
       }
     ]
   },
@@ -80,6 +71,7 @@ const routes = [
   },
   {
     path: '/payment',
+    name: 'PaymentPage',
     component: PaymentPage,
   },
   {
