@@ -7,10 +7,10 @@
           <audio ref="paymentCompletedAudio" :src="paymentCompletedAudioSource" type="audio/mp3"></audio>
           <audio ref="kakaoPayAudio" :src="kakaoPayAudioSource" type="audio/mp3"></audio>
           <audio ref="normalPayAudio" :src="normalPayAudioSource" type="audio/mp3"></audio>
-          <v-btn @click="$router.go(-1 - 2 * cntCanclePay)" style="background-color: #009688">
-            <i class="bi bi-x-lg icon"></i>
-            <p>취소</p>
-          </v-btn>
+          <v-btn color="white" @click="$router.go(-1 - 2 * cntCanclePay)">
+          <v-icon left>mdi-arrow-left</v-icon>
+          <p>취소</p>
+        </v-btn>
         </v-col>
         <v-col cols="4">
           <h2 class="title col-4">결제 방법 선택</h2>

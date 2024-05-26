@@ -6,7 +6,7 @@
     <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
     <v-toolbar class="head-container pb-0" tabs>
       <v-col cols="4">
-        <v-btn color="white" @click="goToBack">
+        <v-btn color="black" @click="goToBack" style="background-color: white">
           <v-icon left>mdi-arrow-left</v-icon>
           <p>뒤로가기</p>
         </v-btn>
