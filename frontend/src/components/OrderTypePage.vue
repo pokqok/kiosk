@@ -23,6 +23,7 @@
 
   <v-btn @click="goToBack">
     <i class="bi bi-arrow-90deg-left"></i>
+    <p class="ml-2">뒤로가기</p>
   </v-btn>
 </template>
 

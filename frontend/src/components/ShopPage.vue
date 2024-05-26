@@ -38,13 +38,13 @@
     </v-toolbar>
   </div>
 
-  <div style="margin-top: 140px"></div>
+  <div style="margin-top: 120px"></div>
   <!-- db연결 시 -->
   <!-- <v-container v-for="i in categories" :key="i"> -->
 
   <!-- testdata 사용 시 -->
   <v-container v-for="i in testCategory" :key="i">
-    <h4 style="scroll-margin: 140px;" :id="'CategoryTitle' + i.name">
+    <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i.name">
       #{{ i.name }}
     </h4>
     <v-row>
@@ -58,6 +58,7 @@
     </v-row>
     <v-divider class="my-5"></v-divider>
   </v-container>
+
 
   <!-- 이부분에 테스트 데이터는 아래 두개 filtered 메서드 부분에서 변경해줘야함 -->
   <ProductOptionModal

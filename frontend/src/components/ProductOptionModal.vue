@@ -22,8 +22,7 @@
             </v-row>
             <v-row>
               <v-col
-                class="d-flex justify-center"
-                style="display: flex; flex-direction: column; align-items: center;"
+                class="d-flex flex-column justify-center align-center"
                 cols="4"
               >
                 <v-btn icon @click="handleSubNumProductClick">
@@ -35,8 +34,7 @@
                 <span>{{ numProduct }}</span>
               </v-col>
               <v-col
-                class="d-flex justify-center"
-                style="display: flex; flex-direction: column; align-items: center;"
+                class="d-flex flex-column justify-center align-center"
                 cols="4"
               >
                 <v-btn icon @click="handleAddNumProductClick">
@@ -56,11 +54,14 @@
                 v-model="selectedOption[i]"
                 color="primary"
                 mandatory
-                dense
+                divided
+                variant="outlined"
+                rounded="xl"
               >
                 <v-btn
                   v-for="options in getOptionByID(tags)"
                   :key="options.id"
+                  class="ma-0"
                   @click="setOptionPrice(tags, options)"
                 >
                   {{ options.name }} ({{ options.price }}원)
@@ -72,7 +73,7 @@
       </v-container>
       <v-card-actions class="justify-end mb-12 mr-5">
         <v-row>
-          <v-col cols="4">
+          <v-col cols="6">
             <v-btn
               block
               height="175%"
@@ -80,11 +81,11 @@
               text
               @click="handlePickProductClick"
             >
-              <v-icon left>mdi-cart</v-icon>
-              <h3>장바구니</h3>
+              <v-icon size="x-large" left>mdi-cart</v-icon>
+              <h2>장바구니</h2>
             </v-btn>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="6">
             <v-btn
               block
               height="175%"
@@ -92,8 +93,8 @@
               text
               @click="handleCloseButtonClick"
             >
-              <v-icon left>mdi-close</v-icon>
-              <h3>취소</h3>
+              <v-icon size="x-large" left>mdi-close</v-icon>
+              <h2>취소</h2>
             </v-btn>
           </v-col>
         </v-row>

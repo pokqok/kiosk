@@ -20,7 +20,7 @@
 
     <v-container>
       <v-row style="margin-top: 12%">
-        <v-col cols="4">
+        <v-col cols="6">
           <v-btn @click="requestPay" block height="150%">
             <span style="display: flex; flex-direction: column; align-items: center">
               <i class="bi bi-credit-card pay-icon"></i>
@@ -28,7 +28,7 @@
             </span>
           </v-btn>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="6">
           <v-btn @click="requestPayKakao" block height="150%">
             <span style="display: flex; flex-direction: column; align-items: center">
               <i class="bi bi-chat-fill pay-icon"></i>

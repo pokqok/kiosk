@@ -58,7 +58,7 @@ button {
 }
 
 button:hover {
-  background-color: #2980b9; /* 호버 시 버튼 색상 진한 파란색으로 변경 */
+  background-color: #52a0ce; /* 호버 시 버튼 색상 진한 파란색으로 변경 */
   box-shadow: 0 4px 10px rgba(52, 152, 219, 0.7); /* 호버 시 그림자 효과 강조 */
 }
 
@@ -76,7 +76,8 @@ input[type="number"] {
   position: fixed;
   top: 0;
   width: 100%;
-  background-color: rgb(70, 130, 180); /* #229954; */
+  background: linear-gradient(90deg, #87cefa, #4682b4);
+  /* background-color: rgb(70, 130, 180); #229954; */
   color: white;
   padding: 10px;
   z-index: 100;

@@ -24,13 +24,18 @@
   </v-container>
 
   <!-- 미구현 -->
-  <v-flex xs12 sm6 class="py-2">
+  <div class="d-flex align-center flex-column">
     <h5 style="margin-top: 10%">언어선택</h5>
-    <v-btn-toggle v-model="Language" mandatory>
-      <v-btn flat> 한국어 </v-btn>
-      <v-btn flat> Eng </v-btn>
+    <v-btn-toggle
+      v-model="Language"
+      mandatory
+      variant="outlined"
+      rounded="xl"
+    >
+      <v-btn class="ma-0 my-1" size="large"> 한국어 </v-btn>
+      <v-btn class="ma-0 my-1" size="large"> Eng </v-btn>
     </v-btn-toggle>
-  </v-flex>
+  </div>
 </template>
 
 <script>
