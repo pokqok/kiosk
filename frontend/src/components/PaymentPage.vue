@@ -1,70 +1,51 @@
 <template>
-  <div class="head-container">
-    <v-row>
-      <v-col cols="4">
-        <audio
-          ref="paymentAudio"
-          :src="paymentAudioSource"
-          type="audio/mp3"
-        ></audio>
-        <audio
-          ref="paymentCompletedAudio"
-          :src="paymentCompletedAudioSource"
-          type="audio/mp3"
-        ></audio>
-        <audio
-          ref="kakaoPayAudio"
-          :src="kakaoPayAudioSource"
-          type="audio/mp3"
-        ></audio>
-        <audio
-          ref="normalPayAudio"
-          :src="normalPayAudioSource"
-          type="audio/mp3"
-        ></audio>
-        <audio
-          ref="clickSound"
-          :src="clickSoundSource"
-          type="audio/mp3"
-        ></audio>
-        <v-btn
-          @click="$router.go(-1 - 2 * cntCanclePay)"
-          style="background-color: #009688"
-        >
-          <i class="bi bi-x-lg icon"></i>
-          <p>취소</p>
-        </v-btn>
-      </v-col>
-      <v-col cols="4">
-        <h2 class="title col-4">결제 방법 선택</h2>
-      </v-col>
-    </v-row>
-  </div>
+  <div>
+    <div class="head-container">
+      <v-row>
+        <v-col cols="4">
+          <audio ref="paymentAudio" :src="paymentAudioSource" type="audio/mp3"></audio>
+          <audio ref="paymentCompletedAudio" :src="paymentCompletedAudioSource" type="audio/mp3"></audio>
+          <audio ref="kakaoPayAudio" :src="kakaoPayAudioSource" type="audio/mp3"></audio>
+          <audio ref="normalPayAudio" :src="normalPayAudioSource" type="audio/mp3"></audio>
+          <v-btn @click="$router.go(-1 - 2 * cntCanclePay)" style="background-color: #009688">
+            <i class="bi bi-x-lg icon"></i>
+            <p>취소</p>
+          </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <h2 class="title col-4">결제 방법 선택</h2>
+        </v-col>
+      </v-row>
+    </div>
 
-  <v-container>
-    <v-row style="margin-top: 12%">
-      <v-col cols="4">
-        <v-btn @click="requestPay" block height="150%">
-          <span
-            style="display: flex; flex-direction: column; align-items: center"
-          >
-            <i class="bi bi-credit-card pay-icon"></i>
-            <h2 style="margin: 0">카드 결제</h2>
-          </span>
-        </v-btn>
-      </v-col>
-      <v-col cols="4">
-        <v-btn @click="requestPayKakao" block height="150%">
-          <span
-            style="display: flex; flex-direction: column; align-items: center"
-          >
-            <i class="bi bi-chat-fill pay-icon"></i>
-            <h2 style="margin: 0">카카오 페이</h2>
-          </span>
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+    <v-container>
+      <v-row style="margin-top: 12%">
+        <v-col cols="4">
+          <v-btn @click="requestPay" block height="150%">
+            <span style="display: flex; flex-direction: column; align-items: center">
+              <i class="bi bi-credit-card pay-icon"></i>
+              <h2 style="margin: 0">카드 결제</h2>
+            </span>
+          </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-btn @click="requestPayKakao" block height="150%">
+            <span style="display: flex; flex-direction: column; align-items: center">
+              <i class="bi bi-chat-fill pay-icon"></i>
+              <h2 style="margin: 0">카카오 페이</h2>
+            </span>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <v-dialog v-model="showModal" max-width="500">
+      <v-card class="square-modal">
+        <v-card-title class="headline large-text">결제 완료</v-card-title>
+        <v-card-text class="order-number-text">주문번호: {{ orderNumber }}</v-card-text>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
@@ -82,17 +63,24 @@ export default {
       paymentCompletedAudioSource: require("@/assets/결제 완료.mp3"),
       kakaoPayAudioSource: require("@/assets/카카오페이.mp3"),
       normalPayAudioSource: require("@/assets/일반결제.mp3"),
-      clickSoundSource: require("@/assets/click-sound.mp3"),
+      showModal: false, // 모달 표시 여부
+      orderNumber: null, // 주문번호
     };
   },
 
   computed: {
-    ...mapState(["productName", "totalPrice"]),
+    ...mapState(["productName", "totalPrice", "cart", "orderCounter"]),
   },
 
   mounted() {
+    if (this.$store.state.ShopID == -1) {
+      alert("login error");
+      this.$router.push('/login/shop');
+      return;
+    }
+
     this.IMP.init("imp03664607");
-    this.playClickSoundThenPaymentAudio();
+    this.playPaymentAudio();
   },
 
   methods: {
@@ -118,20 +106,6 @@ export default {
       this.$refs.kakaoPayAudio.pause();
       this.$refs.normalPayAudio.pause();
     },
-    playClickSoundThenPaymentAudio() {
-      const clickSound = this.$refs.clickSound;
-      clickSound
-        .play()
-        .then(() => {
-          clickSound.onended = () => {
-            this.playPaymentAudio();
-          };
-        })
-        .catch((error) => {
-          console.error("Error playing click sound:", error);
-          this.playPaymentAudio(); // In case click sound fails, still play payment audio
-        });
-    },
 
     requestPay() {
       console.log("결제 시작 진입 성공 (여기서 totalPrice는:",this.totalPrice)
@@ -144,7 +118,7 @@ export default {
           pg: "html5_inicis.INIpayTest",
           merchant_uid: merchantUid,
           name: this.productName,
-          //goodsname: this.productName,
+          goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -191,6 +165,7 @@ export default {
           pay_method: "kakaopay",
           merchant_uid: merchantUid,
           name: this.productName,
+          goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
           buyer_name: "포트원 기술지원팀",
@@ -228,25 +203,45 @@ export default {
               this.clearCart();
           } else {
             alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
-            this.$store.commit("decrementOrderCounter");
             this.cntCanclePay++;
           }
         }
       );
     },
 
+    handlePaymentSuccess(merchantUid) {
+      this.playPaymentCompletedAudio();
+
+      // Vuex 뮤테이션 호출하여 cart 내용을 orders에 추가
+      this.$store.commit("addCartToOrders");
+      console.log("현재 주문 목록:", this.$store.state.orders);
+
+      // 주문번호 설정
+      this.orderNumber = this.$store.state.orderCounter; // store의 orderCounter로 설정
+
+      // 모달 표시
+      this.showModal = true;
+
+      // 결제 데이터를 저장
+      this.savePaymentData(merchantUid, this.totalPrice);
+
+      // 카트 비우기
+      this.$store.commit("clearCart");
+      console.log('Cart after clearCart:', this.$store.state.cart); // clearCart 후 cart 출력
+
+      // 5초 후 모드 선택 페이지로 이동
+      setTimeout(() => {
+        this.showModal = false;
+        console.log("모드 선택 페이지로 이동합니다.");
+        this.$router.push("/mode-select");
+      }, 5000);
+    },
+
     savePaymentData(merchantUid, totalPrice) {
-      axios
-        .post("/api/payments/save", {
-          merchant_uid: merchantUid,
-          total_price: totalPrice,
-        })
-        .then((response) => {
-          console.log("Payment data saved successfully:", response);
-        })
-        .catch((error) => {
-          console.error("Failed to save payment data:", error);
-        });
+      console.log("Payment data saved successfully:", {
+        merchant_uid: merchantUid,
+        total_price: totalPrice,
+      });
     },
   },
 };
@@ -271,5 +266,31 @@ export default {
 
 .pay-icon {
   font-size: 150px;
+}
+
+.square-modal {
+  width: 500px;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.large-text {
+  font-size: 36px;
+  text-align: center;
+}
+
+.order-number-text {
+  font-size: 48px; /* 주문번호 글자 크기를 더 크게 설정 */
+  text-align: center;
+}
+
+.v-card-title, .v-card-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
 }
 </style>
