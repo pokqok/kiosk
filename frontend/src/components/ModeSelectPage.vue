@@ -7,7 +7,8 @@
   <audio ref="modeSelect" :src="modeSelectSource" type="audio/mp3"></audio>
   <v-container>
     <div>
-      <v-btn @click="handleButtonClick('common')" block class="pa-12">
+      <!-- <v-btn @click="handleButtonClick('common')" block class="pa-12"> -->
+      <v-btn @click="goToNext('common')" block class="pa-12">
         <i
           class="bi bi-hand-index-thumb"
           style="font-size: 2rem; margin-right: 10px"
@@ -16,7 +17,8 @@
       </v-btn>
     </div>
     <div>
-      <v-btn @click="handleButtonClick('helper')" block class="mt-10 pa-12">
+      <!-- <v-btn @click="handleButtonClick('helper')" block class="mt-10 pa-12"> -->
+        <v-btn @click="goToNext('helper')" block class="mt-10 pa-12">
         <i class="bi bi-mic" style="font-size: 2rem; margin-right: 10px"></i>
         도우미 모드
       </v-btn>
@@ -58,16 +60,18 @@ export default {
     stopAllAudio() {
       this.$refs.modeSelect.pause();
     },
-    handleButtonClick(mode) {
-      this.playClickSound();
-      this.goToNext(mode);
-    },
-    playClickSound() {
-      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
-      clickSound.play().catch((error) => {
-        console.error("Error playing click sound:", error);
-      });
-    },
+
+    //dev에선 사용 안함
+    // handleButtonClick(mode) {
+    //   this.playClickSound();
+    //   this.goToNext(mode);
+    // },
+    // playClickSound() {
+    //   const clickSound = new Audio(require("@/assets/click-sound.mp3"));
+    //   clickSound.play().catch((error) => {
+    //     console.error("Error playing click sound:", error);
+    //   });
+    // },
   },
 
   // 로그인 정보 받아올 수 있을 때 사용
@@ -80,4 +84,4 @@ export default {
 };
 </script>
 
-<style></style>
+<!-- <style></style> -->

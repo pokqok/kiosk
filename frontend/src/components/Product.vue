@@ -41,15 +41,11 @@ export default {
     }, 100);
   },
   methods: {
-    getImageSrc(item) {
-      // 이미지 경로가 비어있을 경우 빈 이미지를 반환하고,
-      // 비어있지 않을 경우 제품 이미지 경로를 반환합니다.
-      //return image ? image:"https://picsum.photos/100?random=1";
-      console.log("가져온 데이터 테스트: ",item)
-      
-      console.log("가져온 이름들 ",item.id)
-      return "https://picsum.photos/100?random=1";
-    },
+    // getImageSrc(item) {
+    //  //필요 없는 기능, getImageUrl이 대체한다.
+    //   console.log("가져온 데이터 테스트: ",item)
+    //   return "https://picsum.photos/100?random=1";
+    // },
     
     getImageUrl(imageFileName) {
       // public/image/ 디렉토리에서 이미지를 가져옵니다.
@@ -64,7 +60,7 @@ export default {
 };
 </script>
 
-<style>
+<!-- <style>
 .product {
   background-color: white;
   border: 1px solid #e1e1e1;
@@ -110,4 +106,4 @@ export default {
   color: #666;
   margin: 5px 0 0;
 }
-</style>
+</style> -->

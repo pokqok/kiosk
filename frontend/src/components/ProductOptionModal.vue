@@ -1,11 +1,5 @@
 <template>
-  <v-dialog
-    v-model="temp"
-    width="80%"
-    height="80%"
-    persistent
-    style="overflow-y: scroll"
-  >
+  <v-dialog v-model="temp" width="80%" persistent>
     <v-card>
       <v-container fluid>
         <v-row>
@@ -30,6 +24,9 @@
           <v-col md="6">
             <v-row class="d-flex justify-center mt-5">
               <h2>{{ selectedProduct.name }}</h2>
+            </v-row>
+            <v-row class="d-flex justify-center mt-2">
+              <p>{{ selectedProduct.detail }}</p>
             </v-row>
             <v-row>
               <v-col
@@ -82,7 +79,7 @@
                   :key="options.id"
                   @click="setOptionPrice(tags, options)"
                 >
-                  {{ options.name }}
+                  {{ options.name }} ({{ parseInt(options.price) }}원)
                 </v-btn>
               </v-btn-toggle>
             </div>
@@ -196,9 +193,10 @@ export default {
       return category ? category.name : null;
     };
     
-    const getImageSrc = () => {
-      return "https://picsum.photos/100?random=1";
-    };
+    // const getImageSrc = () => {
+    //   //이제 필요없는 기능
+    //   return "https://picsum.photos/100?random=1";
+    // };
 
     const getImageUrl = (imageFileName) =>{
       // public/image/ 디렉토리에서 이미지를 가져옵니다.
@@ -276,7 +274,7 @@ export default {
       subNumProduct,
       getOptionByID,
       setOptionPrice,
-      getImageSrc,
+      //getImageSrc,
       getImageUrl,
       handlePickProduct,
       playClickSound,
@@ -290,7 +288,7 @@ export default {
 };
 </script>
 
-<style>
+<!-- <style>
 body {
   margin: 0;
 }
@@ -312,4 +310,4 @@ div {
 .icon {
   font-size: xx-large;
 }
-</style>
+</style> -->

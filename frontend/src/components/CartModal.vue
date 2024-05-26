@@ -27,12 +27,10 @@
       </v-col>
       <v-btn
         @click="handlePayment"
-        class="btn-fixed shadow"
-        width="30%"
-        height="10%"
-        style="margin-right: 5%"
+        class="shadow cart-fix-btn"
+          height="20%"
       >
-        <v-icon left size="x-large" style="margin-right: 10%">bi-coin</v-icon>
+        <v-icon left size="xx-large" style="margin-right: 10%">bi-coin</v-icon>
         <p>결제</p>
       </v-btn>
     </v-row>
@@ -58,9 +56,14 @@ export default {
     removeFromCart(item, index) {
       this.playClickSound();
       const audio = this.$refs.subOrder;
-      audio.pause();
-      audio.currentTime = 0;
-      audio.play();
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.play().catch(error => {
+          console.error("Error playing subOrder sound:", error);
+        });
+      }
+      //이거 둘중 하나 뺴야할지 고민중
       this.subCart(index);
       this.$emit("subProduct", item);
     },
@@ -69,20 +72,26 @@ export default {
       console.log("handlePayment");
       if (this.totalPrice > 0) {
         this.$emit("payment", {num: this.cart.length, price: this.totalPrice, option: this.cart.option});
-        //그래서 형식이 어떻게 된 건지는 잘 몰라서 일단 대충 넣어둠
+
+        //dev에선 위에거 대신 이걸 이용
+        // this.$emit("payment", this.totalPrice);
+        // this.$router.push({ name: 'PaymentPage' });
+        
         console.log("카트에서 결제함-결제금액: ", this.totalPrice);
-        //this.clearCart(); 해당 clean Cart는 shopPage로 이동했다.
+        //clean Cart는 shopPage로 이동했다.
       } else {
         alert("장바구니가 비어 있습니다.");
       }
     },
     playClickSound() {
       const clickSound = this.$refs.clickSound;
-      clickSound.pause();
-      clickSound.currentTime = 0;
-      clickSound.play().catch((error) => {
-        console.error("Error playing click sound:", error);
-      });
+      if (clickSound) {
+        clickSound.pause();
+        clickSound.currentTime = 0;
+        clickSound.play().catch(error => {
+          console.error("Error playing click sound:", error);
+        });
+      }
     },
     formatOptionsString(optionsArray) { //options를 받아서 문자열로 변환
       //console.log(optionsArray)
@@ -93,10 +102,17 @@ export default {
         +")";
     }
   },
+  watch: {
+    cart(newCart) {
+      if (newCart.length === 0) {
+        this.$emit("hideCartModal");
+      }
+    },
+  },
 };
 </script>
 
-<style>
+<!-- <style>
 .cart-container {
   background-color: #f8f9fa;
   height: 25%;
@@ -118,4 +134,4 @@ export default {
 .shadow {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-</style>
+</style> -->

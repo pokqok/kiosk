@@ -4,30 +4,23 @@
     <audio ref="addOrder" :src="addOrderSource" type="audio/mp3"></audio>
     <audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>
     <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
-    <v-toolbar color="#229954" tabs style="position: fixed; z-index: 1000">
+    <!-- <v-toolbar color="#229954" tabs style="position: fixed; z-index: 1000"> -->
+    <v-toolbar class="head-container pb-0" tabs>
       <v-col cols="4">
-        <v-btn @click="handleBackButtonClick" style="background-color: #009688">
+        <!-- <v-btn @click="handleBackButtonClick" style="background-color: #009688"> -->
+        <v-btn color="black" @click="goToBack" style="background-color: white"> 
           <v-icon left>mdi-arrow-left</v-icon>
           <p>뒤로가기</p>
         </v-btn>
       </v-col>
       <v-col cols="4">
-        <v-toolbar-title class="text-center">
+        <!-- <v-toolbar-title class="text-center">
           <h2>실타래 {{ ShopID }}</h2>
-        </v-toolbar-title>
+        </v-toolbar-title> -->
+        <h2>실타래 {{ ShopID }}</h2>
       </v-col>
       <template v-slot:extension>
         <v-tabs v-model="tab" grow>
-          <!-- db 연결 시 -->
-          <!-- <v-tab
-            v-for="i in categories"
-            :key="i"
-            :href="'#CategoryTitle' + i.name"
-          >
-            Category {{ i.name }}
-          </v-tab> -->
-
-          <!-- testdata 사용 시 -->
           <v-tab
             v-for="i in categories"
             :key="i"
@@ -41,10 +34,6 @@
   </div>
 
   <div style="margin-top: 140px"></div>
-  <!-- db연결 시 -->
-  <!-- <v-container v-for="i in categories" :key="i"> -->
-
-  <!-- testdata 사용 시 -->
   <v-container v-for="i in categories" :key="i">
     <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i.name">
       #{{ i.name }}
@@ -52,16 +41,21 @@
     <v-row>
       <!-- test, 나중에 testdata대신 카테고리에 있는 메뉴목록 -->
       <v-col cols="4" v-for="item in filteredProducts(i.id)" :key="item.id">
-        <ProductItem
+        <!-- <ProductItem
           :product="item"
           @selectProduct="handleSelectProduct($event)"
+        ></ProductItem> -->
+
+        <!-- dev에서는 이걸 쓴다.-->
+        <ProductItem
+          :product="item"
+          @selectProduct="openProductOptionModal($event)"
         ></ProductItem>
       </v-col>
     </v-row>
     <v-divider class="my-5"></v-divider>
   </v-container>
 
-  <!-- 이부분에 테스트 데이터는 아래 두개 filtered 메서드 부분에서 변경해줘야함 -->
   <ProductOptionModal
     @closeProductOptionModal="closeProductOptionModal"
     @payment="payment"
@@ -230,12 +224,16 @@ export default {
       this.$refs.option.play();
     },
     stopAllAudio() {
-      this.resetAudio(this.$refs.orderMenu);
-      this.resetAudio(this.$refs.addOrder);
-      this.resetAudio(this.$refs.subOrder);
-      this.resetAudio(this.$refs.option);
+      // this.resetAudio(this.$refs.orderMenu);
+      // this.resetAudio(this.$refs.addOrder);
+      // this.resetAudio(this.$refs.subOrder);
+      // this.resetAudio(this.$refs.option);
+      this.$refs.orderMenu.pause();
+      this.$refs.addOrder.pause();
+      this.$refs.subOrder.pause();
+      this.$refs.option.pause();
     },
-
+    //dev에선 사용 안함
     resetAudio(audio) {
       if (audio) {
         audio.pause();
@@ -253,25 +251,25 @@ export default {
     ]), //결제 시 이름 넣기 추가
 
     handleScroll() {
-      //db연결 시
-      // for (let i = 0; i < this.categories.length; i++) {
-      //   const category = this.categories[i];
-      //   const element = document.getElementById('CategoryTitle' + categories.name);
-      //   if (window.scrollY >= element.offsetTop - 140) {
-      //     this.tab = i;
-      //   }
-      // }
-
-      // testdata 사용 시
-      for (let i = 0; i < this.testCategory.length; i++) {
-        const category = this.testCategory[i];
-        const element = document.getElementById(
-          "CategoryTitle" + category.name
-        );
+      // db연결 시
+      for (let i = 0; i < this.categories.length; i++) {
+        const category = this.categories[i];
+        const element = document.getElementById('CategoryTitle' + category.name);
         if (window.scrollY >= element.offsetTop - 140) {
           this.tab = i;
         }
       }
+
+      // testdata 사용 시
+      // for (let i = 0; i < this.testCategory.length; i++) {
+      //   const category = this.testCategory[i];
+      //   const element = document.getElementById(
+      //     "CategoryTitle" + category.name
+      //   );
+      //   if (window.scrollY >= element.offsetTop - 140) {
+      //     this.tab = i;
+      //   }
+      // }
     },
 
     openProductOptionModal(data) {
@@ -290,6 +288,7 @@ export default {
 
     //카테고리별 품목 가져오기
     filteredProducts(categoryId) {
+      //db
        return this.products.filter(product => product.category == categoryId);
       //테스트용
       // return this.testProduct.filter(
@@ -304,16 +303,6 @@ export default {
       if ($event.num > 1) {
         this.setProductName("다중 메뉴"); //이름 추가하기
       } else {
-        // for (let i = 0; i < $event.num; i++) {
-        // }
-          // this.addCart({
-          //   product: {
-          //   name: this.selectedProduct.name,
-          //   price: $event.price,
-          // },
-          // option: $event.option,
-          // });
-          //this.setTotalPrice($event.price);
         this.setProductName(this.selectedProduct.name); //이름 추가하기
       }
       this.showOptionModal = false;
@@ -321,6 +310,7 @@ export default {
       console.log("결제 들어가기전 payment확인(shop페이지):",$event.price);
       this.$router.push("/payment");
       //this.clearCart();
+      //이후 코드
     },
   
     restoreSelectedProduct() {
@@ -346,8 +336,8 @@ export default {
       this.showOptionModal = false;
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
-      console.log("옵션:",$event.option);
       for (let i = 0; i < $event.num; i++) {
+        console.log("옵션:",$event.option);
         this.addCart({
           product: {
             name: this.selectedProduct.name,
@@ -375,12 +365,15 @@ export default {
       this.subCart($event);
       
       //this.setTotalPrice(-$event.productPrice);
+      //이걸하면 두번 빼지는 문제 발생, htod에서는 이 주석 풀 것
+
       if (this.cart.length == 0) {
         this.showCartModal = false;
       }
     },
 
     handleBackButtonClick() {
+      //htod에서는 삭제함, playClicksound 없음 대신 goToBack으로 위에 click 이벤트 대신함
       this.playClickSound();
       this.goToBack();
     },
@@ -390,6 +383,7 @@ export default {
       this.$router.push("/order-type/common");
     },
 
+    //dev에선 사용 안함
     playClickSound() {
       const clickSound = new Audio(require("@/assets/click-sound.mp3"));
       clickSound.play().catch((error) => {
@@ -405,7 +399,7 @@ export default {
 };
 </script>
 
-<style>
+<!-- <style>
 .head-container {
   position: fixed;
   top: 0;
@@ -421,4 +415,4 @@ export default {
   font-weight: bold;
   margin: 0;
 }
-</style>
+</style> -->

@@ -1,32 +1,33 @@
 <template>
-  <div class="head-container row">
-    <div class="col-4">
-      <button @click="$router.go(-1)" type="button" class="btn btn-light">
-        <i class="bi bi-x-lg icon"></i>
-        <p>취소</p>
-      </button>
-    </div>
-    <h2 class="title mb-4 col-4">실타래 {{ ShopID }}</h2>
+  <div class="head-container">
+    <v-row>
+      <v-col cols="4">
+        <v-btn color="white" @click="$router.go(-1)">
+          <v-icon>mdi-close</v-icon>
+          <p>뒤로가기</p>
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <h2 class="mb-4">실타래 {{ ShopID }}</h2>
+      </v-col>
+    </v-row>
   </div>
-  <div style="margin-top: 15%">
+
+  <div style="margin-top: 10%"></div>
+
+    <v-container>
     <audio ref="menuAudio" :src="menuAudioSource" type="audio/mp3"></audio>
     <audio ref="addAudio" :src="addAudioSource" type="audio/mp3"></audio>
     <audio ref="optionAudio" :src="optionAudioSource" type="audio/mp3"></audio>
     <div v-if="step == 0">
-      <button
+      <v-btn
         @click="startRecording"
-        size="x-large"
-        icon="$vuetify"
-        style="
-          font-size: 24px;
-          padding: 10px;
-          width: 50%;
-          height: 50vh;
-          background-color: green;
-        "
+        width="50%"
+        height="50vh"
+        color="rgb(30, 144, 255)"
       >
-        <i class="bi bi-mic-fill x-lg"></i>
-      </button>
+        <v-icon size="xxx-large" color="white">mdi-microphone</v-icon>
+      </v-btn>
       <h3 style="margin-top: 3%">버튼을 눌러서 음성인식을 실행해주세요</h3>
       <div v-if="showVolumeMeter" class="volume-meter-container">
         <div class="outer-meter">
@@ -47,32 +48,45 @@
     </div>
     <div v-if="step == 2">
       <div v-if="loading">추천 중...</div>
-      <div v-else class="row">
-        <v-btn
-          @click="startRecording"
-          color="accent"
-          large
-          dark
-          class="mx-auto d-block mt-3"
-          >추가로 주문하기</v-btn
-        >
-        <div v-if="showVolumeMeter" class="volume-meter-container">
-          <div class="outer-meter">
-            <div
-              :style="{ width: volumeMeterWidth + 'px' }"
-              class="inner-meter"
-            ></div>
+      <v-row v-else>
+        <v-col cols="12">
+          <v-btn
+            @click="startRecording"
+            color="accent"
+            dark
+            width="80%"
+            height="150%"
+            >
+              <v-icon size="x-large">mdi-microphone</v-icon>
+              <h3>추가로 주문하기</h3>
+            </v-btn>
+        </v-col>
+
+        <v-col cols="12">
+          <div v-if="showVolumeMeter" class="volume-meter-container">
+            <div class="outer-meter">
+              <div
+                :style="{ width: volumeMeterWidth + 'px' }"
+                class="inner-meter"
+              ></div>
+            </div>
           </div>
-        </div>
-        <ProductItem
-          v-for="item in filteredItems"
-          :product="item"
-          class="col-3"
-          @selectProduct="openProductOptionModal($event)"
-          :key="item.id"
-        ></ProductItem>
-      </div>
+        </v-col>
+
+        <v-col cols="4" v-for="item in filteredItems" :key="item.id">
+          <ProductItem            
+            :product="item"
+            @selectProduct="openProductOptionModal($event)"
+          ></ProductItem>
+        </v-col>
+      </v-row>
+
+
+      
     </div>
+  </v-container>
+    
+
     <ProductOptionModal
       @closeProductOptionModal="closeProductOptionModal"
       @payment="payment"
@@ -88,7 +102,6 @@
       @payment="payment"
       v-if="showCartModal"
     />
-  </div>
 </template>
 
 <script>
@@ -104,6 +117,7 @@ let lastVolume = 0;
 export default {
   props: ["autoQuery"],
   name: "HelperPage",
+  emits: ["comeBack"], // 추가된 부분
   components: { ProductItem, ProductOptionModal, CartModal },
   data() {
     return {
@@ -231,6 +245,7 @@ export default {
     });
   },
 
+  //필요 없는 기능
   filteredTagsByProductId() {
       return () => {
         
