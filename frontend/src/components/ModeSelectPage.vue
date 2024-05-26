@@ -44,11 +44,6 @@ export default {
   },
 
   mounted() {
-    if(this.$store.state.ShopID == -1) {
-      alert("login error")
-      this.$router.push('/login/shop')
-      return;
-    }
     this.playAudio();
   },
 

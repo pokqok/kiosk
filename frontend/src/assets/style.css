@@ -161,3 +161,17 @@ input[type="number"] {
   color: #666;
   margin: 5px 0 0;
 }
+.cart-fix-price {
+  position: fixed;
+  right: 40vw;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.cart-fix-btn {
+  position: fixed;
+  bottom: 0;
+  right: 2vw;
+  width: 30%;
+  margin-right: 5%;
+}

@@ -20,15 +20,14 @@
           </v-btn>
         </v-row>
       </v-col>
-      <v-col cols="1" class="shadow" style="margin-left: 5%;">
+      <v-col cols="1" class="shadow cart-fix-price">
         <p>{{ parseInt(totalPrice) }}원</p>
       </v-col>
       <v-col>
         <v-btn
           @click="handlePayment"
-          class="shadow"
-          width="80%"
-          height="8vw"
+          class="shadow cart-fix-btn"
+          height="20%"
         >
           <v-icon left size="xx-large" style="margin-right: 10%">bi-coin</v-icon>
           <h2>결제</h2>
