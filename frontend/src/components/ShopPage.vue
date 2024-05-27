@@ -4,6 +4,7 @@
     <audio ref="addOrder" :src="addOrderSource" type="audio/mp3"></audio>
     <audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>
     <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
+    <audio ref="clickSound" :src="clickSoundSource" type="audio/mp3"></audio>
     <!-- <v-toolbar color="#229954" tabs style="position: fixed; z-index: 1000"> -->
     <v-toolbar class="head-container pb-0" tabs>
       <v-col cols="4">
@@ -49,7 +50,7 @@
         <!-- dev에서는 이걸 쓴다.-->
         <ProductItem
           :product="item"
-          @selectProduct="openProductOptionModal($event)"
+          @selectProduct="handleProductClick($event)"
         ></ProductItem>
       </v-col>
     </v-row>
@@ -89,6 +90,7 @@ export default {
       addOrderSource: require("@/assets/장바구니추가.mp3"),
       subOrderSource: require("@/assets/장바구니취소.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
+      clickSoundSource: require("@/assets/click-sound.mp3"), 
     };
   },
 
@@ -211,28 +213,63 @@ export default {
     window.removeEventListener("scroll", this.handleScroll);
     },
   methods: {
+    // playMenuAudio() {
+    //   this.$refs.orderMenu.play();
+    // },
+    // playAddOrderAudio() {
+    //   this.$refs.addOrder.play();
+    // },
+    // playSubOrderAudio() {
+    //   this.$refs.subOrder.play();
+    // },
+    // playOptionAudio() {
+    //   this.$refs.option.play();
+    // },
     playMenuAudio() {
-      this.$refs.orderMenu.play();
-    },
-    playAddOrderAudio() {
-      this.$refs.addOrder.play();
-    },
-    playSubOrderAudio() {
-      this.$refs.subOrder.play();
-    },
-    playOptionAudio() {
-      this.$refs.option.play();
+        this.resetAndPlay(this.$refs.orderMenu);
+      },
+      playAddOrderAudio() {
+        this.resetAndPlay(this.$refs.addOrder);
+      },
+      playSubOrderAudio() {
+        this.resetAndPlay(this.$refs.subOrder);
+      },
+      playOptionAudio() {
+        this.resetAndPlay(this.$refs.option);
+      },
+    playClickSound() {
+        this.resetAndPlay(this.$refs.clickSound);
     },
     stopAllAudio() {
-      // this.resetAudio(this.$refs.orderMenu);
-      // this.resetAudio(this.$refs.addOrder);
-      // this.resetAudio(this.$refs.subOrder);
-      // this.resetAudio(this.$refs.option);
-      this.$refs.orderMenu.pause();
-      this.$refs.addOrder.pause();
-      this.$refs.subOrder.pause();
-      this.$refs.option.pause();
+      // this.$refs.orderMenu.pause();
+      // this.$refs.addOrder.pause();
+      // this.$refs.subOrder.pause();
+      // this.$refs.option.pause();
+      const audios = [
+          this.$refs.orderMenu,
+          this.$refs.addOrder,
+          this.$refs.subOrder,
+          this.$refs.option,
+          this.$refs.clickSound,
+        ];
+        audios.forEach((audio) => {
+          if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+          }
+        });
     },
+
+    resetAndPlay(audio) {
+        this.stopAllAudio();
+        if (audio) {
+          audio.currentTime = 0; // 초기화
+          audio.play().catch((error) => {
+            console.error("Error playing audio:", error);
+          });
+        }
+      },
+
     //dev에선 사용 안함
     resetAudio(audio) {
       if (audio) {
@@ -281,6 +318,13 @@ export default {
       this.showCartModal = false;
     },
 
+    
+    handleProductClick(data) {
+        this.playClickSound();
+        this.openProductOptionModal(data);
+      },
+
+    //사용 안함
     handleSelectProduct(data) {
       this.playClickSound();
       this.openProductOptionModal(data);
@@ -381,14 +425,6 @@ export default {
     goToBack() {
       this.$store.commit("clearCart");
       this.$router.push("/order-type/common");
-    },
-
-    //dev에선 사용 안함
-    playClickSound() {
-      const clickSound = new Audio(require("@/assets/click-sound.mp3"));
-      clickSound.play().catch((error) => {
-        console.error("Error playing click sound:", error);
-      });
     },
 
     getCategoryNameById(id) {

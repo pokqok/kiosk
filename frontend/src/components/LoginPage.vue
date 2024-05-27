@@ -29,18 +29,20 @@
       <v-btn
         :disabled="!valid"
         color="success"
-        @click="login"
+        @click="handleLoginClick"
       >
         Login
       </v-btn>
     </v-form>
 
-    <button @click="goToRootPage">메인 페이지로 돌아가기</button>
+    <button @click="handleGoToRootPageClick">메인 페이지로 돌아가기</button>
   </v-container>
 </template>
 
 <script>
 import axios from "axios";
+import clickSoundFile from "@/assets/click-sound.mp3";
+
 export default {
   name: "LoginPage",
   data() {
@@ -100,6 +102,23 @@ export default {
       this.$router.push("/");
       this.$emit("comeBack");
     },
+
+    playClickSound() {
+        const clickSound = new Audio(clickSoundFile);
+        clickSound.play().catch((error) => {
+          console.error("Error playing click sound:", error);
+        });
+      },
+  
+      handleLoginClick() {
+        this.playClickSound();
+        this.login();
+      },
+  
+      handleGoToRootPageClick() {
+        this.playClickSound();
+        this.goToRootPage();
+      },
   },
 };
 </script>

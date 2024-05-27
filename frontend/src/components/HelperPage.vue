@@ -140,6 +140,11 @@ export default {
       menuAudioSource: require("@/assets/음성인식 설명.mp3"),
       addAudioSource: require("@/assets/추가주문.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
+      // minVolume: 0.5,
+      // microphone: null,
+      // volumeCheckInterval: null,
+      // silenceTimer: null,
+      // silenceDuration: 2000,
     };
   },
   watch: {
@@ -316,11 +321,12 @@ export default {
         this.step = 1;
       };
     });
-
+    //this.initializeMediaRecorder();
     if (this.cart.length != 0) this.showCartModal = true;
     setTimeout(() => {
       this.playMenuAudio();
     }, 300);
+    //setTimeout(this.playMenuAudio, 300);
   },
   methods: {
     ...mapMutations(["addCart", "setProductName","subCart", "setTotalPrice"]),
@@ -343,6 +349,7 @@ export default {
       }
     },
     playMenuAudio() {
+      //this.stopAllAudios();
       this.$refs.menuAudio
         .play()
         .catch((error) => console.error("Audio play failed:", error));
@@ -373,6 +380,10 @@ export default {
         this.analyser.fftSize = 256;
         this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         this.updateVolumeMeter();
+        // this.volumeCheckInterval = setInterval(this.checkVolume, 100);
+        // this.recordedChunks = []; // Ensure recordedChunks is reset
+        // this.mediaRecorder.start(); // Start the media recorder
+        // this.audio_recording = true;
         this.audio_recording = true;
         this.mediaRecorder.start();
         setTimeout(() => {
@@ -380,6 +391,53 @@ export default {
         }, 5000);
       }
     },
+    // initializeMediaRecorder() {
+    //     navigator.mediaDevices
+    //       .getUserMedia({ audio: true })
+    //       .then((stream) => {
+    //         this.mediaRecorder = new MediaRecorder(stream);
+    //         this.mediaRecorder.ondataavailable = (event) => {
+    //           if (event.data.size > 0) {
+    //             this.recordedChunks.push(event.data);
+    //           }
+    //         };
+    //         this.mediaRecorder.onstop = () => {
+    //           console.log("Recording stopped.");
+    //           const blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+    //           this.uploadAudio(blob);
+    //           this.audio_recording = false;
+    //           this.step = 1;
+    //         };
+    //       })
+    //       .catch((error) => {
+    //         console.error("Error accessing microphone:", error);
+    //       });
+    //   },
+
+    //   checkVolume() {
+    //     this.analyser.getByteFrequencyData(this.dataArray);
+    //     const avgVolume =
+    //       this.dataArray.reduce((acc, cur) => acc + cur, 0) /
+    //       this.dataArray.length;
+    //     console.log("Average volume:", avgVolume); // 볼륨 확인용 로그
+  
+    //     if (avgVolume < 45) {
+    //       if (!this.silenceTimer) {
+    //         console.log("Starting silence timer"); // 타이머 시작 로그
+    //         this.silenceTimer = setTimeout(() => {
+    //           console.log("Silence detected, stopping recording"); // 타이머 만료 로그
+    //           this.stopRecording();
+    //         }, this.silenceDuration);
+    //       }
+    //     } else {
+    //       if (this.silenceTimer) {
+    //         console.log("Resetting silence timer"); // 타이머 초기화 로그
+    //         clearTimeout(this.silenceTimer);
+    //         this.silenceTimer = null;
+    //       }
+    //     }
+    //   },
+
     stopRecording() {
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
@@ -389,7 +447,32 @@ export default {
           this.submitAudio();
         }, 1000);
       }
+      // if (this.mediaRecorder) {
+      //     this.mediaRecorder.stop();
+      //     console.log("stop0");
+      //     this.audio_recording = false;
+      //     this.showVolumeMeter = false;
+      //     clearInterval(this.volumeCheckInterval);
+      //     clearTimeout(this.silenceTimer);
+      //     this.silenceTimer = null;
+      //     this.uploadAudioAndSubmit();
+      //   }
     },
+
+    // async uploadAudioAndSubmit() {
+    //     if (this.recordedChunks.length > 0) {
+    //       const blob = new Blob(this.recordedChunks, { type: "audio/wav" });
+    //       try {
+    //         await this.uploadAudio(blob);
+    //         this.submitAudio();
+    //       } catch (error) {
+    //         console.error("Error uploading audio:", error);
+    //       }
+    //     } else {
+    //       console.warn("No recorded chunks to upload.");
+    //     }
+    //   },
+      
     async uploadAudio(blob) {
       let formData = new FormData();
       formData.append("audio", blob);
@@ -402,6 +485,19 @@ export default {
           console.error("Error uploading file:", error);
         });
       this.recordedChunks = [];
+      // const formData = new FormData();
+      //   formData.append("audio", blob);
+      //   try {
+      //     const response = await axios.post("/api/upload", formData);
+      //     this.$store.commit("setFile", response.data.uploaded_file);
+      //     console.log("upload");
+      //     console.log("check");
+      //   } catch (error) {
+      //     console.error("Error uploading file:", error);
+      //     throw error; // 에러를 호출자에게 다시 전파
+      //   }
+      //   console.log("ㅇㄴㄹㄴㅁㄻㄴㅇㄹ")
+      //   this.recordedChunks = []; // 업로드 후 recordedChunks 초기화
     },
     submitAudio() {
       if (this.audio_recording) {
@@ -409,7 +505,7 @@ export default {
       } else if (!this.$store.state.file) {
         alert("녹음된 파일이 없습니다.");
       } else {
-        let formData = new FormData();
+        const formData = new FormData();
         formData.append("uploaded_file", this.$store.state.file);
         axios
           .post("/api/audio-upload", formData)
@@ -437,35 +533,12 @@ export default {
           this.loading = false;
           this.step = 2;
 
-     
-
-          // // 응답을 바탕으로 아이템 필터링
-          // const responseItems = this.response.split("\n").map((line) => {
-          //   const match = line.match(/\[(.*?)\]/);
-          //   console.log("추가적 처리중입니다");
-          //   return match ? match[1] : null;
-          // });
-
           const responseItems = this.response.match(/\[(\d+(?:,\s*\d+)*)\]/m);
 
-          // if (responseItems) {
-          //     const matchString = responseItems[1];
-          //     const productIds = matchString.split(',').map(id => parseInt(id.trim()));
-          //     console.log("최종 배열 값: ", productIds);
-          // } else {
-          //     console.log("배열 찾기 실패");
-          // }
-
-          //const matchItem = this.response.match(/productId:\s*\[([^\]]+)\]/);
-          // let match = str.match(/\[(.*?)\]/);
-         // let totalArray = matchArray ? result.split(",").map(Number) : [];
-
-          // testdata.js 데이터에서 응답에 포함된 항목만 추출
+        
           console.log("전체 결과:",result.data.message);
           console.log("this is what you Got: ",responseItems[1]);
-          //  this.filteredItems = this.products.filter((item) =>
-          //    responseItems[1].includes(item.id)
-          //  );
+
           const responseArray = responseItems[1].split(',').map(item => parseInt(item.trim(), 10));
           console.log("배열 변환 결과 ",responseArray);
 
@@ -496,11 +569,19 @@ export default {
         this.volumeMeterWidth = (lastVolume + newWidth) / 2;
       }
       lastVolume = newWidth;
+      // if (!this.showVolumeMeter) return;
+      //   requestAnimationFrame(this.updateVolumeMeter);
+      //   this.analyser.getByteFrequencyData(this.dataArray);
+      //   const average =
+      //     this.dataArray.reduce((a, b) => a + b, 0) / this.dataArray.length;
+      //   const scaleFactor = 1.5;
+      //   const maxVolumeWidth = 200;
+      //   this.volumeMeterWidth = Math.min(maxVolumeWidth, average * scaleFactor);
     },
     openProductOptionModal(product) {
       this.playOptionAudio();
       this.selectedProduct = product;
-      console.log("선택된 메뉴: ", product);
+      //console.log("선택된 메뉴: ", product);
       this.showOptionModal = true;
       this.showCartModal = false;
     },
@@ -539,6 +620,7 @@ export default {
     //   this.$router.push("/payment");
     // },
     payment($event) {
+      this.stopOptionAudio();
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
       if ($event.num > 1) {
@@ -579,6 +661,7 @@ export default {
     },
 
     //데이터 변환 관련
+    //사용 안함
     changeData(products) {
     return products.map(product => {
         return {

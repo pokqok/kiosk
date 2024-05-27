@@ -8,25 +8,28 @@
   <v-container>
     <div>
       <audio ref="orderType" :src="orderTypeSource" type="audio/mp3"></audio>
-      <v-btn @click="goToShop('shop')" block class="pa-12">
+      <v-btn @click="handleGoToShop('shop')" block class="pa-12">
         <i class="bi bi-shop" style="font-size: 2rem; margin-right: 10px"></i>
         매장
       </v-btn>
     </div>
     <div>
-      <v-btn @click="goToShop('Packaging')" block class="mt-10 pa-12">
+      <v-btn @click="handleGoToShop('Packaging')" block class="mt-10 pa-12">
         <i class="bi bi-bag" style="font-size: 2rem; margin-right: 10px"></i>
         포장
       </v-btn>
     </div>
   </v-container>
 
-  <v-btn @click="goToBack">
+  <v-btn @click="handleGoToBack">
     <i class="bi bi-arrow-90deg-left"></i>
+    <p class="ml-2">뒤로가기</p>
   </v-btn>
 </template>
 
 <script>
+import clickSoundFile from "@/assets/click-sound.mp3";
+
 export default {
   name: "OrderTypePage",
   mounted() {
@@ -46,6 +49,13 @@ export default {
     stopAllAudio() {
       this.$refs.orderType.pause();
     },
+    playClickSound() {
+        const clickSound = new Audio(clickSoundFile);
+        clickSound.play().catch((error) => {
+          console.error("Error playing click sound:", error);
+        });
+      },
+
     goToShop(type) {
       if (type == "shop") {
         this.stopAllAudio();
@@ -64,6 +74,14 @@ export default {
     goToBack() {
       this.$router.push("/mode-select");
     },
+    handleGoToShop(type) {
+        this.playClickSound();
+        this.goToShop(type);
+      },
+      handleGoToBack() {
+        this.playClickSound();
+        this.goToBack();
+      },
   },
 };
 </script>

@@ -23,12 +23,11 @@
           :src="normalPayAudioSource"
           type="audio/mp3"
         ></audio>
-        <!--아래 Clicksound는 dev에서는 더이상 쓰지 않는다.-->
-        <!-- <audio
-          ref="clickSound"
-          :src="clickSoundSource"
-          type="audio/mp3"
-        ></audio> -->
+        <audio
+              ref="clickSound"
+              :src="clickSoundSource"
+              type="audio/mp3"
+            ></audio>
         <v-btn color="white" @click="$router.go(-1 - 2 * cntCanclePay)">
           <v-icon left>mdi-arrow-left</v-icon>
           <p>취소</p>
@@ -42,7 +41,7 @@
 
   <v-container>
     <v-row style="margin-top: 12%">
-      <v-col cols="4">
+      <v-col cols="6">
         <v-btn @click="requestPay" block height="150%">
           <span
             style="display: flex; flex-direction: column; align-items: center"
@@ -52,7 +51,7 @@
           </span>
         </v-btn>
       </v-col>
-      <v-col cols="4">
+      <v-col cols="6">
         <v-btn @click="requestPayKakao" block height="150%">
           <span
             style="display: flex; flex-direction: column; align-items: center"
@@ -89,7 +88,7 @@ export default {
       paymentCompletedAudioSource: require("@/assets/결제 완료.mp3"),
       kakaoPayAudioSource: require("@/assets/카카오페이.mp3"),
       normalPayAudioSource: require("@/assets/일반결제.mp3"),
-      //clickSoundSource: require("@/assets/click-sound.mp3"),
+      clickSoundSource: require("@/assets/click-sound.mp3"),
       showModal: false, // 모달 표시 여부
       orderNumber: null, // 주문번호
     };
@@ -100,11 +99,12 @@ export default {
   },
 
   mounted() {
-    if (this.$store.state.ShopID == -1) {
-      alert("login error");
-      this.$router.push('/login/shop');
-      return;
-    }
+    //일단 팅기는 문제때문에 주석처리함, 최종 시연때 풀 것
+    // if (this.$store.state.ShopID == -1) {
+    //   alert("login error");
+    //   this.$router.push('/login/shop');
+    //   return;
+    // }
     this.IMP.init("imp03664607");
     //dev에선 clicksound대신 이거 실행
     this.playPaymentAudio();
@@ -116,24 +116,62 @@ export default {
       "clearCart",
     ]),
 
+    // playPaymentAudio() {
+    //   this.$refs.paymentAudio.play();
+    // },
+    // playPaymentCompletedAudio() {
+    //   this.$refs.paymentCompletedAudio.play();
+    // },
+    // playKakaoPayAudio() {
+    //   this.$refs.kakaoPayAudio.play();
+    // },
+    // playNormalPayAudio() {
+    //   this.$refs.normalPayAudio.play();
+    // },
     playPaymentAudio() {
-      this.$refs.paymentAudio.play();
-    },
-    playPaymentCompletedAudio() {
-      this.$refs.paymentCompletedAudio.play();
-    },
-    playKakaoPayAudio() {
-      this.$refs.kakaoPayAudio.play();
-    },
-    playNormalPayAudio() {
-      this.$refs.normalPayAudio.play();
-    },
+        this.resetAndPlay(this.$refs.paymentAudio);
+      },
+      playPaymentCompletedAudio() {
+        this.resetAndPlay(this.$refs.paymentCompletedAudio);
+      },
+      playKakaoPayAudio() {
+        this.resetAndPlay(this.$refs.kakaoPayAudio);
+      },
+      playNormalPayAudio() {
+        this.resetAndPlay(this.$refs.normalPayAudio);
+      },
+    playClickSound() {
+        this.resetAndPlay(this.$refs.clickSound);
+      },
     stopAllAudio() {
-      this.$refs.paymentAudio.pause();
-      this.$refs.paymentCompletedAudio.pause();
-      this.$refs.kakaoPayAudio.pause();
-      this.$refs.normalPayAudio.pause();
+      // this.$refs.paymentAudio.pause();
+      // this.$refs.paymentCompletedAudio.pause();
+      // this.$refs.kakaoPayAudio.pause();
+      // this.$refs.normalPayAudio.pause();
+      // this.$refs.clickSound.pause();
+      const audios = [
+          this.$refs.paymentAudio,
+          this.$refs.paymentCompletedAudio,
+          this.$refs.kakaoPayAudio,
+          this.$refs.normalPayAudio,
+          this.$refs.clickSound,
+        ];
+      audios.forEach((audio) => {
+          if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+          }
+        });
     },
+    resetAndPlay(audio) {
+        this.stopAllAudio();
+        if (audio) {
+          audio.currentTime = 0; // 초기화
+          audio.play().catch((error) => {
+            console.error("Error playing audio:", error);
+          });
+        }
+      },
     //dev에서는 사용 안함
     // playClickSoundThenPaymentAudio() {
     //   const clickSound = this.$refs.clickSound;
