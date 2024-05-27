@@ -1,10 +1,11 @@
 <template>
   <v-app>
     <v-main>
-      <div class="font-size-buttons">
+      <!-- 기능문제로 +- 폰트조절 버튼 주석처리함-->
+      <!-- <div class="font-size-buttons">
           <button @click="increaseFontSize">+</button>
           <button @click="decreaseFontSize">-</button>
-      </div>
+      </div> -->
       <RouterView @comeBack="showButton = true"></RouterView>
       <RouterLink to="/login/admin">
         <!-- <button v-if="showButton" @click="showButton = false"> -->

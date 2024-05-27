@@ -8,6 +8,8 @@ const pool = mariadb.createPool({
   user: config.db.user,
   password: config.db.password,
   database: config.db.database,
+  // connectionLimit: 100,
+  // idleTimeout: 60000,
 });
 
 // const pool = mariadb.createPool({

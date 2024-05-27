@@ -1,7 +1,7 @@
 <template>
   <v-subheader class = "subheader">카테고리 관리
-    <v-btn color="primary" @click="showAddCategory">카테고리 추가</v-btn>
-    <v-btn @click="openDialog">새로운 입력창 열기</v-btn>
+    <!-- <v-btn color="primary" @click="showAddCategory">카테고리 추가</v-btn> -->
+    <v-btn @click="openDialog">새 카테고리 추가</v-btn>
       <!-- 특정 dialog 열게 하려면 수정좀 해야 할 듯-->
 
       <v-dialog v-model="dialog" persistent max-width="600px">

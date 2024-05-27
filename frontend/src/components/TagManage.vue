@@ -42,7 +42,7 @@
             @change="requireSwitch(item.id, item.isRequired)"
           ></v-switch>
         </td>
-        <td>옵션버튼 추가 예정</td>
+        <!-- <td>옵션버튼 추가 예정</td> -->
       </tr>
     </tbody>
   </v-table>
