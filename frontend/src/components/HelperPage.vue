@@ -505,13 +505,20 @@ export default {
       this.showCartModal = false;
     },
     closeProductOptionModal() {
+      // this.stopOptionAudio();
+      // console.log("취소할 메뉴: ", this.selectedProduct);
+      // this.selectedProduct = null;
+      // this.showProductOptionModal = false;
+      // if (this.cart.length != 0) {
+      //   this.showCartModal = true;
+      // }
       this.stopOptionAudio();
-      this.selectedProduct = null;
-      this.showProductOptionModal = false;
+      this.showOptionModal = false;
       if (this.cart.length != 0) {
         this.showCartModal = true;
       }
     },
+    
 
     // payment($event) {
     //   console.log("개수: ",$event.num);
@@ -587,6 +594,8 @@ export default {
       });
     },
     getCategoryNameById(id) {
+      console.log("전체 카테고리는?:",this.categories);
+      console.log("넘겨준 카테고리 id는?:",this.categories);
       const category = this.categories.find(cat => cat.id === id);
       return category ? category.name : null;
     },
