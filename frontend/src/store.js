@@ -1,10 +1,10 @@
 import { createStore } from "vuex";
-import testdata from "./assets/testdata";
-import { product } from "./data/PageProduct.js";
-import { tag } from "./data/PageTags.js";
-import { option } from "./data/PageOptions.js";
-import { category } from "./data/PageCategory.js";
-import { tagMenu } from "./data/PageTagMenu.js";
+//import testdata from "./data/product.json";
+// import { product } from "./data/PageProduct.js";
+// import { tag } from "./data/PageTags.js";
+// import { option } from "./data/PageOptions.js";
+// import { category } from "./data/PageCategory.js";
+// import { tagMenu } from "./data/PageTagMenu.js";
 import categoryModule from "./categoryModule";
 import tagModule from "./tagModule";
 import kioskModule from "./kioskModule";
@@ -46,12 +46,18 @@ const store = createStore({
       jwt: null,
       productName: "",
 
-      testdata: testdata,
-      testProduct: product,
-      testTag: tag,
-      testOption: option,
-      testCategory: category,
-      testTagMenu: tagMenu,
+      // testdata: testdata,
+      // testProduct: product,
+      // testTag: tag,
+      // testOption: option,
+      // testCategory: category,
+      // testTagMenu: tagMenu,
+
+      testProduct: null,
+      testTag: null,
+      testOption: null,
+      testCategory: null,
+      testTagMenu: null,
 
       ShopID: -1,
       orderType: -1,
@@ -64,6 +70,21 @@ const store = createStore({
   },
 
   mutations: {
+    setTestProduct(state, products) {
+      state.testProduct = products;
+    },
+    setTestTag(state, tags) {
+      state.testTag = tags;
+    },
+    setTestOption(state, options) {
+      state.testOption = options;
+    },
+    setTestCategory(state, categories) {
+      state.testCategory = categories;
+    },
+    setTestTagMenu(state, tagMenu) {
+      state.testTagMenu = tagMenu;
+    },
     setFile(state, file) {
       state.file = file;
     },
@@ -221,6 +242,24 @@ const store = createStore({
     async initSocket() {
       // Socket 초기화 코드
     },
+    async fetchTestData({ commit }) {
+      try {
+        const productRes = require('./data/product.json');
+        const tagRes = require('./data/tag.json');
+        const optionRes = require('./data/option.json');
+        const categoryRes = require('./data/category.json');
+        const tagMenuRes = require('./data/tagMenu.json');
+
+        commit('setTestProduct', productRes);
+        commit('setTestTag', tagRes);
+        commit('setTestOption', optionRes);
+        commit('setTestCategory', categoryRes);
+        commit('setTestTagMenu', tagMenuRes);
+      } catch (error) {
+        console.error('Failed to fetch test data:', error);
+      }
+    },
+   
   },
 });
 

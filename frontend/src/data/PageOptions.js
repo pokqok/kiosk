@@ -66,7 +66,7 @@ let option = [
     {
       id: 10,
       name: '투샷',
-      price: 0,
+      price: 500,
       tag: 3,
       image: '',
       alias: '',
@@ -76,7 +76,7 @@ let option = [
     {
       id: 11,
       name: '쓰리샷',
-      price: 0,
+      price: 1000,
       tag: 3,
       image: '',
       alias: '',
@@ -116,7 +116,7 @@ let option = [
     {
       id: 15,
       name: '시나몬 가루',
-      price: 0,
+      price: 500,
       tag: 5,
       image: '',
       alias: '',
@@ -126,7 +126,7 @@ let option = [
     {
       id: 16,
       name: '초콜릿 칩',
-      price: 0,
+      price: 500,
       tag: 5,
       image: '',
       alias: '',
@@ -136,7 +136,7 @@ let option = [
     {
       id: 17,
       name: '슈가 파우더',
-      price: 0,
+      price: 500,
       tag: 5,
       image: '',
       alias: '',
@@ -146,7 +146,7 @@ let option = [
     {
       id: 18,
       name: '달고나 가루',
-      price: 0,
+      price: 500,
       tag: 5,
       image: '',
       alias: '',

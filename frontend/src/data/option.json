@@ -1,0 +1,153 @@
+[
+    {
+      "id": 1,
+      "name": "뜨겁게",
+      "price": 0,
+      "tag": 1,
+      "image": "",
+      "alias": "",
+      "orderNo": 1,
+      "duplicate": false
+    },
+    {
+      "id": 2,
+      "name": "차갑게",
+      "price": 0,
+      "tag": 1,
+      "image": "",
+      "alias": "",
+      "orderNo": 2,
+      "duplicate": false
+    },
+    {
+      "id": 3,
+      "name": "시럽없음",
+      "price": 0,
+      "tag": 2,
+      "image": "",
+      "alias": "",
+      "orderNo": 1,
+      "duplicate": false
+    },
+    {
+      "id": 4,
+      "name": "시럽적게",
+      "price": 0,
+      "tag": 2,
+      "image": "",
+      "alias": "",
+      "orderNo": 2,
+      "duplicate": false
+    },
+    {
+      "id": 5,
+      "name": "시럽많이",
+      "price": 0,
+      "tag": 2,
+      "image": "",
+      "alias": "",
+      "orderNo": 3,
+      "duplicate": false
+    },
+    {
+      "id": 9,
+      "name": "원샷",
+      "price": 0,
+      "tag": 3,
+      "image": "",
+      "alias": "",
+      "orderNo": 1,
+      "duplicate": false
+    },
+    {
+      "id": 10,
+      "name": "투샷",
+      "price": 500,
+      "tag": 3,
+      "image": "",
+      "alias": "",
+      "orderNo": 2,
+      "duplicate": false
+    },
+    {
+      "id": 11,
+      "name": "쓰리샷",
+      "price": 1000,
+      "tag": 3,
+      "image": "",
+      "alias": "",
+      "orderNo": 3,
+      "duplicate": false
+    },
+    {
+      "id": 12,
+      "name": "크림 없음",
+      "price": 0,
+      "tag": 4,
+      "image": "",
+      "alias": "",
+      "orderNo": 1,
+      "duplicate": false
+    },
+    {
+      "id": 13,
+      "name": "크림 조금",
+      "price": 0,
+      "tag": 4,
+      "image": "",
+      "alias": "",
+      "orderNo": 2,
+      "duplicate": false
+    },
+    {
+      "id": 14,
+      "name": "크림 많이",
+      "price": 1000,
+      "tag": 4,
+      "image": "",
+      "alias": "",
+      "orderNo": 3,
+      "duplicate": false
+    },
+    {
+      "id": 15,
+      "name": "시나몬 가루",
+      "price": 500,
+      "tag": 5,
+      "image": "",
+      "alias": "",
+      "orderNo": 1,
+      "duplicate": true
+    },
+    {
+      "id": 16,
+      "name": "초콜릿 칩",
+      "price": 500,
+      "tag": 5,
+      "image": "",
+      "alias": "",
+      "orderNo": 2,
+      "duplicate": true
+    },
+    {
+      "id": 17,
+      "name": "슈가 파우더",
+      "price": 500,
+      "tag": 5,
+      "image": "",
+      "alias": "",
+      "orderNo": 3,
+      "duplicate": true
+    },
+    {
+      "id": 18,
+      "name": "달고나 가루",
+      "price": 500,
+      "tag": 5,
+      "image": "",
+      "alias": "",
+      "orderNo": 4,
+      "duplicate": true
+    }
+  ]
+  

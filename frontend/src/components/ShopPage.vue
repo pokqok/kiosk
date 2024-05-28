@@ -22,8 +22,13 @@
       </v-col>
       <template v-slot:extension>
         <v-tabs v-model="tab" grow>
-          <v-tab
+          <!-- <v-tab
             v-for="i in categories"
+            :key="i"
+            :href="'#CategoryTitle' + i.name"
+          > -->
+          <v-tab
+            v-for="i in testCategory"
             :key="i"
             :href="'#CategoryTitle' + i.name"
           >
@@ -35,7 +40,7 @@
   </div>
 
   <div style="margin-top: 140px"></div>
-  <v-container v-for="i in categories" :key="i">
+  <v-container v-for="i in testCategory" :key="i">
     <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i.name">
       #{{ i.name }}
     </h4>
@@ -126,43 +131,16 @@ export default {
 
     filteredTagsByProductId() {
       // db 사용 시
-      return () => {
-        if (!this.selectedProduct) return { tags: [], options: [] }; // 선택된 상품이 없으면 빈 배열 반환
-
-        const productId = this.selectedProduct.id; // 선택된 상품의 ID 가져오기
-        const matchedTags = this.tagMenu.filter(tag => tag.productId === productId); // productId와 일치하는 tagMenu 찾기
-
-        const matchedTagIds = matchedTags.map(tag => tag.tagId); // 일치하는 tag의 tagId 추출
-        const filteredTags = this.tags.filter(tag => matchedTagIds.includes(tag.id)); // tagId와 일치하는 tag 필터링
-
-        console.log('옵션들:',this.options);
-        const matchedOptionIds = [];
-          matchedTagIds.forEach(tag => {
-            const options = this.options.filter(option => option.tag == tag);
-            matchedOptionIds.push(...options.map(option => option.id));
-          });
-          // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
-          const filteredOptions = this.options.filter(option => matchedOptionIds.includes(option.id));
-          console.log("선택 상품의 태그들 현황: ",filteredTags);
-          console.log("선택 상품의 태그의 옵션들: ",filteredOptions);
-          //return { tags: matchedTags, options: filteredOptions };
-          return { tags: filteredTags, options: filteredOptions };
-
-      //testdata 사용 시
       // return () => {
       //   if (!this.selectedProduct) return { tags: [], options: [] }; // 선택된 상품이 없으면 빈 배열 반환
 
       //   const productId = this.selectedProduct.id; // 선택된 상품의 ID 가져오기
-      //   const matchedTags = this.testTagMenu.filter(
-      //     (tag) => tag.productId === productId
-      //   ); // productId와 일치하는 tagMenu 찾기
+      //   const matchedTags = this.tagMenu.filter(tag => tag.productId === productId); // productId와 일치하는 tagMenu 찾기
 
-      //   const matchedTagIds = matchedTags.map((tag) => tag.tagId); // 일치하는 tag의 tagId 추출
-      //   const filteredTags = this.testTag.filter((tag) =>
-      //     matchedTagIds.includes(tag.id)
-      //   ); // tagId와 일치하는 tag 필터링
+      //   const matchedTagIds = matchedTags.map(tag => tag.tagId); // 일치하는 tag의 tagId 추출
+      //   const filteredTags = this.tags.filter(tag => matchedTagIds.includes(tag.id)); // tagId와 일치하는 tag 필터링
 
-      //   console.log("옵션들:", this.options);
+      //   console.log('옵션들:',this.options);
       //   const matchedOptionIds = [];
       //     matchedTagIds.forEach(tag => {
       //       const options = this.options.filter(option => option.tag == tag);
@@ -174,6 +152,33 @@ export default {
       //     console.log("선택 상품의 태그의 옵션들: ",filteredOptions);
       //     //return { tags: matchedTags, options: filteredOptions };
       //     return { tags: filteredTags, options: filteredOptions };
+
+      //testdata 사용 시
+      return () => {
+        if (!this.selectedProduct) return { tags: [], options: [] }; // 선택된 상품이 없으면 빈 배열 반환
+
+        const productId = this.selectedProduct.id; // 선택된 상품의 ID 가져오기
+        const matchedTags = this.testTagMenu.filter(
+          (tag) => tag.productId === productId
+        ); // productId와 일치하는 tagMenu 찾기
+
+        const matchedTagIds = matchedTags.map((tag) => tag.tagId); // 일치하는 tag의 tagId 추출
+        const filteredTags = this.testTag.filter((tag) =>
+          matchedTagIds.includes(tag.id)
+        ); // tagId와 일치하는 tag 필터링
+
+        console.log("옵션들:", this.options);
+        const matchedOptionIds = [];
+          matchedTagIds.forEach(tag => {
+            const options = this.options.filter(option => option.tag == tag);
+            matchedOptionIds.push(...options.map(option => option.id));
+          });
+          // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
+          const filteredOptions = this.options.filter(option => matchedOptionIds.includes(option.id));
+          console.log("선택 상품의 태그들 현황: ",filteredTags);
+          console.log("선택 상품의 태그의 옵션들: ",filteredOptions);
+          //return { tags: matchedTags, options: filteredOptions };
+          return { tags: filteredTags, options: filteredOptions };
       };
     },
   },
@@ -202,6 +207,8 @@ export default {
   },
   async created() {
       // 데이터를 비동기적으로 로드
+      this.$store.dispatch('fetchTestData');
+
       this.$store.dispatch('fetchCategories');
       this.$store.dispatch('fetchTags')
       this.$store.dispatch('fetchOptions');
@@ -289,24 +296,21 @@ export default {
 
     handleScroll() {
       // db연결 시
-      for (let i = 0; i < this.categories.length; i++) {
-        const category = this.categories[i];
+      // for (let i = 0; i < this.categories.length; i++) {
+      //   const category = this.categories[i];
+      //   const element = document.getElementById('CategoryTitle' + category.name);
+      //   if (window.scrollY >= element.offsetTop - 140) {
+      //     this.tab = i;
+      //   }
+      // }
+
+      for (let i = 0; i < this.testCategory.length; i++) {
+        const category = this.testCategory[i];
         const element = document.getElementById('CategoryTitle' + category.name);
         if (window.scrollY >= element.offsetTop - 140) {
           this.tab = i;
         }
       }
-
-      // testdata 사용 시
-      // for (let i = 0; i < this.testCategory.length; i++) {
-      //   const category = this.testCategory[i];
-      //   const element = document.getElementById(
-      //     "CategoryTitle" + category.name
-      //   );
-      //   if (window.scrollY >= element.offsetTop - 140) {
-      //     this.tab = i;
-      //   }
-      // }
     },
 
     openProductOptionModal(data) {
@@ -333,11 +337,11 @@ export default {
     //카테고리별 품목 가져오기
     filteredProducts(categoryId) {
       //db
-       return this.products.filter(product => product.category == categoryId);
+      //  return this.products.filter(product => product.category == categoryId);
       //테스트용
-      // return this.testProduct.filter(
-      //   (product) => product.category == categoryId
-      // );
+      return this.testProduct.filter(
+        (product) => product.category == categoryId
+      );
     },
 
 
@@ -428,7 +432,9 @@ export default {
     },
 
     getCategoryNameById(id) {
-      const category = this.categories.find(cat => cat.id === id);
+      //DB
+      //const category = this.categories.find(cat => cat.id === id);
+      const category = this.testCategory.find(cat => cat.id === id);
       return category ? category.name : null;
     },
   },

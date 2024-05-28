@@ -18,6 +18,7 @@ const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@googl
 const wordnet = require('wordnet')
 const mariadb = require('mariadb');
 
+
 const config = require('./DBconfig.json');
 
 const pool = mariadb.createPool({
@@ -55,42 +56,108 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;; // Replace with your actual 
 console.log("API_KEY:", GEMINI_API_KEY);
 
 
-async function getMenuItems() {
-  let connection;
-  try {
-      // MariaDB와의 연결
-      connection = await pool.getConnection();
+// async function getMenuItems() {
+//   let connection;
+//   try {
+//       // MariaDB와의 연결
+//       connection = await pool.getConnection();
 
-      const tags = await connection.execute( `SELECT * FROM tag`);
-      const options = await connection.execute( `SELECT * FROM details`);
-      const tagMenu = await connection.execute( `SELECT * FROM menutag`);
-      const categories = await connection.execute( `SELECT * FROM category`);
-      const products = await connection.execute( `SELECT * FROM product`);
+//       const tags = await connection.execute( `SELECT * FROM tag`);
+//       const options = await connection.execute( `SELECT * FROM details`);
+//       const tagMenu = await connection.execute( `SELECT * FROM menutag`);
+//       const categories = await connection.execute( `SELECT * FROM category`);
+//       const products = await connection.execute( `SELECT * FROM product`);
 
-      if (connection) {
-        await connection.release(); // 연결 해제
-      }
-      //console.log("product: ",tagMenu);
-      //return rows; // 결과를 그대로 반환
+//       if (connection) {
+//         await connection.release(); // 연결 해제
+//       }
+//       //console.log("product: ",tagMenu);
+//       //return rows; // 결과를 그대로 반환
       
-      return products.map(product => {
-        const productCategory = categories.find(category => category.CategoryNO == product.CategoryNO);
-        const productWithTagOptions = tagMenu.filter(item => item.ProductNO == product.ProductNO);
-        const productTags = productWithTagOptions.map(tagOption => {
-            const tag = tags.find(tag => tag.TagNO == tagOption.TagNo);
-            return { id: tag.TagNO, name: tag.TagName };
-        });
+//       return products.map(product => {
+//         const productCategory = categories.find(category => category.CategoryNO == product.CategoryNO);
+//         const productWithTagOptions = tagMenu.filter(item => item.ProductNO == product.ProductNO);
+//         const productTags = productWithTagOptions.map(tagOption => {
+//             const tag = tags.find(tag => tag.TagNO == tagOption.TagNo);
+//             return { id: tag.TagNO, name: tag.TagName };
+//         });
   
+//         const productOptions = productWithTagOptions.map(tagOption => {
+//           const filteredOptions = options.filter(option => option.TagNO == tagOption.TagNo);
+//           const optionsArray = filteredOptions.map(option => ({
+//               id: option.DetNO,
+//               name: option.DetName,
+//               price: option.AddPrice,
+//               image: option.DetImage,
+//               alias: option.DetAlias,
+//               orderNo: option.orderNo,
+//               duplicate: option.isDup,
+//           }));
+//           return optionsArray;
+//         });
+
+//         // 제품 정보를 새로운 형식으로 변환하여 반환 
+
+//         return {
+//             productId: product.ProductNO,
+//             productName: product.ProductName,
+//             productAlias: product.alias,
+//             category: {
+//                 id: productCategory.CategoryNO,
+//                 name: productCategory.CategoryName,
+//                 alias: productCategory.CategoryAlias,
+//                 //isOn: productCategory.isOn === undefined ? true : productCategory.isOn,
+//             },
+//             tags: productTags,
+//             options: productOptions,
+//            //options: productTags.map(tag => productOptions.filter(option => option.TagNO == tag.TagNO)),
+//         };
+       
+//       });
+
+
+//   } catch (err) {
+//       console.error('Error while fetching menu items:', err);
+//       throw err;  // 또는 적절한 에러 처리
+//   } finally {
+//       if (connection) {
+//           await connection.release(); // 연결 해제
+//       }
+//   }
+// }
+
+async function getMenuItems() {
+  try {
+
+      const tags = require('./frontend/src/data/tag.json');
+      const options = require('./frontend/src/data/option.json');
+      const tagMenu = require('./frontend/src/data/tagMenu.json');
+      const categories = require('./frontend/src/data/category.json');
+      const products = require('./frontend/src/data/product.json');
+
+
+      // console.log("카테고리 현황: ",categories);
+      // console.log(tags, options, tagMenu, products);
+
+
+      return products.map(product => {
+        const productCategory = categories.find(category => category.id == product.category);
+        const productWithTagOptions = tagMenu.filter(item => item.productId == product.id);
+        const productTags = productWithTagOptions.map(tagOption => {
+            const tag = tags.find(tag => tag.id == tagOption.tagId);
+            return { id: tag.id, name: tag.name };
+        });
+
         const productOptions = productWithTagOptions.map(tagOption => {
-          const filteredOptions = options.filter(option => option.TagNO == tagOption.TagNo);
+          const filteredOptions = options.filter(option => option.tag == tagOption.tagId);
           const optionsArray = filteredOptions.map(option => ({
-              id: option.DetNO,
-              name: option.DetName,
-              price: option.AddPrice,
-              image: option.DetImage,
-              alias: option.DetAlias,
+              id: option.id,
+              name: option.name,
+              price: option.price,
+              image: option.image,
+              alias: option.alias,
               orderNo: option.orderNo,
-              duplicate: option.isDup,
+              duplicate: option.duplicate,
           }));
           return optionsArray;
         });
@@ -98,30 +165,26 @@ async function getMenuItems() {
         // 제품 정보를 새로운 형식으로 변환하여 반환 
 
         return {
-            productId: product.ProductNO,
-            productName: product.ProductName,
+            productId: product.id,
+            productName: product.name,
+            productAlias: product.alias,
             category: {
-                id: productCategory.CategoryNO,
-                name: productCategory.CategoryName,
-                alias: productCategory.CategoryAlias,
+                id: productCategory.id,
+                name: productCategory.name,
+                alias: productCategory.alias,
                 //isOn: productCategory.isOn === undefined ? true : productCategory.isOn,
             },
             tags: productTags,
             options: productOptions,
            //options: productTags.map(tag => productOptions.filter(option => option.TagNO == tag.TagNO)),
         };
-       
       });
 
 
   } catch (err) {
       console.error('Error while fetching menu items:', err);
       throw err;  // 또는 적절한 에러 처리
-  } finally {
-      if (connection) {
-          await connection.release(); // 연결 해제
-      }
-  }
+  } 
 }
 
 app.get('/api/menu-items', async (req, res) => {
@@ -198,14 +261,7 @@ app.post('/chat', async (req, res) => {
     //   { text: "output: " },
     //];
 
-    const parts = [
-      {text: `질문에 맞는 메뉴의 아이디를 찾아 productId: [] 형식으로 반환하라,
-      \n 해당 이름이 들어간 메뉴나, 카테고리에 속하는 메뉴를 추천하라. 만약 옵션명과 관련된 내용이라면 해당 옵션을 가진 메뉴를 추천하라.
-      \n 질문에 맞는 단어가 없다면 발음이나 철자가 비슷한지를 찾아라.
-      \n 만약 어떤 메뉴와도 상응하는 데이터를 찾지 못하겠다면 모든 메뉴 productId를 반환해라`},
-      {text: `input: ${JSON.stringify(items)}` },
-      {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
-      // {text: "input: 따뜻한 거 추천해줘"},
+       // {text: "input: 따뜻한 거 추천해줘"},
       // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
       // {text: "input: 달달한거 추천해줘"},
       // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:[4,5], productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
@@ -218,6 +274,23 @@ app.post('/chat', async (req, res) => {
       // {text: "input: 아메리카노 추천해줘"},
       // {text: "output: 타겟팅: {categoryId:null, tagId:null, optionId:null,  productId: 1, recommened: null}\n검색결과: 아메리카노\nproductId: [1]"},
       //{text: "input: const Monthly_recommendedItems = [  {   name: '아메리카노',   id: 1,  },  {    name: '카페라떼',    id: 2,   },   {    name: '민트티',    id: 7,   }];"},
+
+    const parts = [
+      // {text: `질문에 맞는 메뉴의 아이디를 찾아 productId: [] 형식으로 반환하라,
+      // \n 해당 이름이 들어간 메뉴나, 카테고리에 속하는 메뉴를 추천하라. 만약 옵션명과 관련된 내용이라면 해당 옵션을 가진 메뉴를 추천하라.
+      // \n 만약 카테고리 이름이 메뉴 이름에 들어간다면, 카테고리 범주를 우선시 하여 찾아라, 
+      // \n 정확한 메뉴이름이 있다면 해당 메뉴들만을 찾는다. 
+      // \n 질문에 맞는 단어가 없다면 발음이나 철자가 비슷한지를 찾아라.
+      // \n 만약 특정 메뉴에 대해 묘사하는 질문을 받는다면, 해당 묘사에 속하는 메뉴가 있는지를 찾아라.
+      // \n 최종적으로 어떤 메뉴와도 상응하는 데이터를 찾지 못하겠다면 모든 메뉴 productId를 반환해라`},
+      {text: `질문에 맞는 메뉴의 아이디를 찾아 productId: [] 형식으로 반환하라.
+      \n 해당 이름이 들어간 메뉴나, 카테고리에 속하는 메뉴를 추천하라. 만약 옵션명과 관련된 내용이라면 해당 옵션을 가진 메뉴를 추천하라.
+      \n 또한 테이블에서 이름 말고도 별칭에 해당하는 것이 있다면 그것을 찾아라.
+      \n 질문에 맞는 단어가 없다면 발음이나 철자가 비슷한지를 찾아라.
+      \n 만약 특정 메뉴에 대해 묘사하는 질문을 받는다면, 해당 묘사에 속하는 메뉴가 있는지를 찾아라.
+      \n 최종적으로 어떤 메뉴와도 상응하는 데이터를 찾지 못하겠다면 모든 메뉴 productId를 반환해라`},
+      {text: `input: ${JSON.stringify(items)}` },
+      {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
       {text: `input: 추천메뉴 테이블: ${JSON.stringify(Monthly_recommendedItems)}`},
       {text: "output: 타겟팅: {categoryId:null, tagId:null, optionId:null,  productId:null, recommened: [1,2,7]}\n검색결과: 아메리카노, 카페라떼, 민트티\nproductId: [1,2,7]"},
       {text: "input: 추천메뉴로 해줘"},
