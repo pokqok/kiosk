@@ -18,6 +18,18 @@ let category = [
       alias: '',
       isOn: true,
     },
+    {  
+      id: 4,
+      name: '디저트',
+      alias: '',
+      isOn: true,
+    },
+    {  
+      id: 5,
+      name: '식사류',
+      alias: '',
+      isOn: true,
+    },
    
   ];
 /*

@@ -24,6 +24,22 @@ let tag = [
       isRequired: true, 
       isOn: true, 
     },
+    {  
+      id: 4,
+      name: '휘핑 크림',
+      alias: '크림',
+      description: '크림을 추가할 수 있습니다.',
+      isRequired: true, 
+      isOn: true, 
+    },
+    {  
+      id: 5,
+      name: '토핑',
+      alias: '토핑, 재료',
+      description: '위에 올릴 수 있는 추가 메뉴입니다.',
+      isRequired: true, 
+      isOn: true, 
+    },
   ];
 
 /*
