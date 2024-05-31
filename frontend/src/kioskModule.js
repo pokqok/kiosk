@@ -35,19 +35,20 @@ const kioskModule = {
     },
     addProduct(state, newProduct){
       if (newProduct.name.trim() !== "") {
+        //+1하는 걸 vue에서 하도록 바꿈, 10단위로 올라가는 문제가 자꾸 생김
+        console.log("추가하려는 메뉴는 바로 이것이다:",newProduct);
         const setProduct = {
-          id: newProduct.id,
-          name: newProduct.name,
-          price: newProduct.price,
-          category: newProduct.category,
-          detail: newProduct.detail,
-          image: newProduct.image,
-          alias: newProduct.alias,
+          "id": newProduct.id,
+          "name": newProduct.name,
+          "price": newProduct.price,
+          "category": newProduct.category,
+          "detail": newProduct.detail,
+          "image": newProduct.image,
+          "alias": newProduct.alias,
           //isOn: newProduct.IsOn == 1 ? true : false
-          isOn: true,
+          "isOn": true,
           //mariaDB는 1/0 으로 바꾸기에 이렇게 지속적인 변경이 필요하다.
       };
-        //+1하는 걸 vue에서 하도록 바꿈, 10단위로 올라가는 문제가 자꾸 생김
         state.products.push(setProduct);
       }
     },
@@ -72,7 +73,8 @@ const kioskModule = {
         productToUpdate.category = newProduct.category;
         productToUpdate.detail = newProduct.detail;
         productToUpdate.alias = newProduct.alias;
-        //productToUpdate.isOn = newProduct.isOn;
+        productToUpdate.isOn = true;
+        
         //   isOn: true,
       }
       //vue에서 사용법 (함수 내에서 )= this.$store.commit('updateCategory', { id: 1, newName: '새로운 이름', newAlias: '새로운 별칭' });
@@ -275,9 +277,8 @@ async addProduct({commit, state}, newProduct) {
     // //context.commit('addCategory', newCategory);
     try {
       commit("addProduct", newProduct);
-      await axios.post('/api/product/changeProduct', {
-        product: state.products,
-      });
+      // await axios.post('/api/product/changeProduct', {product: state.products});
+      await axios.post('/api/product/changeProduct', state.products);
     } catch (error) {
         console.error("변경 중 오류 발생:", error);
     }
@@ -297,9 +298,8 @@ async deleteProduct({commit, state}, deleteId) {
     // }
     try {
       commit("deleteProduct", deleteId);
-      await axios.post('/api/product/changeProduct', {
-        product: state.products,
-      });
+      // await axios.post('/api/product/changeProduct', {product: state.products});
+      await axios.post('/api/product/changeProduct', state.products);
     } catch (error) {
         console.error("변경 중 오류 발생:", error);
     }
@@ -324,9 +324,8 @@ async changeProduct({commit, state}, newProduct ) {
       console.log("받은 데이터 형식 테스트", newProduct);
       commit("changeProduct", { newProduct });
       console.log(newProduct.name + " 변경 성공");
-      await axios.post('/api/product/changeProduct', {
-        product: state.products,
-      });
+      // await axios.post('/api/product/changeProduct', {product: state.products});
+      await axios.post('/api/product/changeProduct', state.products);
   } catch (error) {
       console.error("변경 중 오류 발생:", error);
   }

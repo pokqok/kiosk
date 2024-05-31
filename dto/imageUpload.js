@@ -70,7 +70,7 @@ router.post('/uploadImage', imageUpload.single('file'), async (req, res) => {
     // }
     try {
         const { productId, overwrite } = req.body;
-        const filePath = path.join(__dirname, '../frontend/src/data/product.json');
+        const filePath = path.join(__dirname, '../frontend/public/image/', req.file.filename);
 
         console.log(req.body);
         console.log(req.file);
@@ -80,7 +80,11 @@ router.post('/uploadImage', imageUpload.single('file'), async (req, res) => {
         }
 
         // product.json 파일 읽기
-        let products =  require(PRODUCT_FILE_PATH);
+        const data = fs.readFileSync(PRODUCT_FILE_PATH, 'utf8');
+    
+        // JSON 문자열을 JavaScript 객체로 변환
+        const products = JSON.parse(data);
+        console.log("자 현재 메뉴 드가자",products)
 
         if (overwrite === 'true') { // 이미지를 덮어씌울 경우
             const existingProductIndex = products.findIndex(product => product.id === productId);

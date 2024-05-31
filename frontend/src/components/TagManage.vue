@@ -307,9 +307,9 @@ export default {
 
     clearEditTag() {
       this.editedTagyId = null;
-      this.editedTagName = "";
-      this.editedTagAlias = "";
-      this.editedTagDescription = "";
+      // this.editedTagName = "";
+      // this.editedTagAlias = "";
+      // this.editedTagDescription = "";
       //this.editTagDialog = false;
     },
 
@@ -373,7 +373,7 @@ export default {
       const id = selectedTagId;
       //alert(selectedTagId);
       this.$store.dispatch("deleteTag", id);
-
+      this.editTagDialog = false;
       this.clearEditTag();
     },
 

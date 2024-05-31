@@ -2,6 +2,8 @@ const mariadb = require("mariadb");
 const express = require("express");
 const router = express.Router();
 const config = require("../DBconfig.json");
+const path = require('path');
+const fs = require('fs');
 
 const pool = mariadb.createPool({
   host: config.db.host,
@@ -10,21 +12,42 @@ const pool = mariadb.createPool({
   database: config.db.database,
 });
 
+const TAG_FILE_PATH = path.join(__dirname, '../frontend/src/data/tag.json');
+
 router.get("/", async (req, res) => {
-  console.log("test");
-  res.status(200).send("test");
+  console.log("태그 진입 test");
+  res.status(200).send("tag test");
 });
 
 router.get("/getTag", async (req, res) => {
+  // try {
+  //   const conn = await pool.getConnection();
+  //   const result = await conn.query("SELECT * FROM TAG");
+  //   conn.release();
+  //   console.log("TAG 가져오기 성공");
+  //   res.status(200).json(result);
+  // } catch (error) {
+  //   console.error("TAG 가져오기 에러:", error);
+  //   res.status(500).send("TAG 가져오기 실패");
+  // }
+
   try {
-    const conn = await pool.getConnection();
-    const result = await conn.query("SELECT * FROM TAG");
-    conn.release();
-    console.log("TAG 가져오기 성공");
-    res.status(200).json(result);
+    // JSON 파일 경로 설정
+    const filePath = path.join(__dirname, '../frontend/src/data/tag.json');
+    
+    // 파일 읽기
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error("태그 파일 읽기 에러:", err);
+        return res.status(500).send("태그 파일 읽기 실패");
+      }
+
+      // 읽어온 JSON 데이터를 클라이언트로 보내기
+      res.status(200).send(data);
+    });
   } catch (error) {
-    console.error("TAG 가져오기 에러:", error);
-    res.status(500).send("TAG 가져오기 실패");
+    console.error("태그 가져오기 에러:", error);
+    res.status(500).send("태그가져오기 실패");
   }
 });
 
@@ -183,12 +206,21 @@ router.post("/toggleRequired", async (req, res) => {
 
 router.post("/apply", async (req, res) => {
   // 태그 적용
+  // try {
+  //   if (transaction) {
+  //     await transaction.commit();
+  //     transaction.release();
+  //     transaction = undefined;
+  //   } //트랜잭션 존재 시, 커밋하고 초기화
+  //   res.status(200).send("변경 사항이 성공적으로 적용되었습니다.");
+  // } catch (error) {
+  //   console.error("변경 사항 적용 에러:", error);
+  //   res.status(500).send("변경 사항을 적용하는 도중 에러가 발생했습니다.");
+  // }
+
   try {
-    if (transaction) {
-      await transaction.commit();
-      transaction.release();
-      transaction = undefined;
-    } //트랜잭션 존재 시, 커밋하고 초기화
+    const tag = req.body;
+    fs.writeFileSync(TAG_FILE_PATH, JSON.stringify(tag, null, 2), 'utf8');
     res.status(200).send("변경 사항이 성공적으로 적용되었습니다.");
   } catch (error) {
     console.error("변경 사항 적용 에러:", error);
