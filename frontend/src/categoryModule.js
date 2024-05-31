@@ -1,5 +1,11 @@
 import axios from "axios";
+//import fs from 'fs';
+//const fs = require('fs');
+//import path from 'path';
 //import {createStore} from 'vuex';
+
+
+//const CATEGORY_FILE_PATH = './data/category.json';
 
 const categoryModule = {
   state() {
@@ -23,6 +29,7 @@ const categoryModule = {
     //DB에서 카테고리 업데이트
     setCategorys(state, categorys) {
       state.categorys = categorys; // 카테고리 데이터 업데이트
+      console.log("가져온 카테고리:",categorys);
     },
 
     //카테고리에 변경사항 적용시, commit/rollback 후 다시 가져오기
@@ -30,6 +37,7 @@ const categoryModule = {
       state.categorys = newCategorys;
       //굳이 newCategories인 이유는 없음
     },
+
 
     //카테고리 생성
     addCategory(state, newCategory) {
@@ -41,14 +49,20 @@ const categoryModule = {
 
     //카테고리 변경
     updateCategory(state, { id, name, alias }) {
+      console.log("변경 시작:",name);
       const categoryToUpdate = state.categorys.find(
         (category) => category.id == id
       );
+
+      console.log("찾은 카테고리:",categoryToUpdate)
       if (categoryToUpdate) {
         categoryToUpdate.name = name;
         categoryToUpdate.alias = alias;
+    
+        console.log("수정 후 카테고리:",categoryToUpdate)
+      } else {
+        console.error('해당 ID의 카테고리를 찾을 수 없습니다.');
       }
-      //vue에서 사용법 (함수 내에서 )= this.$store.commit('updateCategory', { id: 1, newName: '새로운 이름', newAlias: '새로운 별칭' });
     },
 
     //카테고리 삭제
@@ -74,119 +88,170 @@ const categoryModule = {
 
   actions: {
     async fetchCategorys({ commit }) {
+      //DB를 사용하는 경우
+      // try {
+      //   // /categories/getAllCategories 엔드포인트에 GET 요청 보내기
+      //   const response = await axios.get("/api/category/getAllCategories");
+      //   console.log("API Response:", response.data); // Add this line to log the API response
+      //   let CategoryData = [];
+      //   // 응답에서 카테고리 데이터 추출
+      //   const responseData = response.data;
+      //   console.log("API Response:", response.data); // Add this line to log the API response
+      //   responseData.forEach((item) => {
+      //     // 원하는 형태로 변환하여 객체 생성
+      //     const setcategory = {
+      //       id: item.CategoryNO,
+      //       name: item.CategoryName,
+      //       alias: item.CategoryAlias,
+      //       isOn: item.IsOn == 1 ? true : false,
+      //       //mariaDB는 1/0 으로 바꾸기에 이렇게 지속적인 변경이 필요하다.
+      //     };
+      //     CategoryData.push(setcategory);
+      //   });
+      //   // 받아온 카테고리 데이터를 store에 저장하기 위해 mutation 호출
+      //   commit("setCategorys", CategoryData);
+      // } catch (error) {
+      //   console.error("카테고리 데이터를 불러오는 중 오류 발생:", error);
+      // }
+
+      //제출용 testData 사용 시
+      //require('./data/category.json');
       try {
-        // /categories/getAllCategories 엔드포인트에 GET 요청 보내기
         const response = await axios.get("/api/category/getAllCategories");
-        console.log("API Response:", response.data); // Add this line to log the API response
-        let CategoryData = [];
-        // 응답에서 카테고리 데이터 추출
+        //const categories = require('./data/category.json');
         const responseData = response.data;
-        console.log("API Response:", response.data); // Add this line to log the API response
-        responseData.forEach((item) => {
-          // 원하는 형태로 변환하여 객체 생성
-          const setcategory = {
-            id: item.CategoryNO,
-            name: item.CategoryName,
-            alias: item.CategoryAlias,
-            isOn: item.IsOn == 1 ? true : false,
-            //mariaDB는 1/0 으로 바꾸기에 이렇게 지속적인 변경이 필요하다.
-          };
-          CategoryData.push(setcategory);
-        });
-        // 받아온 카테고리 데이터를 store에 저장하기 위해 mutation 호출
-        commit("setCategorys", CategoryData);
+        console.log("실제로 가져온 JSON:",responseData)
+        commit('setCategorys', responseData);
       } catch (error) {
-        console.error("카테고리 데이터를 불러오는 중 오류 발생:", error);
+        console.error('Error reading categories from JSON file:', error);
       }
+
     },
+
     //카테고리 추가
-    async addCategory(context, newCategory) {
-      try {
-        // 서버에 카테고리 추가 요청 보내기
-        await axios.post("/api/category/add", {
-          categoryId: newCategory.id,
-          categoryName: newCategory.name,
-        });
+    async addCategory({ commit }, newCategory) {
+      //DB사용 시
+      // try {
+      //   // 서버에 카테고리 추가 요청 보내기
+      //   await axios.post("/api/category/add", {
+      //     categoryId: newCategory.id,
+      //     categoryName: newCategory.name,
+      //   });
 
-        // DB에 추가하면 이제 여기 store(웹페이지)에서에 데이터 추가도 적용
-        console.log(newCategory.name + "추가 성공");
-        context.commit("addCategory", newCategory);
+      //   // DB에 추가하면 이제 여기 store(웹페이지)에서에 데이터 추가도 적용
+      //   console.log(newCategory.name + "추가 성공");
+      //   context.commit("addCategory", newCategory);
+      // } catch (error) {
+      //   console.error("카테고리 추가 중 오류 발생:", error);
+      // }
+
+      //제출용
+      try {
+        commit('addCategory', newCategory);
+        //fs.writeFileSync(CATEGORY_FILE_PATH, JSON.stringify(state.categories, null, 2));
       } catch (error) {
-        console.error("카테고리 추가 중 오류 발생:", error);
+        console.error('Error writing new category to JSON file:', error);
       }
-      //context.commit('addCategory', newCategory);
     },
 
-    async deleteCategory(context, id) {
-      try {
-        // 서버에 카테고리 삭제 요청 보내기
-        await axios.post("/api/category/delete", { categoryId: id });
+    async deleteCategory({ commit }, id) {
+      // try {
+      //   // 서버에 카테고리 삭제 요청 보내기
+      //   await axios.post("/api/category/delete", { categoryId: id });
 
-        // DB에 추가하면 이제 여기 store에도 적용
-        context.commit("deleteCategory", id);
-      } catch (error) {
-        console.error("카테고리 삭제 중 오류 발생:", error);
-      }
+      //   // DB에 추가하면 이제 여기 store에도 적용
+      //   context.commit("deleteCategory", id);
+      // } catch (error) {
+      //   console.error("카테고리 삭제 중 오류 발생:", error);
+      // }
       //context.commit('deleteCategory', id);
+      try {
+        //console.log("삭제하려는 id",id);
+        commit('deleteCategory', id);
+        //fs.writeFileSync(CATEGORY_FILE_PATH, JSON.stringify(state.categories, null, 2));
+      } catch (error) {
+        console.error('Error deleting category from JSON file:', error);
+      }
     },
 
     // 카테고리 정보 변경
-    async updateCategory(context, { id, name, alias }) {
-      try {
-        // 서버에 카테고리 변경 요청 보내기
-        //console(name+'is here!');
-        await axios.post("/api/category/update", {
-          categoryId: id,
-          categoryName: name /*, newAlias */,
-        });
+    async updateCategory({ commit }, {id, name, alias} ) {
+      // try {
+      //   // 서버에 카테고리 변경 요청 보내기
+      //   //console(name+'is here!');
+      //   await axios.post("/api/category/update", {
+      //     categoryId: id,
+      //     categoryName: name /*, newAlias */,
+      //   });
 
-        // 변경 성공 시 스토어 상태 업데이트
-        context.commit("updateCategory", { id, name, alias });
+      //   // 변경 성공 시 스토어 상태 업데이트
+      //   context.commit("updateCategory", { id, name, alias });
+      // } catch (error) {
+      //   console.error("카테고리 변경 중 오류 발생:", error);
+      // }
+      
+      try {
+        console.log('업데이트 카테고리 시작');
+        console.log('selectedCategoryId:', id);
+        console.log('editedCategoryName:', name);
+        commit('updateCategory', { id, name, alias });
+        //fs.writeFileSync(CATEGORY_FILE_PATH, JSON.stringify(state.categories, null, 2));
       } catch (error) {
-        console.error("카테고리 변경 중 오류 발생:", error);
+        console.error('Error updating category in JSON file:', error);
       }
-      // context.commit('updateCategory', { id, newName, newAlias });
     },
 
     // 카테고리 적용,
-    async applyCategory(context, newCategorys) {
-      // 카테고리 데이터 교체 뮤테이션 호출
+    async applyCategory({ commit }, newCategory) {
+    
       try {
         // 서버에 카테고리 업데이트 요청 보내기
-        await axios.post("/api/category/apply", newCategorys);
-        // 업데이트 성공 시 스토어 상태 업데이트
-        // 다시 가져오도록 하기 (사실 굳이 상관은 없다)
-        context.commit("changeCategorys", newCategorys);
+        //console.log("변경사항 확인(카테고리):", state.categorys)
+        await axios.post("/api/category/apply", newCategory);
+        commit('changeCategorys', newCategory);
       } catch (error) {
         console.error("카테고리 업데이트 중 오류 발생:", error);
       }
-      //context.commit('applyCategory', newCategorys);
+     
     },
 
     //카테고리 적용 취소, 다 rollback하고 다시 DB에서 가져온다.
     async cancelCategory(context) {
+      // try {
+      //   // 서버에 카테고리 취소 요청 보내기
+      //   await axios.post("/api/category/cancel");
+      //   // 취소 성공 시 다시 DB에서 가져와서 초기화하기
+      //   context.dispatch("fetchCategorys");
+      // } catch (error) {
+      //   console.error("카테고리 취소 중 오류 발생:", error);
+      // }
+
       try {
-        // 서버에 카테고리 취소 요청 보내기
-        await axios.post("/api/category/cancel");
-        // 취소 성공 시 다시 DB에서 가져와서 초기화하기
         context.dispatch("fetchCategorys");
       } catch (error) {
-        console.error("카테고리 취소 중 오류 발생:", error);
+        console.error('Error canceling category changes:', error);
       }
     },
 
-    async toggleCategory(context, { id, isOn }) {
+    async toggleCategory({ commit }, { id }) {
+      // try {
+      //   // 서버에 카테고리 취소 요청 보내기
+      //   console.log(isOn);
+      //   await axios.post("/api/category/toggle", {
+      //     categoryId: id,
+      //     categoryOn: isOn,
+      //   });
+      //   // 취소 성공 시 다시 DB에서 가져와서 초기화하기
+      //   context.commit("toggleCategory", id);
+      // } catch (error) {
+      //   console.error("카테고리 취소 중 오류 발생:", error);
+      // }
+
       try {
-        // 서버에 카테고리 취소 요청 보내기
-        console.log(isOn);
-        await axios.post("/api/category/toggle", {
-          categoryId: id,
-          categoryOn: isOn,
-        });
-        // 취소 성공 시 다시 DB에서 가져와서 초기화하기
-        context.commit("toggleCategory", id);
+        commit('toggleCategory', id);
+        //fs.writeFileSync(CATEGORY_FILE_PATH, JSON.stringify(state.categories, null, 2));
       } catch (error) {
-        console.error("카테고리 취소 중 오류 발생:", error);
+        console.error('Error toggling category in JSON file:', error);
       }
     },
   },

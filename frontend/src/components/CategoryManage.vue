@@ -240,14 +240,16 @@
       },
 
       updateCategory(selectedCategoryId) {
+        
         if (this.editedCategoryName.trim() !== '') {
           const newName = this.editedCategoryName;
+          //console.log("변경하려는 이름은?:",newName);
           const newAlias = '';
           const editedId = selectedCategoryId;
           //alert(editedId);
           this.$store.dispatch('updateCategory', { id: editedId, name: newName, alias: newAlias});
-          
-          this.editedCategoryName = '';
+          console.log("전체 카테고리 현황은?!?:",this.Categorys);
+          //this.editedCategoryName = '';
           this.editDialog = false; // 수정 다이얼로그 닫기
         }else{
           alert('입력 예외');

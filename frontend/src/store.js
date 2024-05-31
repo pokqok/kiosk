@@ -1,10 +1,4 @@
 import { createStore } from "vuex";
-//import testdata from "./data/product.json";
-// import { product } from "./data/PageProduct.js";
-// import { tag } from "./data/PageTags.js";
-// import { option } from "./data/PageOptions.js";
-// import { category } from "./data/PageCategory.js";
-// import { tagMenu } from "./data/PageTagMenu.js";
 import categoryModule from "./categoryModule";
 import tagModule from "./tagModule";
 import kioskModule from "./kioskModule";
@@ -45,13 +39,6 @@ const store = createStore({
       socket: null,
       jwt: null,
       productName: "",
-
-      // testdata: testdata,
-      // testProduct: product,
-      // testTag: tag,
-      // testOption: option,
-      // testCategory: category,
-      // testTagMenu: tagMenu,
 
       testProduct: null,
       testTag: null,

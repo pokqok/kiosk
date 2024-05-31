@@ -285,7 +285,7 @@ export default {
     },
     getImageUrl(imageFileName) {
       // public/image/ 디렉토리에서 이미지를 가져옵니다.
-      console.log(`../../public/image/${imageFileName}`);
+      //console.log(`../../public/image/${imageFileName}`);
       
       return `/image/${imageFileName}`;
     },
@@ -323,7 +323,7 @@ export default {
       this.resetNewProductForm();
     },
     deleteProduct(){
-      alert("삭제 상품 id:",this.selectedProductId);
+      alert("삭제 상품 id:"+this.selectedProductId)
       this.$store.dispatch('deleteProduct', this.selectedProductId);
       this.showManageCardModal = false;
       this.selectedProductId = null;
