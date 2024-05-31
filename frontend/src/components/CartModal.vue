@@ -12,7 +12,7 @@
         >
           <p>{{ item.name }} - {{ parseInt(item.price) }}원 </p>
           <!--{{ formatOptionsString(item.option) }} -->
-          <v-chip v-for="(option, optionIndex) in item.option" :key="optionIndex" class="mr-2 mt-2" outlined>
+          <v-chip v-for="(option, optionIndex) in item.option" :key="optionIndex" class="mx-2" outlined>
             {{ option.optionName }}
           </v-chip>
           <v-spacer></v-spacer>
@@ -21,7 +21,7 @@
           </v-btn>
         </v-row>
       </v-col>
-      <v-col cols="1" class="price-fixed shadow">
+      <v-col cols="1" class="cart-fix-price shadow">
         <!-- store 및 shopPage에서의 전체 데이터 관리 형식이 바뀌어서 변형 필요-->
         <p>{{ parseInt(totalPrice) }}원</p>
       </v-col>
