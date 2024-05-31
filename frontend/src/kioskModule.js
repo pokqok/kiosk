@@ -87,7 +87,7 @@ const kioskModule = {
     // 모든 태그의 옵션 가져오기
     async fetchOptions({ commit }) {
       try {
-        const response = await axios.get(HOST + 'kiosk/getOption');
+        const response = await axios.get(HOST + '/kiosk/getOption');
         // let optionData =[];
         const responseData = response.data;
 
