@@ -44,7 +44,7 @@ const io = new Server(server, {
   },
 });
 
-console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스트 출력
+//console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스트 출력
 
 // 제미니 api
 
@@ -53,7 +53,7 @@ console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스
 const MODEL_NAME = "gemini-1.5-pro-latest";
 process.env.GOOGLE_APPLICATION_CREDENTIALS;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;; // Replace with your actual API key
-console.log("API_KEY:", GEMINI_API_KEY);
+//console.log("API_KEY:", GEMINI_API_KEY);
 
 
 // async function getMenuItems() {
