@@ -382,7 +382,7 @@ export default {
 
     pickProduct($event) {
       this.stopAllAudio();
-      this.playAddOrderAudio();
+      //this.playAddOrderAudio();
       this.showOptionModal = false;
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
@@ -409,7 +409,7 @@ export default {
 
     subProduct($event) {
       this.stopAllAudio();
-      this.playSubOrderAudio();
+      //this.playSubOrderAudio();
       console.log("장바구니 크기:", this.cart.length);
       this.subCart($event);
 

@@ -28,11 +28,6 @@
             :src="clickSoundSource"
             type="audio/mp3"
           ></audio>
-          <audio
-            ref="cashPaymentAudio"
-            :src="cashPaymentAudioSource"
-            type="audio/mp3"
-          ></audio>
           <v-btn color="white" @click="$router.go(-1 - 2 * cntCanclePay)">
             <v-icon left>mdi-arrow-left</v-icon>
             <p>취소</p>
@@ -79,12 +74,18 @@
       </v-row>
     </v-container>
 
-    <v-dialog v-model="showModal" max-width="500">
+    <v-dialog v-model="showModal" max-width="500" persistent>
       <v-card class="square-modal">
         <v-card-title class="headline large-text">결제 완료</v-card-title>
         <v-card-text class="order-number-text"
           >주문번호: {{ orderNumber }}</v-card-text
         >
+        <v-card-text class="animation-container">
+          <div class="loader"></div>
+        </v-card-text>
+        <v-card-text class="info-text">
+          잠시 후 모드 선택 창으로 돌아갑니다
+        </v-card-text>
       </v-card>
     </v-dialog>
   </div>
@@ -104,7 +105,6 @@ export default {
       kakaoPayAudioSource: require("@/assets/카카오페이.mp3"),
       normalPayAudioSource: require("@/assets/일반결제.mp3"),
       clickSoundSource: require("@/assets/click-sound.mp3"),
-      //cashPaymentAudioSource: require("@/assets/현금주문.mp3"),
       showModal: false,
       orderNumber: null,
     };
@@ -117,7 +117,7 @@ export default {
     this.playPaymentAudio();
   },
   methods: {
-    ...mapMutations(["clearCart", "addCartToOrders"]),
+    ...mapMutations(["clearCart", "addCartToOrders", "incrementOrderCounter"]),
     playPaymentAudio() {
       this.resetAndPlay(this.$refs.paymentAudio);
     },
@@ -133,9 +133,7 @@ export default {
     playClickSound() {
       this.resetAndPlay(this.$refs.clickSound);
     },
-    playCashPaymentAudio() {
-      this.resetAndPlay(this.$refs.cashPaymentAudio);
-    },
+
     stopAllAudio() {
       const audios = [
         this.$refs.paymentAudio,
@@ -143,7 +141,6 @@ export default {
         this.$refs.kakaoPayAudio,
         this.$refs.normalPayAudio,
         this.$refs.clickSound,
-        this.$refs.cashPaymentAudio,
       ];
       audios.forEach((audio) => {
         if (audio) {
@@ -164,7 +161,7 @@ export default {
     requestPay() {
       console.log("결제 시작 진입 성공 (여기서 totalPrice는:", this.totalPrice);
       console.log(
-        "결제 시작 진입 성공 (결제하는 상품 이름은 :",
+        "결제 시작 진입 성공 (결제하는 상품 이름은:",
         this.productName
       );
       this.playNormalPayAudio();
@@ -220,9 +217,7 @@ export default {
       );
     },
     requestPayCash() {
-      //this.playCashPaymentAudio();
       const merchantUid = "merchant_" + new Date().getTime();
-      // Handle cash payment without IMP.request_pay
       this.handlePaymentPending(merchantUid);
     },
     handlePaymentPending(merchantUid) {
@@ -230,15 +225,11 @@ export default {
       console.log("현재 주문 목록:", this.$store.state.orders);
       this.orderNumber = this.$store.state.orderCounter;
       this.showModal = true;
+      this.startCountdown();
       this.savePaymentData(merchantUid, this.totalPrice);
       this.$store.commit("incrementOrderCounter");
       this.$store.commit("clearCart");
       console.log("Cart after clearCart:", this.$store.state.cart);
-      setTimeout(() => {
-        this.showModal = false;
-        console.log("모드 선택 페이지로 이동합니다.");
-        this.$router.push("/mode-select");
-      }, 5000);
     },
     handlePaymentSuccess(merchantUid) {
       this.playPaymentCompletedAudio();
@@ -246,13 +237,15 @@ export default {
       console.log("현재 주문 목록:", this.$store.state.orders);
       this.orderNumber = this.$store.state.orderCounter;
       this.showModal = true;
+      this.startCountdown();
       this.savePaymentData(merchantUid, this.totalPrice);
       this.$store.commit("incrementOrderCounter");
       this.$store.commit("clearCart");
       console.log("Cart after clearCart:", this.$store.state.cart);
+    },
+    startCountdown() {
       setTimeout(() => {
         this.showModal = false;
-        console.log("모드 선택 페이지로 이동합니다.");
         this.$router.push("/mode-select");
       }, 5000);
     },
@@ -302,5 +295,35 @@ export default {
 .order-number-text {
   font-size: 48px;
   text-align: center;
+}
+.animation-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.info-text {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 20px;
+}
+.v-overlay__scrim {
+  background-color: rgba(0, 0, 0, 0.5) !important;
 }
 </style>

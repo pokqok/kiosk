@@ -174,6 +174,12 @@ const store = createStore({
       localStorage.setItem('orderCounter', state.orderCounter); // Save updated orderCounter to localStorage
     },
     completeOrder(state, orderId) {
+      //play audio from assets folder
+      const audio = new Audio(require('@/assets/제조완료.mp3'));
+      //stop all audio first
+      audio.pause();
+      //then play audio
+      audio.play();
       const order = state.orders.find(order => order.id === orderId);
       if (order) {
         order.status = 'completed';
