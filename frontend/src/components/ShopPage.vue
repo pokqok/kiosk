@@ -1,15 +1,15 @@
 <template>
   <div>
     <audio ref="orderMenu" :src="orderMenuSource" type="audio/mp3"></audio>
-    <audio ref="addOrder" :src="addOrderSource" type="audio/mp3"></audio>
-    <audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>
+    <!--<audio ref="addOrder" :src="addOrderSource" type="audio/mp3"></audio>-->
+    <!--<audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>-->
     <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
     <audio ref="clickSound" :src="clickSoundSource" type="audio/mp3"></audio>
     <!-- <v-toolbar color="#229954" tabs style="position: fixed; z-index: 1000"> -->
     <v-toolbar class="head-container pb-0" tabs>
       <v-col cols="4">
         <!-- <v-btn @click="handleBackButtonClick" style="background-color: #009688"> -->
-        <v-btn color="black" @click="goToBack" style="background-color: white"> 
+        <v-btn color="black" @click="goToBack" style="background-color: white">
           <v-icon left>mdi-arrow-left</v-icon>
           <p>뒤로가기</p>
         </v-btn>
@@ -92,10 +92,10 @@ export default {
       showCartModal: false,
       selectedProduct: null,
       orderMenuSource: require("@/assets/원하시는메뉴를선택해주세요.mp3"),
-      addOrderSource: require("@/assets/장바구니추가.mp3"),
-      subOrderSource: require("@/assets/장바구니취소.mp3"),
+      //addOrderSource: require("@/assets/장바구니추가.mp3"),
+      //subOrderSource: require("@/assets/장바구니취소.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
-      clickSoundSource: require("@/assets/click-sound.mp3"), 
+      clickSoundSource: require("@/assets/click-sound.mp3"),
     };
   },
 
@@ -169,16 +169,18 @@ export default {
 
         console.log("옵션들:", this.options);
         const matchedOptionIds = [];
-          matchedTagIds.forEach(tag => {
-            const options = this.options.filter(option => option.tag == tag);
-            matchedOptionIds.push(...options.map(option => option.id));
-          });
-          // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
-          const filteredOptions = this.options.filter(option => matchedOptionIds.includes(option.id));
-          console.log("선택 상품의 태그들 현황: ",filteredTags);
-          console.log("선택 상품의 태그의 옵션들: ",filteredOptions);
-          //return { tags: matchedTags, options: filteredOptions };
-          return { tags: filteredTags, options: filteredOptions };
+        matchedTagIds.forEach((tag) => {
+          const options = this.options.filter((option) => option.tag == tag);
+          matchedOptionIds.push(...options.map((option) => option.id));
+        });
+        // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
+        const filteredOptions = this.options.filter((option) =>
+          matchedOptionIds.includes(option.id)
+        );
+        console.log("선택 상품의 태그들 현황: ", filteredTags);
+        console.log("선택 상품의 태그의 옵션들: ", filteredOptions);
+        //return { tags: matchedTags, options: filteredOptions };
+        return { tags: filteredTags, options: filteredOptions };
       };
     },
   },
@@ -206,19 +208,19 @@ export default {
     this.playMenuAudio();
   },
   async created() {
-      // 데이터를 비동기적으로 로드
-      this.$store.dispatch('fetchTestData');
+    // 데이터를 비동기적으로 로드
+    this.$store.dispatch("fetchTestData");
 
-      this.$store.dispatch('fetchCategories');
-      this.$store.dispatch('fetchTags')
-      this.$store.dispatch('fetchOptions');
-      this.$store.dispatch('fetchProducts');
-      this.$store.dispatch('fetchTagMenu');
-      this.restoreSelectedProduct();
-    },
-    beforeUnmount() {
+    this.$store.dispatch("fetchCategories");
+    this.$store.dispatch("fetchTags");
+    this.$store.dispatch("fetchOptions");
+    this.$store.dispatch("fetchProducts");
+    this.$store.dispatch("fetchTagMenu");
+    this.restoreSelectedProduct();
+  },
+  beforeUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
-    },
+  },
   methods: {
     // playMenuAudio() {
     //   this.$refs.orderMenu.play();
@@ -233,19 +235,19 @@ export default {
     //   this.$refs.option.play();
     // },
     playMenuAudio() {
-        this.resetAndPlay(this.$refs.orderMenu);
-      },
-      playAddOrderAudio() {
-        this.resetAndPlay(this.$refs.addOrder);
-      },
-      playSubOrderAudio() {
-        this.resetAndPlay(this.$refs.subOrder);
-      },
-      playOptionAudio() {
-        this.resetAndPlay(this.$refs.option);
-      },
+      this.resetAndPlay(this.$refs.orderMenu);
+    },
+    /*playAddOrderAudio() {
+      this.resetAndPlay(this.$refs.addOrder);
+    },
+    playSubOrderAudio() {
+      this.resetAndPlay(this.$refs.subOrder);
+    },*/
+    playOptionAudio() {
+      this.resetAndPlay(this.$refs.option);
+    },
     playClickSound() {
-        this.resetAndPlay(this.$refs.clickSound);
+      this.resetAndPlay(this.$refs.clickSound);
     },
     stopAllAudio() {
       // this.$refs.orderMenu.pause();
@@ -253,29 +255,29 @@ export default {
       // this.$refs.subOrder.pause();
       // this.$refs.option.pause();
       const audios = [
-          this.$refs.orderMenu,
-          this.$refs.addOrder,
-          this.$refs.subOrder,
-          this.$refs.option,
-          this.$refs.clickSound,
-        ];
-        audios.forEach((audio) => {
-          if (audio) {
-            audio.pause();
-            audio.currentTime = 0;
-          }
-        });
+        this.$refs.orderMenu,
+        this.$refs.addOrder,
+        this.$refs.subOrder,
+        this.$refs.option,
+        this.$refs.clickSound,
+      ];
+      audios.forEach((audio) => {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
     },
 
     resetAndPlay(audio) {
-        this.stopAllAudio();
-        if (audio) {
-          audio.currentTime = 0; // 초기화
-          audio.play().catch((error) => {
-            console.error("Error playing audio:", error);
-          });
-        }
-      },
+      this.stopAllAudio();
+      if (audio) {
+        audio.currentTime = 0; // 초기화
+        audio.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
+      }
+    },
 
     //dev에선 사용 안함
     resetAudio(audio) {
@@ -306,7 +308,9 @@ export default {
 
       for (let i = 0; i < this.testCategory.length; i++) {
         const category = this.testCategory[i];
-        const element = document.getElementById('CategoryTitle' + category.name);
+        const element = document.getElementById(
+          "CategoryTitle" + category.name
+        );
         if (window.scrollY >= element.offsetTop - 140) {
           this.tab = i;
         }
@@ -322,11 +326,10 @@ export default {
       this.showCartModal = false;
     },
 
-    
     handleProductClick(data) {
-        this.playClickSound();
-        this.openProductOptionModal(data);
-      },
+      this.playClickSound();
+      this.openProductOptionModal(data);
+    },
 
     //사용 안함
     handleSelectProduct(data) {
@@ -344,7 +347,6 @@ export default {
       );
     },
 
-
     payment($event) {
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
@@ -355,16 +357,16 @@ export default {
       }
       this.showOptionModal = false;
       this.showCartModal = false;
-      console.log("결제 들어가기전 payment확인(shop페이지):",$event.price);
+      console.log("결제 들어가기전 payment확인(shop페이지):", $event.price);
       this.$router.push("/payment");
       //this.clearCart();
       //이후 코드
     },
-  
+
     restoreSelectedProduct() {
-    // 예를 들어, localStorage 또는 Vuex 상태에서 이전 상태를 복구하는 로직
-    this.selectedProduct = this.$store.state.selectedProduct || {};
-    } ,
+      // 예를 들어, localStorage 또는 Vuex 상태에서 이전 상태를 복구하는 로직
+      this.selectedProduct = this.$store.state.selectedProduct || {};
+    },
     /*
       pickProduct($event) {
         this.showOptionModal = false;
@@ -385,7 +387,7 @@ export default {
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
       for (let i = 0; i < $event.num; i++) {
-        console.log("옵션:",$event.option);
+        console.log("옵션:", $event.option);
         this.addCart({
           product: {
             name: this.selectedProduct.name,
@@ -395,11 +397,10 @@ export default {
         });
       }
       this.showCartModal = true;
-      console.log("장바구니 크기:",this.cart.length);
+      console.log("장바구니 크기:", this.cart.length);
     },
 
     closeProductOptionModal() {
-      
       this.showOptionModal = false;
       if (this.cart.length != 0) {
         this.showCartModal = true;
@@ -409,9 +410,9 @@ export default {
     subProduct($event) {
       this.stopAllAudio();
       this.playSubOrderAudio();
-      console.log("장바구니 크기:",this.cart.length);
+      console.log("장바구니 크기:", this.cart.length);
       this.subCart($event);
-      
+
       //this.setTotalPrice(-$event.productPrice);
       //이걸하면 두번 빼지는 문제 발생, htod에서는 이 주석 풀 것
 
@@ -434,7 +435,7 @@ export default {
     getCategoryNameById(id) {
       //DB
       //const category = this.categories.find(cat => cat.id === id);
-      const category = this.testCategory.find(cat => cat.id === id);
+      const category = this.testCategory.find((cat) => cat.id === id);
       return category ? category.name : null;
     },
   },

@@ -5,7 +5,7 @@
         <v-row>
           <v-col cols="12" md="6">
             <div class="d-flex justify-center">
-              <v-chip 
+              <v-chip
                 class="ma-2 x-large"
                 color="light-green"
                 text-color="white"
@@ -14,7 +14,6 @@
               </v-chip>
               <v-img
                 :src="getImageUrl(selectedProduct.image)"
-
                 aspect-ratio="1.7"
                 contain
                 style="margin-top: 10%"
@@ -89,7 +88,7 @@
               text
               @click="handlePickProductClick"
             >
-              <v-icon size = "x-large" left>mdi-cart</v-icon>
+              <v-icon size="x-large" left>mdi-cart</v-icon>
               <h2>장바구니</h2>
             </v-btn>
           </v-col>
@@ -101,7 +100,7 @@
               text
               @click="handleCloseButtonClick"
             >
-              <v-icon size = "x-large" left>mdi-close</v-icon>
+              <v-icon size="x-large" left>mdi-close</v-icon>
               <h2>취소</h2>
             </v-btn>
           </v-col>
@@ -131,7 +130,7 @@ export default {
     },
     category: {
       type: String,
-      required: true
+      required: true,
     },
   },
   setup(props, { emit }) {
@@ -160,11 +159,10 @@ export default {
         alert("1개 이하로 주문 하실 수 없습니다");
       }
     };
-    
+
     const getOptionByID = (tag) => {
       return props.option.filter((option) => option.tag === tag.id);
     };
-
 
     // const setOptionPrice = (tagId, price) => {
     //   optionPrices[tagId] = price;
@@ -176,25 +174,24 @@ export default {
         tagName: tag.name,
         optionId: option.id,
         optionName: option.name,
-        optionPrice: option.price
+        optionPrice: option.price,
       };
-
     };
 
     const getCategoryNameById = (id) => {
-      const category = this.categories.find(cat => cat.id === id);
+      const category = this.categories.find((cat) => cat.id === id);
       return category ? category.name : null;
     };
-    
+
     // const getImageSrc = () => {
     //   //이제 필요없는 기능
     //   return "https://picsum.photos/100?random=1";
     // };
 
-    const getImageUrl = (imageFileName) =>{
+    const getImageUrl = (imageFileName) => {
       // public/image/ 디렉토리에서 이미지를 가져옵니다.
       console.log(`../../public/image/${imageFileName}`);
-      if(!imageFileName){
+      if (!imageFileName) {
         return "https://picsum.photos/100?random=1"; //비어있는 경우 랜덤 이미지.
       }
       return `/image/${imageFileName}`;
@@ -219,12 +216,13 @@ export default {
       if (selectedOption.includes(undefined)) {
         alert("옵션을 전부 선택해 주세요");
       } else {
-        console.log("안의 내용은?",Object.values(totalOption));
+        playAddCartSound();
+        console.log("안의 내용은?", Object.values(totalOption));
         emit("pickProduct", {
           num: numProduct.value,
           price: price.value + optionPrice.value,
           option: Object.values(totalOption), // 객체의 값만 배열 형태로 전달
-          optionPrice: optionPrice.value
+          optionPrice: optionPrice.value,
         });
       }
     };
@@ -236,8 +234,15 @@ export default {
       });
     };
 
+    const playAddCartSound = () => {
+      const addCartSound = new Audio(require("@/assets/장바구니추가.mp3"));
+      addCartSound.play().catch((error) => {
+        console.error("Error playing add cart sound:", error);
+      });
+    };
+
     const handlePickProductClick = () => {
-      playClickSound();
+      console.log("장바구니에 추가 버튼 클릭");
       handlePickProduct();
     };
 

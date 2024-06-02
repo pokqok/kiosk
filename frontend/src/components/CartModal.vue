@@ -10,9 +10,14 @@
           class="align-center"
           style="margin-left: 10%"
         >
-          <p>{{ item.name }} - {{ parseInt(item.price) }}원 </p>
+          <p>{{ item.name }} - {{ parseInt(item.price) }}원</p>
           <!--{{ formatOptionsString(item.option) }} -->
-          <v-chip v-for="(option, optionIndex) in item.option" :key="optionIndex" class="mx-2" outlined>
+          <v-chip
+            v-for="(option, optionIndex) in item.option"
+            :key="optionIndex"
+            class="mx-2"
+            outlined
+          >
             {{ option.optionName }}
           </v-chip>
           <v-spacer></v-spacer>
@@ -25,11 +30,7 @@
         <!-- store 및 shopPage에서의 전체 데이터 관리 형식이 바뀌어서 변형 필요-->
         <p>{{ parseInt(totalPrice) }}원</p>
       </v-col>
-      <v-btn
-        @click="handlePayment"
-        class="shadow cart-fix-btn"
-          height="20%"
-      >
+      <v-btn @click="handlePayment" class="shadow cart-fix-btn" height="20%">
         <v-icon left size="xx-large" style="margin-right: 10%">bi-coin</v-icon>
         <p>결제</p>
       </v-btn>
@@ -59,7 +60,7 @@ export default {
       if (audio) {
         audio.pause();
         audio.currentTime = 0;
-        audio.play().catch(error => {
+        audio.play().catch((error) => {
           console.error("Error playing subOrder sound:", error);
         });
       }
@@ -71,12 +72,16 @@ export default {
       this.playClickSound();
       console.log("handlePayment");
       if (this.totalPrice > 0) {
-        this.$emit("payment", {num: this.cart.length, price: this.totalPrice, option: this.cart.option});
+        this.$emit("payment", {
+          num: this.cart.length,
+          price: this.totalPrice,
+          option: this.cart.option,
+        });
 
         //dev에선 위에거 대신 이걸 이용
         // this.$emit("payment", this.totalPrice);
         // this.$router.push({ name: 'PaymentPage' });
-        
+
         console.log("카트에서 결제함-결제금액: ", this.totalPrice);
         //clean Cart는 shopPage로 이동했다.
       } else {
@@ -88,19 +93,23 @@ export default {
       if (clickSound) {
         clickSound.pause();
         clickSound.currentTime = 0;
-        clickSound.play().catch(error => {
+        clickSound.play().catch((error) => {
           console.error("Error playing click sound:", error);
         });
       }
     },
-    formatOptionsString(optionsArray) { //options를 받아서 문자열로 변환
+    formatOptionsString(optionsArray) {
+      //options를 받아서 문자열로 변환
       //console.log(optionsArray)
-      if (!optionsArray || optionsArray.length == 0) return '';
-      return "("+ optionsArray
-        .map(option => `${option.tagName}:${option.optionName}`)
-        .join(', ')
-        +")";
-    }
+      if (!optionsArray || optionsArray.length == 0) return "";
+      return (
+        "(" +
+        optionsArray
+          .map((option) => `${option.tagName}:${option.optionName}`)
+          .join(", ") +
+        ")"
+      );
+    },
   },
   watch: {
     cart(newCart) {

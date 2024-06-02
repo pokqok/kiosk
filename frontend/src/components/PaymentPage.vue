@@ -104,7 +104,7 @@ export default {
       kakaoPayAudioSource: require("@/assets/카카오페이.mp3"),
       normalPayAudioSource: require("@/assets/일반결제.mp3"),
       clickSoundSource: require("@/assets/click-sound.mp3"),
-      cashPaymentAudioSource: require("@/assets/현금주문.mp3"),
+      //cashPaymentAudioSource: require("@/assets/현금주문.mp3"),
       showModal: false,
       orderNumber: null,
     };
@@ -220,7 +220,7 @@ export default {
       );
     },
     requestPayCash() {
-      this.playCashPaymentAudio();
+      //this.playCashPaymentAudio();
       const merchantUid = "merchant_" + new Date().getTime();
       // Handle cash payment without IMP.request_pay
       this.handlePaymentPending(merchantUid);

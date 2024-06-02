@@ -102,10 +102,7 @@ export default {
         ).length;
 
         if (newCashOrders > oldCashOrders) {
-          //wait 5 seconds
-          setTimeout(() => {
-            this.playCashRequestAudio();
-          }, 2000);
+          this.playCashRequestAudio();
         }
       },
       deep: true,
