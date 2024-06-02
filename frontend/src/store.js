@@ -44,22 +44,25 @@ const store = createStore({
       messages: [],
       socket: null,
       jwt: null,
-      productName: "0",
+      productName: "",
+
       testdata: testdata,
       testProduct: product,
       testTag: tag,
       testOption: option,
       testCategory: category,
       testTagMenu: tagMenu,
+
       ShopID: -1,
       orderType: -1,
       cart: [],
       totalPrice: 0,
       orderCounter: 0,
       optionsList: {},
-      orders: [] // New state for storing orders
+      orders: [],
     };
   },
+
   mutations: {
     setFile(state, file) {
       state.file = file;
@@ -90,6 +93,20 @@ const store = createStore({
       state.orderType = type;
     },
     addCart(state, { product, options }) {
+      // <<수정 이전 코드, 형식이 다르니 이부분을 참조하자.>>
+      // const productWithPrice = {
+      //   ...product,
+      //   productPrice: product.price + (options ? options.reduce((acc, option) => acc + option.price, 0) : 0),
+      //   option: options,
+      // };
+      // const index = state.cart.length;
+      // state.cart.push(productWithPrice);
+      // //state.option = options;
+      // state.optionsList[index] = options || [];
+      // //state.totalPrice += productWithPrice.productPrice;
+      // //코드에 쓰이지 않아서 없앰
+      // state.totalPrice += productWithPrice.price;
+      
       const productName = product.name || "알 수 없는 제품";
       const productPrice = parseFloat(product.price) || 0;
       const optionsPrice = options ? options.reduce((acc, option) => acc + (parseFloat(option.price) || 0), 0) : 0;
@@ -107,7 +124,10 @@ const store = createStore({
     },
     subCart(state, index) {
       if (index !== -1 && index < state.cart.length) {
-        state.totalPrice -= state.cart[index].productPrice;
+        //state.totalPrice -= state.cart[index].productPrice;
+        //console.log("제거 전에 있던 금액은 바로 이것:", state.totalPrice);
+        //console.log("카트안에 있는 가격은 과연: ",state.cart[index].price)
+        state.totalPrice -= parseInt(state.cart[index].price);
         state.cart.splice(index, 1);
         delete state.optionsList[index];
         const newOptionsList = {};
@@ -115,10 +135,12 @@ const store = createStore({
           newOptionsList[i] = state.optionsList[i] || [];
         });
         state.optionsList = newOptionsList;
+        //console.log("현재 제거 후 금액은 바로 이것:", state.totalPrice);
       }
     },
     incrementOrderCounter(state) {
       state.orderCounter++;
+      console.log("Order Counter: ", state.orderCounter);
       state.productName = "주문번호 : " + state.orderCounter;
     },
     decrementOrderCounter(state) {
@@ -194,7 +216,12 @@ const store = createStore({
     tagModule: tagModule,
     kioskModule: kioskModule,
   },
-  plugins: [localStoragePlugin]
+  plugins: [localStoragePlugin],
+  actions: {
+    async initSocket() {
+      // Socket 초기화 코드
+    },
+  },
 });
 
 export default store;

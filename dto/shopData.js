@@ -8,14 +8,26 @@ const pool = mariadb.createPool({
   user: config.db.user,
   password: config.db.password,
   database: config.db.database,
+  // connectionLimit: 100,
+  // idleTimeout: 60000,
 });
+
+// const pool = mariadb.createPool({
+//   host: "localhost",
+//   user: "manager",
+//   password: "manager",
+//   database: "kiosk",
+// });
 
 
 
 router.get('/getCategory', async (req, res) => {
     try {
+      console.log('test1');
       const conn = await pool.getConnection();
+      console.log('test2');
       const result = await conn.query('SELECT * FROM category');
+      console.log('test3');
       conn.release();
       console.log('가져오기 성공');
       res.status(200).json(result);

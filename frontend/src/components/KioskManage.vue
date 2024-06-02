@@ -5,7 +5,7 @@
   </v-subheader>
   <v-divider></v-divider>
   <div>여기에 다양한 옵션을 넣을 수 있게 설정g</div>
-  <v-app-bar color="pink">
+  <!-- <v-app-bar color="pink">
     <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
     <v-toolbar-title>앙 테스트</v-toolbar-title>
@@ -13,7 +13,7 @@
     <v-spacer></v-spacer>
 
     <v-btn icon="mdi-magnify"></v-btn>
-  </v-app-bar>
+  </v-app-bar> -->
 
   <v-main>
     <div class="menu">
