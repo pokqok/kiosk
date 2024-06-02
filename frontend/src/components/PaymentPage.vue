@@ -113,6 +113,12 @@ export default {
     ...mapState(["productName", "totalPrice", "cart", "orderCounter"]),
   },
   mounted() {
+    // if (this.$store.state.ShopID == -1) {
+    //   alert("login error");
+    //   this.$router.push('/login/shop');
+    //   return;
+    // }
+
     this.IMP.init("imp03664607");
     this.playPaymentAudio();
   },
@@ -292,6 +298,7 @@ export default {
   font-size: 36px;
   text-align: center;
 }
+
 .order-number-text {
   font-size: 48px;
   text-align: center;

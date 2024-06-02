@@ -55,7 +55,6 @@ const store = createStore({
       orders: [],
     };
   },
-
   mutations: {
     setTestProduct(state, products) {
       state.testProduct = products;
@@ -130,7 +129,6 @@ const store = createStore({
     },
     incrementOrderCounter(state) {
       state.orderCounter++;
-      console.log("Order Counter: ", state.orderCounter);
       state.productName = "주문번호 : " + state.orderCounter;
     },
     decrementOrderCounter(state) {

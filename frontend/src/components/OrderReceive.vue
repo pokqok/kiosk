@@ -16,6 +16,7 @@
                 <v-icon>{{
                   order.minimized ? "mdi-chevron-down" : "mdi-chevron-up"
                 }}</v-icon>
+
               </v-btn>
               <v-btn icon @click="confirmResetSingleOrder(order.id)">
                 <v-icon color="red">mdi-delete</v-icon>
@@ -23,6 +24,7 @@
             </v-card-title>
             <v-card-text v-if="!order.minimized">
               <div v-if="order.details">
+
                 <div>
                   <strong>총 가격:</strong> {{ order.details.totalPrice }}원
                 </div>
@@ -108,6 +110,12 @@ export default {
       deep: true,
     },
   },
+  created() {
+    window.addEventListener('storage', this.syncOrders);
+  },
+  beforeUnmount() {
+    window.removeEventListener('storage', this.syncOrders);
+  },
   methods: {
     ...mapMutations([
       "completeOrder",
@@ -156,6 +164,7 @@ export default {
 .headline {
   font-weight: bold;
 }
+
 .product-info {
   margin-bottom: 10px;
 }
@@ -169,4 +178,5 @@ export default {
   border-radius: 4px;
   margin-left: 10px;
 }
+
 </style>

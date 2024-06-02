@@ -25,7 +25,11 @@
         required
       ></v-text-field>
 
-      <v-btn :disabled="!valid" color="success" @click="handleLoginClick">
+      <v-btn
+        :disabled="!valid"
+        color="success"
+        @click="login"
+      >
         Login
       </v-btn>
     </v-form>
@@ -45,8 +49,12 @@ export default {
       email: "",
       password: "",
       valid: true,
-      IDRules: [(v) => !!v || "ID is required"],
-      passwordRules: [(v) => !!v || "Password is required"],
+      IDRules: [
+        v => !!v || 'ID is required',
+      ],
+      passwordRules: [
+        v => !!v || 'Password is required',
+      ],
     };
   },
   methods: {
@@ -113,9 +121,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.login-page {
-  margin-top: 60px;
-}
-</style>

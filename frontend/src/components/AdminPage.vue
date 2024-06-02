@@ -13,6 +13,7 @@
       <!-- <v-list-item @click="goToKioskManage" title="키오스크 관리"></v-list-item> -->
       <v-list-item @click="goToUserManage" title="계정 설정"></v-list-item>
       <v-list-item @click="goToOrderReceive" title="주문 접수"></v-list-item> <!-- 주문 접수 항목 추가 -->
+
       <v-list-item @click="goToSalesPage" title="매출 내역"></v-list-item> <!-- 매출 내역 항목 추가 -->
     </v-navigation-drawer>
     <button @click="goToRootPage">메인 페이지로 돌아가기</button>
@@ -68,6 +69,3 @@ export default {
   },
 };
 </script>
-
-<!-- 스타일 (필요에 따라 추가) -->
-<style></style>

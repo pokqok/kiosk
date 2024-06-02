@@ -7,14 +7,17 @@
       </div>
       <RouterView @comeBack="showButton = true"></RouterView>
       <RouterLink to="/login/admin">
+      
         <!-- <button v-if="showButton" @click="showButton = false"> -->
         <button v-if="showButton" @click="handleButtonClick">
+
           관리자 로그인
         </button>
       </RouterLink>
       <RouterLink to="/login/shop">
         <!-- <button v-if="showButton" @click="showButton = false"> -->
         <button v-if="showButton" @click="handleButtonClick">
+
           상점 로그인
         </button>
       </RouterLink>
@@ -39,6 +42,7 @@
 </template>
 
 <script>
+
 import clickSoundFile from "@/assets/click-sound.mp3";
 
 export default {

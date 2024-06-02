@@ -8,6 +8,7 @@ import { loadFonts } from './plugins/webfontloader'
 import './assets/style.css'
 
 
+
 loadFonts()
 
 

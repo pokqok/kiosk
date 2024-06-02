@@ -55,7 +55,6 @@ process.env.GOOGLE_APPLICATION_CREDENTIALS;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;; // Replace with your actual API key
 console.log("API_KEY:", GEMINI_API_KEY);
 
-
 // async function getMenuItems() {
 //   let connection;
 //   try {
@@ -217,27 +216,7 @@ app.post('/chat', async (req, res) => {
   try {
     const userInput = req.body.userInput;
     console.log("Chat request received:", userInput);
-    //const menuItems = getMenuItems();
 
-    const items = await getMenuItems(); // getMenuItems()의 실행이 완료될 때까지 대기
-    items.forEach(item => {
-      const category = item.category;
-      const isOn = category.isOn === undefined ? true : category.isOn;
-      
-      console.log("Product ID:", item.productId);
-      console.log("Product Name:", item.productName);
-      console.log("Category ID:", category.id);
-      console.log("Category Name:", category.name);
-      console.log("Category Alias:", category.alias);
-      console.log("Is Category On:", isOn);
-      console.log("Tags:", item.tags);
-      console.log("Options:", item.options);
-      console.log("-----------------------");
-    });
-
-    //console.log('test:', JSON.stringify(items));
-    console.log(JSON.stringify(Monthly_recommendedItems));
-    
     const generationConfig = {
       temperature: 1,
       topK: 0,
@@ -251,7 +230,6 @@ app.post('/chat', async (req, res) => {
       { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
       { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
     ];
-
     // const parts = [
     //   { text: `input: ${JSON.stringify(menuItems)},${JSON.stringify(Monthly_recommendedItems)}` }, // Convert to JSON strings
     //   {
@@ -298,7 +276,6 @@ app.post('/chat', async (req, res) => {
       {text: `input: ${userInput}`},
       {text: "output: "},
     ];
-
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
@@ -548,15 +525,6 @@ app.use("/tag", tagRouter);
 
 const kioskRouter = require("./dto/shopData.js");
 app.use("/kiosk", kioskRouter);
-
-//이미지 업로드
-const uploadImage = require('./dto/imageUpload.js');
-app.use('/image', uploadImage);
-
-const productRouter = require('./dto/product.js');
-app.use('/product', productRouter);
-//-
-//---------------------------------------------------
 
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
   server.listen(PORT, () => {

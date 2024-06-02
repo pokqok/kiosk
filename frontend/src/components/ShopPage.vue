@@ -32,13 +32,12 @@
             :key="i"
             :href="'#CategoryTitle' + i.name"
           >
-            #{{ i.name }}
+            <h4>Category {{ i.name }}</h4>
           </v-tab>
         </v-tabs>
       </template>
     </v-toolbar>
   </div>
-
   <div style="margin-top: 140px"></div>
   <v-container v-for="i in testCategory" :key="i">
     <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i.name">
@@ -70,7 +69,6 @@
     v-if="showOptionModal"
     :tag="filteredTagsByProductId().tags"
     :option="filteredTagsByProductId().options"
-    :category="getCategoryNameById(selectedProduct.category)"
   />
 
   <CartModal @subProduct="subProduct" @payment="payment" v-if="showCartModal" />
@@ -192,19 +190,16 @@ export default {
   },
 
   mounted() {
-    window.addEventListener("scroll", this.handleScroll);
+    // if(this.$store.state.ShopID == -1) {
+    //   alert("login error")
+    //   this.$router.push('/login/shop')
+    //   return;
+    // }
 
+    window.addEventListener("scroll", this.handleScroll);
     if (this.cart.length != 0) {
       this.showCartModal = true;
     }
-
-    // shopID 받아 올 수 있을 때 사용
-    // if(this.ShopID == -1) {
-    //     alert('login error')
-    // } else if(this.orderType == -1) {
-    //     alert('orderType error')
-    // }
-
     this.playMenuAudio();
   },
   async created() {
@@ -290,7 +285,6 @@ export default {
     ...mapMutations([
       "addCart",
       "subCart",
-      "clearCart",
       "setTotalPrice",
       "setProductName",
       "orderType",
@@ -398,6 +392,7 @@ export default {
       }
       this.showCartModal = true;
       console.log("장바구니 크기:", this.cart.length);
+
     },
 
     closeProductOptionModal() {
@@ -416,6 +411,7 @@ export default {
       //this.setTotalPrice(-$event.productPrice);
       //이걸하면 두번 빼지는 문제 발생, htod에서는 이 주석 풀 것
 
+
       if (this.cart.length == 0) {
         this.showCartModal = false;
       }
@@ -431,7 +427,6 @@ export default {
       this.$store.commit("clearCart");
       this.$router.push("/order-type/common");
     },
-
     getCategoryNameById(id) {
       //DB
       //const category = this.categories.find(cat => cat.id === id);

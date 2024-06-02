@@ -33,6 +33,7 @@
 
   <!-- 미구현 -->
   <div class="d-flex align-center flex-column">
+
     <!--<h5 style="margin-top: 10%">언어선택</h5>
     
     <v-btn-toggle
@@ -101,7 +102,7 @@ export default {
 
   methods: {
     goToNext(mode) {
-      this.stopAllAudio();
+      this.stopAllAudio;
       this.$router.push("/order-type/" + mode);
     },
     playAudio() {
@@ -110,6 +111,7 @@ export default {
     stopAllAudio() {
       this.$refs.modeSelect.pause();
     },
+
 
     playClickSound() {
       const clickSound = new Audio(clickSoundFile);
@@ -123,15 +125,8 @@ export default {
       this.goToNext(mode);
     },
   },
-
-  // 로그인 정보 받아올 수 있을 때 사용
-  // mounted() {
-  //     if(this.$store.state.ShopID == -1) {
-  //         alert("login error")
-  //         this.$router.push('/login/shop')
-  //     }
-  // }
 };
+
 </script>
 
 <!-- <style></style> -->

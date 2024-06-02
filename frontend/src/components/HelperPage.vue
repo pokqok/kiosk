@@ -29,6 +29,7 @@
         <v-icon size="xxx-large" color="white">mdi-microphone</v-icon>
       </v-btn>
       <h3 style="margin-top: 3%">버튼을 눌러서 음성인식을 실행해주세요</h3>
+
       <div v-if="showVolumeMeter" class="volume-meter-container">
         <div class="outer-meter">
           <div
@@ -38,6 +39,7 @@
         </div>
       </div>
     </div>
+
     <div v-if="step == 1">
       <v-progress-circular
         indeterminate
@@ -46,6 +48,7 @@
       ></v-progress-circular>
       <p>인식결과: <span v-html="formattedTranscription"></span></p>
     </div>
+
     <div v-if="step == 2">
       <div v-if="loading">추천 중...</div>
       <v-row v-else>
@@ -57,6 +60,7 @@
             width="80%"
             height="150%"
             >
+
               <v-icon size="x-large">mdi-microphone</v-icon>
               <h3>추가로 주문하기</h3>
             </v-btn>
@@ -96,13 +100,16 @@
       :option=filteredTagsByProductId().options
       :category="getCategoryNameById(selectedProduct.category)"
       v-if="showOptionModal"
-    />
-    <CartModal
+  />
+
+  <CartModal
       @subProduct="subProduct"
       @payment="payment"
       v-if="showCartModal"
     />
+
 </template>
+
 
 <script>
 import { mapState, mapMutations } from "vuex";

@@ -42,6 +42,7 @@ router.get('/getCategory', async (req, res) => {
         // 읽어온 JSON 데이터를 클라이언트로 보내기
         res.status(200).send(data);
       });
+
     } catch (error) {
       console.error("카테고리 가져오기 에러:", error);
       res.status(500).send("카테고리 가져오기 실패");

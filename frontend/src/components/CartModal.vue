@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="cart.length > 0">
     <audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>
     <audio ref="clickSound" :src="clickSoundSource" type="audio/mp3"></audio>
     <v-row class="futter cart-container align-center shadow">
@@ -7,7 +7,7 @@
         <v-row
           v-for="(item, index) in cart"
           :key="index"
-          class="align-center"
+          class="align-center ml-5"
           style="margin-left: 10%"
         >
           <p>{{ item.name }} - {{ parseInt(item.price) }}원</p>
@@ -21,7 +21,7 @@
             {{ option.optionName }}
           </v-chip>
           <v-spacer></v-spacer>
-          <v-btn @click="removeFromCart(item, index)">
+          <v-btn @click="removeFromCart(index)">
             <v-icon>bi-x-lg</v-icon>
           </v-btn>
         </v-row>
@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       subOrderSource: require("@/assets/장바구니취소.mp3"),
-      clickSoundSource: require("@/assets/click-sound.mp3"),
+      clickSoundSource: require("@/assets/장바구니취소.mp3"),
     };
   },
   computed: {
@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     ...mapMutations(["subCart", "clearCart"]),
-    removeFromCart(item, index) {
+    removeFromCart(index) {
       this.playClickSound();
       const audio = this.$refs.subOrder;
       if (audio) {
@@ -66,11 +66,9 @@ export default {
       }
       //이거 둘중 하나 뺴야할지 고민중
       this.subCart(index);
-      this.$emit("subProduct", item);
     },
     handlePayment() {
       this.playClickSound();
-      console.log("handlePayment");
       if (this.totalPrice > 0) {
         this.$emit("payment", {
           num: this.cart.length,
@@ -144,3 +142,4 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 </style> -->
+

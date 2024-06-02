@@ -9,8 +9,7 @@
     <div v-else class="product" @click="$emit('selectProduct', product)">
 
       <div class="product-img-container">
-        <img class="product-img" :src="getImageUrl(product.image)" alt="" />
-
+        <img class="product-img" :src="getImageSrc(product.image)"  @error="handleImageError"/>
       </div>
       <div class="product-info">
         <p class="product-name">{{ product.name }}</p>
@@ -53,11 +52,17 @@ export default {
       if(!imageFileName){
         return "https://picsum.photos/100?random=1"; //비어있는 경우 랜덤 이미지.
       }
-      return `/image/${imageFileName}`;
+
+      return `/image/${item}`;
     },
+
+    handleImageError(event) {
+      event.target.src = "https://picsum.photos/100?random=1";
+    }
   },
 
 };
+
 </script>
 
 <!-- <style>

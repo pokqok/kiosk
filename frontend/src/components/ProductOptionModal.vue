@@ -136,10 +136,8 @@ export default {
   setup(props, { emit }) {
     const numProduct = ref(1);
     const optionPrices = reactive({});
-    //const selectedOptionIds = reactive([]);
     const temp = ref(true);
     const selectedOption = reactive(Array(props.tag.length).fill(undefined));
-    //const selectedOption =reactive({});
     const totalOption = reactive({});
     const price = computed(() => parseInt(props.selectedProduct.price));
     const optionPrice = computed(() => {
@@ -196,21 +194,6 @@ export default {
       }
       return `/image/${imageFileName}`;
     };
-
-    // const handlePickProduct = () => {
-    //   if (selectedOption.includes(undefined)) {
-    //     alert("옵션을 전부 선택해 주세요");
-    //   } else {
-    //     console.log("상품:",numProduct);
-    //     console.log("옵션정보:",selectedOption);
-    //     emit("pickProduct", {
-    //       num: numProduct.value,
-    //       price: price.value + optionPrice.value,
-    //       options: selectedOption,
-    //       //optionPrice: selectedOption, //이 부분에서 수정이 필요하다
-    //     });
-    //   }
-    // };
 
     const handlePickProduct = () => {
       if (selectedOption.includes(undefined)) {
@@ -280,7 +263,6 @@ export default {
       handleCloseButtonClick,
       handleSubNumProductClick,
       handleAddNumProductClick,
-      getCategoryNameById,
     };
   },
 };
