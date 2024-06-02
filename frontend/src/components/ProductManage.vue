@@ -76,10 +76,91 @@ export default {
   },
   methods: {
     searchItems() {
-      //검색기능 구현 예정
+      // 검색기능 구현 예정
     },
-    //버튼 기능 추가 바람
-  },
+    showUploadModal(productId) {
+      this.selectedProductId = productId;
+      this.showModal = true;
+    },
+    handleUploadSuccess(updatedProduct) {
+      const productIndex = this.products.findIndex(p => p.id === updatedProduct.id);
+      if (productIndex !== -1) {
+        this.$set(this.products, productIndex, updatedProduct);
+      }
+    },
+    getImageUrl(imageFileName) {
+      // public/image/ 디렉토리에서 이미지를 가져옵니다.
+      //console.log(`../../public/image/${imageFileName}`);
+      
+      return `/image/${imageFileName}`;
+    },
+    showNewMenuModal() {
+      this.showNewMenuCard = true;
+    },
+    addNewMenu() {
+      // 새로운 메뉴 추가 로직 구현
+      this.showNewMenuCard = false;
+    },
+    showManageCard(productId) {
+      this.selectedProductId = productId;
+      this.showManageCardModal = true;
+    }, 
+
+    submitNewProduct() {
+      const newProductId = this.products.length ? Math.max(...this.products.map(p => p.id)) + 1 : 1;
+      const newProduct = { ...this.newProduct, id: newProductId };
+      this.sortTags();
+      alert(JSON.stringify(newProduct, null, 2));
+      this.$store.dispatch('addProduct', newProduct);
+      this.showNewMenuCard = false;
+      this.resetNewProductForm();
+    },
+
+    submitChangedProduct() {
+      const productId = this.selectedProductId;
+      //onst productIndex = this.products.findIndex(p => p.id == productId);
+      //const selectedProduct = this.products[productIndex];
+      const setProduct = { ...this.newProduct,  id: productId };
+      this.sortTags();
+      alert(JSON.stringify(setProduct, null, 2));
+      this.$store.dispatch('changeProduct', setProduct);
+      this.showManageCardModal = false;
+      this.resetNewProductForm();
+    },
+    deleteProduct(){
+      alert("삭제 상품 id:"+this.selectedProductId)
+      this.$store.dispatch('deleteProduct', this.selectedProductId);
+      this.showManageCardModal = false;
+      this.selectedProductId = null;
+    },
+    resetNewProductForm() {
+      this.selectedFile = null;
+      this.newProduct = {
+        id: null,
+        name: '',
+        alias: '',
+        detail: '',
+        price: 0,
+        image: '',
+        isOn: false,
+        category: null,
+        tags: [],
+      };
+    },
+   
+    updateImageName() {
+    if (this.selectedFile) {
+      console.log("선택 파일 이름은:",this.selectedFile)
+      this.newProduct.image = this.selectedFile.name;
+    } else {
+      this.newProduct.image = null;
+    }
+    },
+    sortTags() {
+      console.log("변경 실시")
+      this.newProduct.tags.sort((a, b) => a - b);
+    },
+  }
 };
 </script>
 

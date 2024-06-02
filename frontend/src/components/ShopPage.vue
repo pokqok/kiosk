@@ -1,31 +1,32 @@
 <template>
   <div>
     <audio ref="orderMenu" :src="orderMenuSource" type="audio/mp3"></audio>
-    <audio ref="addOrder" :src="addOrderSource" type="audio/mp3"></audio>
-    <audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>
+    <!--<audio ref="addOrder" :src="addOrderSource" type="audio/mp3"></audio>-->
+    <!--<audio ref="subOrder" :src="subOrderSource" type="audio/mp3"></audio>-->
     <audio ref="option" :src="optionAudioSource" type="audio/mp3"></audio>
+    <audio ref="clickSound" :src="clickSoundSource" type="audio/mp3"></audio>
+    <!-- <v-toolbar color="#229954" tabs style="position: fixed; z-index: 1000"> -->
     <v-toolbar class="head-container pb-0" tabs>
       <v-col cols="4">
+        <!-- <v-btn @click="handleBackButtonClick" style="background-color: #009688"> -->
         <v-btn color="black" @click="goToBack" style="background-color: white">
           <v-icon left>mdi-arrow-left</v-icon>
           <p>뒤로가기</p>
         </v-btn>
       </v-col>
       <v-col cols="4">
+        <!-- <v-toolbar-title class="text-center">
+          <h2>실타래 {{ ShopID }}</h2>
+        </v-toolbar-title> -->
         <h2>실타래 {{ ShopID }}</h2>
       </v-col>
       <template v-slot:extension>
         <v-tabs v-model="tab" grow>
-          <!-- db 연결 시 -->
           <!-- <v-tab
             v-for="i in categories"
             :key="i"
             :href="'#CategoryTitle' + i.name"
-          >
-            Category {{ i.name }}
-          </v-tab> -->
-
-          <!-- testdata 사용 시 -->
+          > -->
           <v-tab
             v-for="i in testCategory"
             :key="i"
@@ -37,12 +38,7 @@
       </template>
     </v-toolbar>
   </div>
-
-  <div style="margin-top: 120px"></div>
-  <!-- db연결 시 -->
-  <!-- <v-container v-for="i in categories" :key="i"> -->
-
-  <!-- testdata 사용 시 -->
+  <div style="margin-top: 140px"></div>
   <v-container v-for="i in testCategory" :key="i">
     <h4 style="scroll-margin: 140px" :id="'CategoryTitle' + i.name">
       #{{ i.name }}
@@ -50,17 +46,21 @@
     <v-row>
       <!-- test, 나중에 testdata대신 카테고리에 있는 메뉴목록 -->
       <v-col cols="4" v-for="item in filteredProducts(i.id)" :key="item.id">
+        <!-- <ProductItem
+          :product="item"
+          @selectProduct="handleSelectProduct($event)"
+        ></ProductItem> -->
+
+        <!-- dev에서는 이걸 쓴다.-->
         <ProductItem
           :product="item"
-          @selectProduct="openProductOptionModal($event)"
+          @selectProduct="handleProductClick($event)"
         ></ProductItem>
       </v-col>
     </v-row>
     <v-divider class="my-5"></v-divider>
   </v-container>
 
-
-  <!-- 이부분에 테스트 데이터는 아래 두개 filtered 메서드 부분에서 변경해줘야함 -->
   <ProductOptionModal
     @closeProductOptionModal="closeProductOptionModal"
     @payment="payment"
@@ -90,9 +90,10 @@ export default {
       showCartModal: false,
       selectedProduct: null,
       orderMenuSource: require("@/assets/원하시는메뉴를선택해주세요.mp3"),
-      addOrderSource: require("@/assets/장바구니추가.mp3"),
-      subOrderSource: require("@/assets/장바구니취소.mp3"),
+      //addOrderSource: require("@/assets/장바구니추가.mp3"),
+      //subOrderSource: require("@/assets/장바구니취소.mp3"),
       optionAudioSource: require("@/assets/옵션.mp3"),
+      clickSoundSource: require("@/assets/click-sound.mp3"),
     };
   },
 
@@ -167,11 +168,11 @@ export default {
         console.log("옵션들:", this.options);
         const matchedOptionIds = [];
         matchedTagIds.forEach((tag) => {
-          const options = this.testOption.filter((option) => option.tag == tag);
+          const options = this.options.filter((option) => option.tag == tag);
           matchedOptionIds.push(...options.map((option) => option.id));
         });
         // 옵션 ID를 사용하여 해당 옵션들을 필터링합니다.
-        const filteredOptions = this.testOption.filter((option) =>
+        const filteredOptions = this.options.filter((option) =>
           matchedOptionIds.includes(option.id)
         );
         console.log("선택 상품의 태그들 현황: ", filteredTags);
@@ -201,38 +202,84 @@ export default {
     }
     this.playMenuAudio();
   },
+  async created() {
+    // 데이터를 비동기적으로 로드
+    this.$store.dispatch("fetchTestData");
 
-  // async created() {
-  //   // 데이터를 비동기적으로 로드
-  //   // this.$store.dispatch('fetchCategories');
-  //   // this.$store.dispatch('fetchTags')
-  //   // this.$store.dispatch('fetchOptions');
-  //   // this.$store.dispatch('fetchProducts');
-  //   // this.$store.dispatch('fetchTagMenu');
-  // },
-
+    this.$store.dispatch("fetchCategories");
+    this.$store.dispatch("fetchTags");
+    this.$store.dispatch("fetchOptions");
+    this.$store.dispatch("fetchProducts");
+    this.$store.dispatch("fetchTagMenu");
+    this.restoreSelectedProduct();
+  },
   beforeUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
   },
-
   methods: {
+    // playMenuAudio() {
+    //   this.$refs.orderMenu.play();
+    // },
+    // playAddOrderAudio() {
+    //   this.$refs.addOrder.play();
+    // },
+    // playSubOrderAudio() {
+    //   this.$refs.subOrder.play();
+    // },
+    // playOptionAudio() {
+    //   this.$refs.option.play();
+    // },
     playMenuAudio() {
-      this.$refs.orderMenu.play();
+      this.resetAndPlay(this.$refs.orderMenu);
     },
-    playAddOrderAudio() {
-      this.$refs.addOrder.play();
+    /*playAddOrderAudio() {
+      this.resetAndPlay(this.$refs.addOrder);
     },
     playSubOrderAudio() {
-      this.$refs.subOrder.play();
-    },
+      this.resetAndPlay(this.$refs.subOrder);
+    },*/
     playOptionAudio() {
-      this.$refs.option.play();
+      this.resetAndPlay(this.$refs.option);
+    },
+    playClickSound() {
+      this.resetAndPlay(this.$refs.clickSound);
     },
     stopAllAudio() {
-      this.$refs.orderMenu.pause();
-      this.$refs.addOrder.pause();
-      this.$refs.subOrder.pause();
-      this.$refs.option.pause();
+      // this.$refs.orderMenu.pause();
+      // this.$refs.addOrder.pause();
+      // this.$refs.subOrder.pause();
+      // this.$refs.option.pause();
+      const audios = [
+        this.$refs.orderMenu,
+        this.$refs.addOrder,
+        this.$refs.subOrder,
+        this.$refs.option,
+        this.$refs.clickSound,
+      ];
+      audios.forEach((audio) => {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
+    },
+
+    resetAndPlay(audio) {
+      this.stopAllAudio();
+      if (audio) {
+        audio.currentTime = 0; // 초기화
+        audio.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
+      }
+    },
+
+    //dev에선 사용 안함
+    resetAudio(audio) {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
     },
 
     ...mapMutations([
@@ -244,16 +291,15 @@ export default {
     ]), //결제 시 이름 넣기 추가
 
     handleScroll() {
-      //db연결 시
+      // db연결 시
       // for (let i = 0; i < this.categories.length; i++) {
       //   const category = this.categories[i];
-      //   const element = document.getElementById('CategoryTitle' + categories.name);
+      //   const element = document.getElementById('CategoryTitle' + category.name);
       //   if (window.scrollY >= element.offsetTop - 140) {
       //     this.tab = i;
       //   }
       // }
 
-      // testdata 사용 시
       for (let i = 0; i < this.testCategory.length; i++) {
         const category = this.testCategory[i];
         const element = document.getElementById(
@@ -274,23 +320,68 @@ export default {
       this.showCartModal = false;
     },
 
+    handleProductClick(data) {
+      this.playClickSound();
+      this.openProductOptionModal(data);
+    },
+
+    //사용 안함
+    handleSelectProduct(data) {
+      this.playClickSound();
+      this.openProductOptionModal(data);
+    },
+
     //카테고리별 품목 가져오기
     filteredProducts(categoryId) {
-      // return this.products.filter(product => product.category == categoryId);
+      //db
+      //  return this.products.filter(product => product.category == categoryId);
       //테스트용
       return this.testProduct.filter(
         (product) => product.category == categoryId
       );
     },
 
+    payment($event) {
+      console.log("개수: ", $event.num);
+      console.log("가격:", $event.price);
+      if ($event.num > 1) {
+        this.setProductName("다중 메뉴"); //이름 추가하기
+      } else {
+        this.setProductName(this.selectedProduct.name); //이름 추가하기
+      }
+      this.showOptionModal = false;
+      this.showCartModal = false;
+      console.log("결제 들어가기전 payment확인(shop페이지):", $event.price);
+      this.$router.push("/payment");
+      //this.clearCart();
+      //이후 코드
+    },
+
+    restoreSelectedProduct() {
+      // 예를 들어, localStorage 또는 Vuex 상태에서 이전 상태를 복구하는 로직
+      this.selectedProduct = this.$store.state.selectedProduct || {};
+    },
+    /*
+      pickProduct($event) {
+        this.showOptionModal = false;
+        console.log("개수: ",$event.num);
+        console.log("가격:",$event.price)
+        for (let i = 0; i < $event.num; i++) {
+          this.addCart($event.price);
+          this.setTotalPrice($event.price);
+        }
+        this.showCartModal = true;
+      },
+    */
+
     pickProduct($event) {
       this.stopAllAudio();
-      this.playAddOrderAudio();
+      //this.playAddOrderAudio();
       this.showOptionModal = false;
       console.log("개수: ", $event.num);
       console.log("가격:", $event.price);
       for (let i = 0; i < $event.num; i++) {
-        console.log("옵션:", $event.option); // 옵션 정보 출력
+        console.log("옵션:", $event.option);
         this.addCart({
           product: {
             name: this.selectedProduct.name,
@@ -300,6 +391,8 @@ export default {
         });
       }
       this.showCartModal = true;
+      console.log("장바구니 크기:", this.cart.length);
+
     },
 
     closeProductOptionModal() {
@@ -311,18 +404,53 @@ export default {
 
     subProduct($event) {
       this.stopAllAudio();
-      this.playSubOrderAudio();
+      //this.playSubOrderAudio();
+      console.log("장바구니 크기:", this.cart.length);
       this.subCart($event);
-      this.setTotalPrice(-$event.productPrice);
+
+      //this.setTotalPrice(-$event.productPrice);
+      //이걸하면 두번 빼지는 문제 발생, htod에서는 이 주석 풀 것
+
+
       if (this.cart.length == 0) {
         this.showCartModal = false;
       }
+    },
+
+    handleBackButtonClick() {
+      //htod에서는 삭제함, playClicksound 없음 대신 goToBack으로 위에 click 이벤트 대신함
+      this.playClickSound();
+      this.goToBack();
     },
 
     goToBack() {
       this.$store.commit("clearCart");
       this.$router.push("/order-type/common");
     },
+    getCategoryNameById(id) {
+      //DB
+      //const category = this.categories.find(cat => cat.id === id);
+      const category = this.testCategory.find((cat) => cat.id === id);
+      return category ? category.name : null;
+    },
   },
 };
 </script>
+
+<!-- <style>
+.head-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #229954;
+  padding: 10px 0;
+  z-index: 100;
+}
+
+.title {
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  margin: 0;
+}
+</style> -->

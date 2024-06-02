@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "커피",
+    "alias": "",
+    "isOn": true
+  },
+  {
+    "id": 2,
+    "name": "에이드",
+    "alias": "음료, 음료수",
+    "isOn": true
+  },
+  {
+    "id": 3,
+    "name": "차",
+    "alias": "티",
+    "isOn": true
+  },
+  {
+    "id": 4,
+    "name": "디저트",
+    "alias": "간식, 먹을거리",
+    "isOn": true
+  },
+  {
+    "id": 5,
+    "name": "식사류",
+    "alias": "음식",
+    "isOn": true
+  }
+]

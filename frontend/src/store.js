@@ -1,10 +1,4 @@
 import { createStore } from "vuex";
-import testdata from "./assets/testdata";
-import { product } from "./data/PageProduct.js";
-import { tag } from "./data/PageTags.js";
-import { option } from "./data/PageOptions.js";
-import { category } from "./data/PageCategory.js";
-import { tagMenu } from "./data/PageTagMenu.js";
 import categoryModule from "./categoryModule";
 import tagModule from "./tagModule";
 import kioskModule from "./kioskModule";
@@ -44,23 +38,39 @@ const store = createStore({
       messages: [],
       socket: null,
       jwt: null,
-      productName: "0",
-      testdata: testdata,
-      testProduct: product,
-      testTag: tag,
-      testOption: option,
-      testCategory: category,
-      testTagMenu: tagMenu,
+      productName: "",
+
+      testProduct: null,
+      testTag: null,
+      testOption: null,
+      testCategory: null,
+      testTagMenu: null,
+
       ShopID: -1,
       orderType: -1,
       cart: [],
       totalPrice: 0,
       orderCounter: 0,
       optionsList: {},
-      orders: [] // New state for storing orders
+      orders: [],
     };
   },
   mutations: {
+    setTestProduct(state, products) {
+      state.testProduct = products;
+    },
+    setTestTag(state, tags) {
+      state.testTag = tags;
+    },
+    setTestOption(state, options) {
+      state.testOption = options;
+    },
+    setTestCategory(state, categories) {
+      state.testCategory = categories;
+    },
+    setTestTagMenu(state, tagMenu) {
+      state.testTagMenu = tagMenu;
+    },
     setFile(state, file) {
       state.file = file;
     },
@@ -95,7 +105,7 @@ const store = createStore({
       const optionsPrice = options ? options.reduce((acc, option) => acc + (parseFloat(option.price) || 0), 0) : 0;
       const productWithPrice = {
         ...product,
-        productName, // Ensure productName is set
+        productName,
         productPrice: productPrice + optionsPrice,
         option: options,
       };
@@ -107,7 +117,7 @@ const store = createStore({
     },
     subCart(state, index) {
       if (index !== -1 && index < state.cart.length) {
-        state.totalPrice -= state.cart[index].productPrice;
+        state.totalPrice -= parseInt(state.cart[index].price);
         state.cart.splice(index, 1);
         delete state.optionsList[index];
         const newOptionsList = {};
@@ -132,7 +142,7 @@ const store = createStore({
     updateOptions(state, { index, options }) {
       state.optionsList[index] = options;
     },
-    addCartToOrders(state) {
+    addCartToOrders(state, { paymentMethod }) {
       if (!Array.isArray(state.cart) || state.cart.length === 0) {
         console.error('Cart is empty or not an array:', state.cart);
         return;
@@ -153,7 +163,8 @@ const store = createStore({
           totalPrice: state.totalPrice
         },
         status: 'pending',
-        minimized: false // Add minimized property with default value
+        minimized: false,
+        paymentMethod: paymentMethod || 'card' // Add paymentMethod to newOrder
       };
       state.orders.unshift(newOrder); // 최신 주문이 앞으로 오도록
       state.orderCounter += 1; // Increment orderCounter after adding to orders
@@ -161,6 +172,12 @@ const store = createStore({
       localStorage.setItem('orderCounter', state.orderCounter); // Save updated orderCounter to localStorage
     },
     completeOrder(state, orderId) {
+      //play audio from assets folder
+      const audio = new Audio(require('@/assets/제조완료.mp3'));
+      //stop all audio first
+      audio.pause();
+      //then play audio
+      audio.play();
       const order = state.orders.find(order => order.id === orderId);
       if (order) {
         order.status = 'completed';
@@ -194,7 +211,29 @@ const store = createStore({
     tagModule: tagModule,
     kioskModule: kioskModule,
   },
-  plugins: [localStoragePlugin]
+  plugins: [localStoragePlugin],
+  actions: {
+    async initSocket() {
+      // Socket 초기화 코드
+    },
+    async fetchTestData({ commit }) {
+      try {
+        const productRes = require('./data/product.json');
+        const tagRes = require('./data/tag.json');
+        const optionRes = require('./data/option.json');
+        const categoryRes = require('./data/category.json');
+        const tagMenuRes = require('./data/tagMenu.json');
+
+        commit('setTestProduct', productRes);
+        commit('setTestTag', tagRes);
+        commit('setTestOption', optionRes);
+        commit('setTestCategory', categoryRes);
+        commit('setTestTagMenu', tagMenuRes);
+      } catch (error) {
+        console.error('Failed to fetch test data:', error);
+      }
+    },
+  },
 });
 
 export default store;
