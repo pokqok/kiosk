@@ -16,6 +16,17 @@ const { SpeechClient } = require("@google-cloud/speech").v2;
 const oracledb = require("oracledb");
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
 const wordnet = require('wordnet')
+const mariadb = require('mariadb');
+
+
+const config = require('./DBconfig.json');
+
+const pool = mariadb.createPool({
+  host: config.db.host,
+  user: config.db.user,
+  password: config.db.password,
+  database: config.db.database,
+});
 
 app.use(express.static(__dirname)); // 정적 파일 제공을 위해 추가
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -33,7 +44,7 @@ const io = new Server(server, {
   },
 });
 
-console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스트 출력
+//console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스트 출력
 
 // 제미니 api
 
@@ -42,13 +53,170 @@ console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS); // 환경 변수 테스
 const MODEL_NAME = "gemini-1.5-pro-latest";
 process.env.GOOGLE_APPLICATION_CREDENTIALS;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;; // Replace with your actual API key
-console.log("API_KEY:", GEMINI_API_KEY);
+//console.log("API_KEY:", GEMINI_API_KEY);
+
+
+// async function getMenuItems() {
+//   let connection;
+//   try {
+//       // MariaDB와의 연결
+//       connection = await pool.getConnection();
+
+//       const tags = await connection.execute( `SELECT * FROM tag`);
+//       const options = await connection.execute( `SELECT * FROM details`);
+//       const tagMenu = await connection.execute( `SELECT * FROM menutag`);
+//       const categories = await connection.execute( `SELECT * FROM category`);
+//       const products = await connection.execute( `SELECT * FROM product`);
+
+//       if (connection) {
+//         await connection.release(); // 연결 해제
+//       }
+//       //console.log("product: ",tagMenu);
+//       //return rows; // 결과를 그대로 반환
+      
+//       return products.map(product => {
+//         const productCategory = categories.find(category => category.CategoryNO == product.CategoryNO);
+//         const productWithTagOptions = tagMenu.filter(item => item.ProductNO == product.ProductNO);
+//         const productTags = productWithTagOptions.map(tagOption => {
+//             const tag = tags.find(tag => tag.TagNO == tagOption.TagNo);
+//             return { id: tag.TagNO, name: tag.TagName };
+//         });
+  
+//         const productOptions = productWithTagOptions.map(tagOption => {
+//           const filteredOptions = options.filter(option => option.TagNO == tagOption.TagNo);
+//           const optionsArray = filteredOptions.map(option => ({
+//               id: option.DetNO,
+//               name: option.DetName,
+//               price: option.AddPrice,
+//               image: option.DetImage,
+//               alias: option.DetAlias,
+//               orderNo: option.orderNo,
+//               duplicate: option.isDup,
+//           }));
+//           return optionsArray;
+//         });
+
+//         // 제품 정보를 새로운 형식으로 변환하여 반환 
+
+//         return {
+//             productId: product.ProductNO,
+//             productName: product.ProductName,
+//             productAlias: product.alias,
+//             category: {
+//                 id: productCategory.CategoryNO,
+//                 name: productCategory.CategoryName,
+//                 alias: productCategory.CategoryAlias,
+//                 //isOn: productCategory.isOn === undefined ? true : productCategory.isOn,
+//             },
+//             tags: productTags,
+//             options: productOptions,
+//            //options: productTags.map(tag => productOptions.filter(option => option.TagNO == tag.TagNO)),
+//         };
+       
+//       });
+
+
+//   } catch (err) {
+//       console.error('Error while fetching menu items:', err);
+//       throw err;  // 또는 적절한 에러 처리
+//   } finally {
+//       if (connection) {
+//           await connection.release(); // 연결 해제
+//       }
+//   }
+// }
+
+async function getMenuItems() {
+  try {
+
+      const tags = require('./frontend/src/data/tag.json');
+      const options = require('./frontend/src/data/option.json');
+      const tagMenu = require('./frontend/src/data/tagMenu.json');
+      const categories = require('./frontend/src/data/category.json');
+      const products = require('./frontend/src/data/product.json');
+
+
+      // console.log("카테고리 현황: ",categories);
+      // console.log(tags, options, tagMenu, products);
+
+
+      return products.map(product => {
+        const productCategory = categories.find(category => category.id == product.category);
+        const productWithTagOptions = tagMenu.filter(item => item.productId == product.id);
+        const productTags = productWithTagOptions.map(tagOption => {
+            const tag = tags.find(tag => tag.id == tagOption.tagId);
+            return { id: tag.id, name: tag.name };
+        });
+
+        const productOptions = productWithTagOptions.map(tagOption => {
+          const filteredOptions = options.filter(option => option.tag == tagOption.tagId);
+          const optionsArray = filteredOptions.map(option => ({
+              id: option.id,
+              name: option.name,
+              price: option.price,
+              image: option.image,
+              alias: option.alias,
+              orderNo: option.orderNo,
+              duplicate: option.duplicate,
+          }));
+          return optionsArray;
+        });
+
+        // 제품 정보를 새로운 형식으로 변환하여 반환 
+
+        return {
+            productId: product.id,
+            productName: product.name,
+            productAlias: product.alias,
+            category: {
+                id: productCategory.id,
+                name: productCategory.name,
+                alias: productCategory.alias,
+                //isOn: productCategory.isOn === undefined ? true : productCategory.isOn,
+            },
+            tags: productTags,
+            options: productOptions,
+           //options: productTags.map(tag => productOptions.filter(option => option.TagNO == tag.TagNO)),
+        };
+      });
+
+
+  } catch (err) {
+      console.error('Error while fetching menu items:', err);
+      throw err;  // 또는 적절한 에러 처리
+  } 
+}
+
+app.get('/api/menu-items', async (req, res) => {
+    try {
+        const items = await getMenuItems();
+        res.json(items);
+    } catch (err) {
+        res.status(500).send('Server error while fetching menu items');
+    }
+});
+
+const menuItems = getMenuItems();
+
+const Monthly_recommendedItems = [
+  {
+    name: '아메리카노',
+    id: 1,
+   },
+   {
+     name: '카페라떼',
+     id: 2,
+    },
+    {
+     name: '민트티',
+     id: 7,
+  }
+];
 
 app.post('/chat', async (req, res) => {
   try {
     const userInput = req.body.userInput;
     console.log("Chat request received:", userInput);
-
     //const menuItems = getMenuItems();
 
     const items = await getMenuItems(); // getMenuItems()의 실행이 완료될 때까지 대기
@@ -67,6 +235,9 @@ app.post('/chat', async (req, res) => {
       console.log("-----------------------");
     });
 
+    //console.log('test:', JSON.stringify(items));
+    console.log(JSON.stringify(Monthly_recommendedItems));
+    
     const generationConfig = {
       temperature: 1,
       topK: 0,
@@ -81,14 +252,16 @@ app.post('/chat', async (req, res) => {
       { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
     ];
 
-    const parts = [
-      {text: `질문에 맞는 메뉴의 아이디를 찾아 productId: [] 형식으로 반환하라,
-      \n 아래 질문들과 답변은 형식을 위한 예시이다. 반드시 테이블에 있는 모든 메뉴를 탐색하라.
-      \n 질문에 맞는 단어가 없다면 발음이나 철자가 비슷한지를 찾아라.
-      \n 만약 어떤 메뉴와도 상응하는 데이터를 찾지 못하겠다면 모든 메뉴 productId를 반환해라`},
-      {text: `input: ${JSON.stringify(items)}` },
-      {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
-      {text: "input: 따뜻한 거 추천해줘"},
+    // const parts = [
+    //   { text: `input: ${JSON.stringify(menuItems)},${JSON.stringify(Monthly_recommendedItems)}` }, // Convert to JSON strings
+    //   {
+    //     text: `output: 메뉴 반환 형식은 각 메뉴마다 1번부터 번호를 붙이고, 메뉴이름에 ** 메뉴 ** 를 붙이지 말아줘. \n1. 메뉴이름 - 당도 : 가능한 당도 옵션 - 온도 : 가능한 온도 옵션 - 카페인 여부 \n 2. 메뉴이름 - 당도 : 가능한 당도 옵션 - 온도 : 가능한 온도 옵션 \n 이렇게 해줘\n이외에는 필요없어\n최대 3개 까지만\n\n이달의 추천메뉴가 쿼리로 주어질때는 recommendedItems의 내용만 출력해줘. ## 차가운 음료 메뉴: 이렇게 꾸미지 않아도 괜찮아.
+    //     만약 특정 옵션 테이블 중 알맞는 옵션이 사전에 제공이 되어있으면 그것만 출력해줘. 만약 메뉴 이름이 정확한게 왔으면 그것만 출력해줘. 예를 들어서 바닐라 라떼, 이런식으로 오면 바닐라 라떼에 대한것만 출력해.` },
+    //   { text: `input: ${userInput}` },
+    //   { text: "output: " },
+    //];
+
+       // {text: "input: 따뜻한 거 추천해줘"},
       // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
       // {text: "input: 달달한거 추천해줘"},
       // {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:[4,5], productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
@@ -101,6 +274,23 @@ app.post('/chat', async (req, res) => {
       // {text: "input: 아메리카노 추천해줘"},
       // {text: "output: 타겟팅: {categoryId:null, tagId:null, optionId:null,  productId: 1, recommened: null}\n검색결과: 아메리카노\nproductId: [1]"},
       //{text: "input: const Monthly_recommendedItems = [  {   name: '아메리카노',   id: 1,  },  {    name: '카페라떼',    id: 2,   },   {    name: '민트티',    id: 7,   }];"},
+
+    const parts = [
+      // {text: `질문에 맞는 메뉴의 아이디를 찾아 productId: [] 형식으로 반환하라,
+      // \n 해당 이름이 들어간 메뉴나, 카테고리에 속하는 메뉴를 추천하라. 만약 옵션명과 관련된 내용이라면 해당 옵션을 가진 메뉴를 추천하라.
+      // \n 만약 카테고리 이름이 메뉴 이름에 들어간다면, 카테고리 범주를 우선시 하여 찾아라, 
+      // \n 정확한 메뉴이름이 있다면 해당 메뉴들만을 찾는다. 
+      // \n 질문에 맞는 단어가 없다면 발음이나 철자가 비슷한지를 찾아라.
+      // \n 만약 특정 메뉴에 대해 묘사하는 질문을 받는다면, 해당 묘사에 속하는 메뉴가 있는지를 찾아라.
+      // \n 최종적으로 어떤 메뉴와도 상응하는 데이터를 찾지 못하겠다면 모든 메뉴 productId를 반환해라`},
+      {text: `질문에 맞는 메뉴의 아이디를 찾아 productId: [] 형식으로 반환하라.
+      \n 해당 이름이 들어간 메뉴나, 카테고리에 속하는 메뉴를 추천하라. 만약 옵션명과 관련된 내용이라면 해당 옵션을 가진 메뉴를 추천하라.
+      \n 또한 테이블에서 이름 말고도 별칭에 해당하는 것이 있다면 그것을 찾아라.
+      \n 질문에 맞는 단어가 없다면 발음이나 철자가 비슷한지를 찾아라.
+      \n 만약 특정 메뉴에 대해 묘사하는 질문을 받는다면, 해당 묘사에 속하는 메뉴가 있는지를 찾아라.
+      \n 최종적으로 어떤 메뉴와도 상응하는 데이터를 찾지 못하겠다면 모든 메뉴 productId를 반환해라`},
+      {text: `input: ${JSON.stringify(items)}` },
+      {text: "output: 타겟팅: {categoryId:null, tagId:1, optionId:1, productId:null, recommened: null\n}\n검색결과: 아메리카노, 카페라떼\nproductId: [1,2]"},
       {text: `input: 추천메뉴 테이블: ${JSON.stringify(Monthly_recommendedItems)}`},
       {text: "output: 타겟팅: {categoryId:null, tagId:null, optionId:null,  productId:null, recommened: [1,2,7]}\n검색결과: 아메리카노, 카페라떼, 민트티\nproductId: [1,2,7]"},
       {text: "input: 추천메뉴로 해줘"},
@@ -108,6 +298,7 @@ app.post('/chat', async (req, res) => {
       {text: `input: ${userInput}`},
       {text: "output: "},
     ];
+
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
@@ -126,28 +317,27 @@ app.post('/chat', async (req, res) => {
   }
 });
 
-// 태그 목록 조회
-/*
-app.get('/tags', async (req, res) => {
-  try {
-    console.log("태그 목록 조회 요청이 들어왔습니다.");
-    // Oracle DB 연결
-    const connection = await oracledb.getConnection(dbConfig);
 
-    // 쿼리 실행
-    const result = await connection.execute("SELECT * FROM product");
+// // 태그 목록 조회
+// app.get("/tags", async (req, res) => {
+//   try {
+//     console.log("태그 목록 조회 요청이 들어왔습니다.");
+//     // Oracle DB 연결
+//     const connection = await oracledb.getConnection(dbConfig);
 
-    // 연결 종료
-    await connection.close();
+//     // 쿼리 실행
+//     const result = await connection.execute("SELECT * FROM product");
 
-    // 쿼리 결과 반환
-    res.json(result.rows);
-  } catch (error) {
-    console.error("태그 목록 조회 중 오류 발생:", error);
-    res.status(500).send("태그 목록 조회 중 오류가 발생했습니다.");
-  }
-});
-*/
+//     // 연결 종료
+//     await connection.close();
+
+//     // 쿼리 결과 반환
+//     res.json(result.rows);
+//   } catch (error) {
+//     console.error("태그 목록 조회 중 오류 발생:", error);
+//     res.status(500).send("태그 목록 조회 중 오류가 발생했습니다.");
+//   }
+// });
 
 // http 요청 들어오면 frontend/dist/index.html 제공
 // app.get("*", (req, res) => {
@@ -156,7 +346,6 @@ app.get('/tags', async (req, res) => {
 app.get("/", (req, res) => {
   res.sendFile("test.html", { root: __dirname });
 });
-
 
 const jwtSecret = "mysecret key";
 
@@ -349,11 +538,6 @@ app.post("/login/shop", (req, res) => {
   }
 });
 
-
-
-
-
-
 //db 연결
 const categoryRouter = require("./dto/categorys.js");
 app.use("/category", categoryRouter);
@@ -365,7 +549,6 @@ app.use("/tag", tagRouter);
 const kioskRouter = require("./dto/shopData.js");
 app.use("/kiosk", kioskRouter);
 
-
 //이미지 업로드
 const uploadImage = require('./dto/imageUpload.js');
 app.use('/image', uploadImage);
@@ -374,7 +557,6 @@ const productRouter = require('./dto/product.js');
 app.use('/product', productRouter);
 //-
 //---------------------------------------------------
-
 
 const PORT = process.env.PORT || 3000; // 포트 번호 설정
   server.listen(PORT, () => {

@@ -5,7 +5,7 @@
         <v-row>
           <v-col cols="12" md="6">
             <div class="d-flex justify-center">
-              <v-chip 
+              <v-chip
                 class="ma-2 x-large"
                 color="light-green"
                 text-color="white"
@@ -29,8 +29,7 @@
             </v-row>
             <v-row>
               <v-col
-                class="d-flex justify-center"
-                style="display: flex; flex-direction: column; align-items: center;"
+                class="d-flex flex-column justify-center align-center"
                 cols="4"
               >
                 <v-btn icon @click="handleSubNumProductClick">
@@ -42,8 +41,7 @@
                 <span>{{ numProduct }}</span>
               </v-col>
               <v-col
-                class="d-flex justify-center"
-                style="display: flex; flex-direction: column; align-items: center;"
+                class="d-flex flex-column justify-center align-center"
                 cols="4"
               >
                 <v-btn icon @click="handleAddNumProductClick">
@@ -63,14 +61,17 @@
                 v-model="selectedOption[i]"
                 color="primary"
                 mandatory
-                dense
+                divided
+                variant="outlined"
+                rounded="xl"
               >
                 <v-btn
                   v-for="options in getOptionByID(tags)"
                   :key="options.id"
+                  class="ma-0"
                   @click="setOptionPrice(tags, options)"
                 >
-                  {{ options.name }} ({{ options.price }}원)
+                  {{ options.name }} ({{ parseInt(options.price) }}원)
                 </v-btn>
               </v-btn-toggle>
             </div>
@@ -79,7 +80,7 @@
       </v-container>
       <v-card-actions class="justify-end mb-12 mr-5">
         <v-row>
-          <v-col cols="4">
+          <v-col cols="6">
             <v-btn
               block
               height="175%"
@@ -87,11 +88,11 @@
               text
               @click="handlePickProductClick"
             >
-              <v-icon left>mdi-cart</v-icon>
-              <h3>장바구니</h3>
+              <v-icon size="x-large" left>mdi-cart</v-icon>
+              <h2>장바구니</h2>
             </v-btn>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="6">
             <v-btn
               block
               height="175%"
@@ -99,8 +100,8 @@
               text
               @click="handleCloseButtonClick"
             >
-              <v-icon left>mdi-close</v-icon>
-              <h3>취소</h3>
+              <v-icon size="x-large" left>mdi-close</v-icon>
+              <h2>취소</h2>
             </v-btn>
           </v-col>
         </v-row>
@@ -129,16 +130,16 @@ export default {
     },
     category: {
       type: String,
-      required: true
+      required: true,
     },
   },
   setup(props, { emit }) {
     const numProduct = ref(1);
     const optionPrices = reactive({});
-
     //const selectedOptionIds = reactive([]);
     const temp = ref(true);
     const selectedOption = reactive(Array(props.tag.length).fill(undefined));
+    //const selectedOption =reactive({});
     const totalOption = reactive({});
     const price = computed(() => parseInt(props.selectedProduct.price));
     const optionPrice = computed(() => {
@@ -158,10 +159,14 @@ export default {
         alert("1개 이하로 주문 하실 수 없습니다");
       }
     };
-    
+
     const getOptionByID = (tag) => {
       return props.option.filter((option) => option.tag === tag.id);
     };
+
+    // const setOptionPrice = (tagId, price) => {
+    //   optionPrices[tagId] = price;
+    // };
 
     const setOptionPrice = (tag, option) => {
       optionPrices[tag.id] = option.price;
@@ -169,37 +174,55 @@ export default {
         tagName: tag.name,
         optionId: option.id,
         optionName: option.name,
-        optionPrice: option.price
+        optionPrice: option.price,
       };
-
     };
 
     const getCategoryNameById = (id) => {
-      const category = this.categories.find(cat => cat.id === id);
+      const category = this.categories.find((cat) => cat.id === id);
       return category ? category.name : null;
     };
-    
-    const getImageSrc = () => {
-      return "https://picsum.photos/100?random=1";
 
-    };
+    // const getImageSrc = () => {
+    //   //이제 필요없는 기능
+    //   return "https://picsum.photos/100?random=1";
+    // };
 
     const getImageUrl = (imageFileName) => {
+      // public/image/ 디렉토리에서 이미지를 가져옵니다.
+      console.log(`../../public/image/${imageFileName}`);
       if (!imageFileName) {
-        return "https://picsum.photos/100?random=1";
+        return "https://picsum.photos/100?random=1"; //비어있는 경우 랜덤 이미지.
       }
       return `/image/${imageFileName}`;
     };
+
+    // const handlePickProduct = () => {
+    //   if (selectedOption.includes(undefined)) {
+    //     alert("옵션을 전부 선택해 주세요");
+    //   } else {
+    //     console.log("상품:",numProduct);
+    //     console.log("옵션정보:",selectedOption);
+    //     emit("pickProduct", {
+    //       num: numProduct.value,
+    //       price: price.value + optionPrice.value,
+    //       options: selectedOption,
+    //       //optionPrice: selectedOption, //이 부분에서 수정이 필요하다
+    //     });
+    //   }
+    // };
 
     const handlePickProduct = () => {
       if (selectedOption.includes(undefined)) {
         alert("옵션을 전부 선택해 주세요");
       } else {
+        playAddCartSound();
+        console.log("안의 내용은?", Object.values(totalOption));
         emit("pickProduct", {
           num: numProduct.value,
           price: price.value + optionPrice.value,
-          option: Object.values(totalOption),
-          optionPrice: optionPrice.value
+          option: Object.values(totalOption), // 객체의 값만 배열 형태로 전달
+          optionPrice: optionPrice.value,
         });
       }
     };
@@ -211,8 +234,15 @@ export default {
       });
     };
 
+    const playAddCartSound = () => {
+      const addCartSound = new Audio(require("@/assets/장바구니추가.mp3"));
+      addCartSound.play().catch((error) => {
+        console.error("Error playing add cart sound:", error);
+      });
+    };
+
     const handlePickProductClick = () => {
-      playClickSound();
+      console.log("장바구니에 추가 버튼 클릭");
       handlePickProduct();
     };
 
@@ -242,6 +272,7 @@ export default {
       subNumProduct,
       getOptionByID,
       setOptionPrice,
+      //getImageSrc,
       getImageUrl,
       handlePickProduct,
       playClickSound,
@@ -254,3 +285,27 @@ export default {
   },
 };
 </script>
+
+<!-- <style>
+body {
+  margin: 0;
+}
+
+div {
+  box-sizing: border-box;
+}
+
+.futter {
+  background: white;
+  border-radius: 8px;
+  width: 100%;
+  height: 15%;
+  position: fixed;
+  bottom: 0;
+  z-index: 9999;
+}
+
+.icon {
+  font-size: xx-large;
+}
+</style> -->

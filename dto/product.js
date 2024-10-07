@@ -2,6 +2,8 @@ const mariadb = require("mariadb");
 const express = require("express");
 const router = express.Router();
 const config = require("../DBconfig.json");
+const path = require('path');
+const fs = require('fs');
 /*
 */
 const pool = mariadb.createPool({
@@ -12,6 +14,7 @@ const pool = mariadb.createPool({
 });
 
 //let transaction;
+const PRODUCT_FILE_PATH = path.join(__dirname, '../frontend/src/data/product.json');
 
 router.post('/addProduct', async (req, res) => {
     try {
@@ -38,36 +41,47 @@ router.post('/addProduct', async (req, res) => {
 });
 
 router.post('/changeProduct', async (req, res) => {
+    // try {
+    //     console.log("DB에 상품 변경 시작");
+    //     const { product } = req.body;
+    //     const conn = await pool.getConnection();
+    //     console.log("ㅎ닝라ㅓㅠㅎㅇㄹㄶ:",product.name)
+    //     // 상품 정보 업데이트
+    //     await conn.query(`
+    //         UPDATE product 
+    //         SET ProductName = ?, Price = ?, CategoryNO = ?, ProductDetail = ?, ProductAlias = ?
+    //         WHERE ProductNO = ?
+    //     `, [product.name, product.price, product.category, product.detail, product.alias, product.id]);
+
+    //     // 태그 정보 업데이트
+    //     // 먼저 기존 태그 정보 삭제
+    //     await conn.query(`DELETE FROM menutag WHERE ProductNO = ?`, [product.id]);
+    //     // 새로운 태그 정보 추가
+    //     for (let j = 0; j < product.tags.length; j++) {
+    //         await conn.query(`
+    //           INSERT INTO menutag (ProductNO, TagNO, orderNo) 
+    //           VALUES (?, ?, ?)
+    //         `, [product.id, product.tags[j], j + 1]);
+    //     }
+
+    //     conn.release();
+    //     console.log('변경 성공');
+    //     res.status(200).send('상품 변경 성공');
+    // } catch (error) {
+    //     console.error('상품 변경 에러:', error);
+    //     res.status(500).send('변경 실패');
+    // }
+
     try {
-        console.log("DB에 상품 변경 시작");
-        const { product } = req.body;
-        const conn = await pool.getConnection();
-        console.log("ㅎ닝라ㅓㅠㅎㅇㄹㄶ:",product.name)
-        // 상품 정보 업데이트
-        await conn.query(`
-            UPDATE product 
-            SET ProductName = ?, Price = ?, CategoryNO = ?, ProductDetail = ?, ProductAlias = ?
-            WHERE ProductNO = ?
-        `, [product.name, product.price, product.category, product.detail, product.alias, product.id]);
-
-        // 태그 정보 업데이트
-        // 먼저 기존 태그 정보 삭제
-        await conn.query(`DELETE FROM menutag WHERE ProductNO = ?`, [product.id]);
-        // 새로운 태그 정보 추가
-        for (let j = 0; j < product.tags.length; j++) {
-            await conn.query(`
-              INSERT INTO menutag (ProductNO, TagNO, orderNo) 
-              VALUES (?, ?, ?)
-            `, [product.id, product.tags[j], j + 1]);
-        }
-
-        conn.release();
-        console.log('변경 성공');
-        res.status(200).send('상품 변경 성공');
-    } catch (error) {
-        console.error('상품 변경 에러:', error);
-        res.status(500).send('변경 실패');
-    }
+      console.log("DB에 상품 변경 시작");
+      const product = req.body;
+      fs.writeFileSync(PRODUCT_FILE_PATH, JSON.stringify(product, null, 2), 'utf8');
+      console.log('변경 성공');
+      res.status(200).send('상품 변경 성공');
+  } catch (error) {
+      console.error('상품 변경 에러:', error);
+      res.status(500).send('변경 실패');
+  }
 });
 
   router.post('/deleteProduct', async (req, res) => {

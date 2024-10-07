@@ -21,6 +21,7 @@
         v-model="password"
         :rules="passwordRules"
         label="password"
+        type="password"
         required
       ></v-text-field>
 
@@ -53,18 +54,20 @@ export default {
       if (this.$route.params.mode == "admin") {
         try {
           const response = await axios.post("admin", {
+            //192.168.0.167:8081은 본인이 서버를 열때 나오는 Network 주소로 변경
             email: this.email,
             password: this.password,
           });
           if (response.data.success) {
             console.log("LOGIN SUCCESS");
             alert("로그인 완료되었습니다.");
+            // 관리자 페이지로 이동
             this.$router.push("/admin/" + response.data.userID); // 이동할 페이지 위치
           } else {
-            alert("로그인 실패: " + response.data.message);
+            alert("로그인 실패");
           }
         } catch (error) {
-          alert("로그인 요청 실패: " + error);
+          alert("틀린 ID 혹은 패스워드입니다. 다시 입력해주세요.");
         }
       } else if (this.$route.params.mode == "shop") {
         try {
@@ -78,10 +81,10 @@ export default {
             this.$store.commit("setShopID", response.data.shopID);
             this.$router.push("/mode-select"); // 이동할 페이지 위치
           } else {
-            alert("로그인 실패: " + response.data.message);
+            alert("로그인 실패");
           }
         } catch (error) {
-          alert("로그인 요청 실패: " + error);
+          alert("틀린 ID 혹은 패스워드입니다. 다시 입력해주세요.");
         }
       }
     },
@@ -110,3 +113,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.login-page {
+  margin-top: 60px;
+}
+</style>

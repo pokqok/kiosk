@@ -3,6 +3,9 @@ const mariadb = require("mariadb");
 const express = require("express");
 const router = express.Router();
 const config = require("../DBconfig.json");
+const bodyParser = require("body-parser");
+const fs = require("fs");
+const path = require("path");
 /*
 
 
@@ -14,28 +17,40 @@ const pool = mariadb.createPool({
   database: config.db.database,
 });
 
-
-//미들웨어 설정
-router.use('/categorys', (req, res, next) => {
-  if (req.path === '/categorys') {
-      next(); // categoryRouter.js에 대한 요청은 허용하고 나머지는 거부합니다.
-  } else {
-      res.status(403).send('Access forbidden'); // /category 경로 외의 요청은 거부합니다.
-  }
-});
-
-
 let transaction; // 공유되는 트랜잭션임
 //이걸로 apply/cancel해야 거기서 commit/rollback을 해줌
 
+
+const CATEGORY_FILE_PATH = path.join(__dirname, '../frontend/src/data/category.json');
+//const CATEGORY_FILE_PATH = '../frontend/src/data/category.json';
+
+
 // DB 가져오기
 router.get("/getAllCategories", async (req, res) => {
+  // try {
+  //   const conn = await pool.getConnection();
+  //   const result = await conn.query("SELECT * FROM CATEGORY");
+  //   conn.release();
+  //   res.status(200).json(result);
+  // } catch (error) {
+  //   console.error("카테고리 가져오기 에러:", error);
+  //   res.status(500).send("카테고리 가져오기 실패");
+  // }
+
   try {
-    const conn = await pool.getConnection();
-    const result = await conn.query("SELECT * FROM CATEGORY");
-    conn.release();
-    console.log('DB반환 성공: ' + JSON.stringify(result));
-    res.status(200).json(result);
+    // JSON 파일 경로 설정
+    const filePath = path.join(__dirname, '../frontend/src/data/category.json');
+    
+    // 파일 읽기
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error("카테고리 파일 읽기 에러:", err);
+        return res.status(500).send("카테고리 파일 읽기 실패");
+      }
+
+      // 읽어온 JSON 데이터를 클라이언트로 보내기
+      res.status(200).send(data);
+    });
   } catch (error) {
     console.error("카테고리 가져오기 에러:", error);
     res.status(500).send("카테고리 가져오기 실패");
@@ -152,14 +167,18 @@ router.post("/toggle", async (req, res) => {
   }
 });
 
-// 변경 사항 적용
+
 router.post("/apply", async (req, res) => {
   try {
-    if (transaction) {
-      await transaction.commit();
-      transaction.release();
-      transaction = undefined;
-    } //트랜잭션 존재 시, 커밋하고 초기화
+    // if (transaction) {
+    //   await transaction.commit();
+    //   transaction.release();
+    //   transaction = undefined;
+    // }
+
+    const categories = req.body;
+    fs.writeFileSync(CATEGORY_FILE_PATH, JSON.stringify(categories, null, 2), 'utf8');
+    
     res.status(200).send("변경 사항이 성공적으로 적용되었습니다.");
   } catch (error) {
     console.error("변경 사항 적용 에러:", error);

@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const HOST = "http://localhost:3000";
+
 const tagModule = {
   state() {
     return {
@@ -42,6 +44,7 @@ const tagModule = {
       if (newTag.name.trim() !== "") {
         //+1하는 걸 vue에서 하도록 바꿈, 10단위로 올라가는 문제가 자꾸 생김
         state.tags.push(newTag);
+        console.log("추가 내용:",newTag)
       }
     },
 
@@ -71,79 +74,87 @@ const tagModule = {
 
   actions: {
     async fetchTags({ commit }) {
+      // try {
+      //   const response = await axios.get("/tag/getTag");
+
+      //   let TagData = [];
+      //   // 응답에서 카테고리 데이터 추출
+      //   const responseData = response.data;
+
+      //   responseData.forEach((item) => {
+      //     // 원하는 형태로 변환하여 객체 생성
+      //     const setTag = {
+      //       id: item.TagNO,
+      //       name: item.TagName,
+      //       alias: item.TagAlias,
+      //       description: item.TagDet,
+      //       isRequired: item.IsRequired == 1 ? true : false,
+      //       isOn: item.IsOn == 1 ? true : false,
+      //       //mariaDB는 1/0 으로 저장하기에 이렇게 지속적인 변경이 필요하다.
+      //     };
+      //     TagData.push(setTag);
+      //   });
+      //   // 받아온 카테고리 데이터를 저장하기 위해 mutation 호출
+      //   commit("setTags", TagData);
+      // } catch (error) {
+      //   console.error("카테고리 데이터를 불러오는 중 오류 발생:", error);
+      // }
+
       try {
-        const response = await axios.get("/tag/getTag");
-
-        let TagData = [];
-        // 응답에서 카테고리 데이터 추출
+        const response = await axios.get(HOST+"/tag/getTag");
         const responseData = response.data;
-
-        responseData.forEach((item) => {
-          // 원하는 형태로 변환하여 객체 생성
-          const setTag = {
-            id: item.TagNO,
-            name: item.TagName,
-            alias: item.TagAlias,
-            description: item.TagDet,
-            isRequired: item.IsRequired == 1 ? true : false,
-            isOn: item.IsOn == 1 ? true : false,
-            //mariaDB는 1/0 으로 저장하기에 이렇게 지속적인 변경이 필요하다.
-          };
-          TagData.push(setTag);
-        });
-        // 받아온 카테고리 데이터를 저장하기 위해 mutation 호출
-        commit("setTags", TagData);
+        commit("setTags", responseData);
       } catch (error) {
-        console.error("카테고리 데이터를 불러오는 중 오류 발생:", error);
+        console.error("태그 데이터를 불러오는 중 오류 발생:", error);
       }
     },
     //카테고리 추가
-    async addTag(context, newTag) {
+    async addTag({commit}, newTag) {
       try {
-        // 서버에 카테고리 추가 요청 보내기
-        await axios.post("/tag/addTag", {
-          TagId: newTag.id,
-          TagName: newTag.name,
-          TagAlias: newTag.alias,
-          TagDescription: newTag.description,
-        });
+        // // 서버에 카테고리 추가 요청 보내기
+        // await axios.post("/tag/addTag", {
+        //   TagId: newTag.id,
+        //   TagName: newTag.name,
+        //   TagAlias: newTag.alias,
+        //   TagDescription: newTag.description,
+        // });
 
-        // DB에 추가하면 이제 여기 store(웹페이지)에서에 데이터 추가도 적용
-        console.log(newTag.name + "추가 성공");
-        context.commit("addTag", newTag);
+        // // DB에 추가하면 이제 여기 store(웹페이지)에서에 데이터 추가도 적용
+        // console.log(newTag.name + "추가 성공");
+        commit("addTag", newTag);
       } catch (error) {
         console.error("카테고리 추가 중 오류 발생:", error);
       }
       //context.commit('addTag', newTag);
     },
 
-    async deleteTag(context, id) {
+    async deleteTag({commit}, id) {
       try {
         // 서버에 카테고리 삭제 요청 보내기
-        alert("id: " + id);
-        await axios.post("/tag/deleteTag", { TagId: id });
+        // alert("id: " + id);
+        // await axios.post("/tag/deleteTag", { TagId: id });
 
         // DB에 추가하면 이제 여기 store에도 적용
-        context.commit("deleteTag", id);
+        commit("deleteTag", id);
       } catch (error) {
         console.error("카테고리 삭제 중 오류 발생:", error);
       }
       //context.commit('deleteTag', id);
     },
 
-    async updateTag(context, { id, name, alias, description }) {
+    async updateTag({commit}, { id, name, alias, description }) {
       try {
         //{ id: editedId, name: newName, alias: newAlias, description: newDescription}
-        alert("이름: " + name + "id: " + id);
-        await axios.post("/tag/updateTag", {
-          TagId: id,
-          TagName: name,
-          TagAlias: alias,
-          TagDescrption: description,
-        });
+        // alert("이름: " + name + "id: " + id);
+        // await axios.post("/tag/updateTag", {
+        //   TagId: id,
+        //   TagName: name,
+        //   TagAlias: alias,
+        //   TagDescrption: description,
+        // });
 
         // 변경 성공 시 스토어 상태 업데이트
-        context.commit("updateTag", { id, name, alias, description });
+        commit("updateTag", { id, name, alias, description });
       } catch (error) {
         console.error("카테고리 변경 중 오류 발생:", error);
       }
@@ -151,16 +162,13 @@ const tagModule = {
     },
 
     // 카테고리 적용,
-    async applyTag(context, newTags) {
+    async applyTag({commit}, newTags) {
       // 카테고리 데이터 교체 뮤테이션 호출
       try {
-        // 서버에 카테고리 업데이트 요청 보내기
-        await axios.post("/tag/apply", newTags);
-        // 업데이트 성공 시 스토어 상태 업데이트
-        // 다시 가져오도록 하기 (사실 굳이 상관은 없다)
-        context.commit("changeTags", newTags);
+        await axios.post(HOST+"/tag/apply", newTags);
+        commit("changeTags", newTags);
       } catch (error) {
-        console.error("카테고리 업데이트 중 오류 발생:", error);
+        console.error("태그 업데이트 중 오류 발생:", error);
       }
       //context.commit('applyTag', newTags);
     },

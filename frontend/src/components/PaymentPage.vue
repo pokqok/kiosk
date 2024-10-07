@@ -28,11 +28,8 @@
             :src="clickSoundSource"
             type="audio/mp3"
           ></audio>
-          <v-btn
-            @click="$router.go(-1 - 2 * cntCanclePay)"
-            style="background-color: #009688"
-          >
-            <i class="bi bi-x-lg icon"></i>
+          <v-btn color="white" @click="$router.go(-1 - 2 * cntCanclePay)">
+            <v-icon left>mdi-arrow-left</v-icon>
             <p>취소</p>
           </v-btn>
         </v-col>
@@ -64,26 +61,41 @@
             </span>
           </v-btn>
         </v-col>
+        <v-col cols="4">
+          <v-btn @click="requestPayCash" block height="150%">
+            <span
+              style="display: flex; flex-direction: column; align-items: center"
+            >
+              <i class="bi bi-cash-stack pay-icon"></i>
+              <h2 style="margin: 0">현금 결제</h2>
+            </span>
+          </v-btn>
+        </v-col>
       </v-row>
     </v-container>
 
-    <v-dialog v-model="showModal" max-width="500">
+    <v-dialog v-model="showModal" max-width="500" persistent>
       <v-card class="square-modal">
         <v-card-title class="headline large-text">결제 완료</v-card-title>
         <v-card-text class="order-number-text"
           >주문번호: {{ orderNumber }}</v-card-text
         >
+        <v-card-text class="animation-container">
+          <div class="loader"></div>
+        </v-card-text>
+        <v-card-text class="info-text">
+          잠시 후 모드 선택 창으로 돌아갑니다
+        </v-card-text>
       </v-card>
     </v-dialog>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "PaymentPage",
-
   data() {
     return {
       IMP: window.IMP,
@@ -92,30 +104,20 @@ export default {
       paymentCompletedAudioSource: require("@/assets/결제 완료.mp3"),
       kakaoPayAudioSource: require("@/assets/카카오페이.mp3"),
       normalPayAudioSource: require("@/assets/일반결제.mp3"),
-      clickSoundSource: require("@/assets/click-sound.mp3"), // 추가된 클릭 사운드
-      showModal: false, // 모달 표시 여부
-      orderNumber: null, // 주문번호
+      clickSoundSource: require("@/assets/click-sound.mp3"),
+      showModal: false,
+      orderNumber: null,
     };
   },
-
   computed: {
     ...mapState(["productName", "totalPrice", "cart", "orderCounter"]),
   },
-
   mounted() {
-    if (this.$store.state.ShopID == -1) {
-      alert("login error");
-      this.$router.push("/login/shop");
-      return;
-    }
-
     this.IMP.init("imp03664607");
     this.playPaymentAudio();
   },
-
   methods: {
-    ...mapActions([]),
-
+    ...mapMutations(["clearCart", "addCartToOrders", "incrementOrderCounter"]),
     playPaymentAudio() {
       this.resetAndPlay(this.$refs.paymentAudio);
     },
@@ -131,6 +133,7 @@ export default {
     playClickSound() {
       this.resetAndPlay(this.$refs.clickSound);
     },
+
     stopAllAudio() {
       const audios = [
         this.$refs.paymentAudio,
@@ -149,21 +152,25 @@ export default {
     resetAndPlay(audio) {
       this.stopAllAudio();
       if (audio) {
-        audio.currentTime = 0; // 초기화
+        audio.currentTime = 0;
         audio.play().catch((error) => {
           console.error("Error playing audio:", error);
         });
       }
     },
-
     requestPay() {
+      console.log("결제 시작 진입 성공 (여기서 totalPrice는:", this.totalPrice);
+      console.log(
+        "결제 시작 진입 성공 (결제하는 상품 이름은:",
+        this.productName
+      );
       this.playNormalPayAudio();
       const merchantUid = "merchant_" + new Date().getTime();
       this.IMP.request_pay(
         {
           pg: "html5_inicis.INIpayTest",
           merchant_uid: merchantUid,
-          name: this.productName,
+          name: "실타래",
           goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
@@ -182,7 +189,6 @@ export default {
         }
       );
     },
-
     requestPayKakao() {
       this.playKakaoPayAudio();
       const merchantUid = "merchant_" + new Date().getTime();
@@ -191,7 +197,7 @@ export default {
           pg: "html5_inicis.INIpayTest",
           pay_method: "kakaopay",
           merchant_uid: merchantUid,
-          name: this.productName,
+          name: "실타래",
           goodsname: this.productName,
           amount: this.totalPrice,
           buyer_email: "Iamport@chai.finance",
@@ -210,40 +216,47 @@ export default {
         }
       );
     },
-
+    requestPayCash() {
+      const merchantUid = "merchant_" + new Date().getTime();
+      this.handlePaymentPending(merchantUid);
+    },
+    handlePaymentPending(merchantUid) {
+      this.$store.commit("addCartToOrders", { paymentMethod: "cash" });
+      console.log("현재 주문 목록:", this.$store.state.orders);
+      this.orderNumber = this.$store.state.orderCounter;
+      this.showModal = true;
+      this.startCountdown();
+      this.savePaymentData(merchantUid, this.totalPrice);
+      this.$store.commit("incrementOrderCounter");
+      this.$store.commit("clearCart");
+      console.log("Cart after clearCart:", this.$store.state.cart);
+    },
     handlePaymentSuccess(merchantUid) {
       this.playPaymentCompletedAudio();
-
-      // Vuex 뮤테이션 호출하여 cart 내용을 orders에 추가
-      this.$store.commit("addCartToOrders");
+      this.$store.commit("addCartToOrders", { paymentMethod: "card" });
       console.log("현재 주문 목록:", this.$store.state.orders);
-
-      // 주문번호 설정
-      this.orderNumber = this.$store.state.orderCounter; // store의 orderCounter로 설정
-
-      // 모달 표시
+      this.orderNumber = this.$store.state.orderCounter;
       this.showModal = true;
-
-      // 결제 데이터를 저장
+      this.startCountdown();
       this.savePaymentData(merchantUid, this.totalPrice);
-
-      // 카트 비우기
+      this.$store.commit("incrementOrderCounter");
       this.$store.commit("clearCart");
-      console.log("Cart after clearCart:", this.$store.state.cart); // clearCart 후 cart 출력
-
-      // 5초 후 모드 선택 페이지로 이동
+      console.log("Cart after clearCart:", this.$store.state.cart);
+    },
+    startCountdown() {
       setTimeout(() => {
         this.showModal = false;
-        console.log("모드 선택 페이지로 이동합니다.");
         this.$router.push("/mode-select");
       }, 5000);
     },
-
-    savePaymentData(merchantUid, totalPrice) {
-      console.log("Payment data saved successfully:", {
-        merchant_uid: merchantUid,
-        total_price: totalPrice,
-      });
+    savePaymentData(merchantUid, amount) {
+      const paymentData = {
+        merchantUid,
+        amount,
+        timestamp: new Date().toISOString(),
+      };
+      localStorage.setItem("paymentData", JSON.stringify(paymentData));
+      console.log("Payment data saved to local storage:", paymentData);
     },
   },
 };
@@ -258,18 +271,15 @@ export default {
   padding: 10px 0;
   z-index: 100;
 }
-
 .title {
   color: white;
   text-align: center;
   font-weight: bold;
   margin: 0;
 }
-
 .pay-icon {
   font-size: 150px;
 }
-
 .square-modal {
   width: 500px;
   height: 500px;
@@ -278,22 +288,42 @@ export default {
   align-items: center;
   flex-direction: column;
 }
-
 .large-text {
   font-size: 36px;
   text-align: center;
 }
-
 .order-number-text {
-  font-size: 48px; /* 주문번호 글자 크기를 더 크게 설정 */
+  font-size: 48px;
   text-align: center;
 }
-
-.v-card-title,
-.v-card-text {
+.animation-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 1;
+  margin-top: 20px;
+}
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.info-text {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 20px;
+}
+.v-overlay__scrim {
+  background-color: rgba(0, 0, 0, 0.5) !important;
 }
 </style>
